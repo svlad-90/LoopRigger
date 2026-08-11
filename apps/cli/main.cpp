@@ -1,6 +1,9 @@
+#include "livelooping/core/ControlMapping.h"
 #include "livelooping/core/LiveLoopingEngine.h"
 
 #include <iostream>
+#include <map>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -9,6 +12,13 @@ using livelooping::core::ControllerCommand;
 using livelooping::core::ControllerId;
 using livelooping::core::InputTarget;
 using livelooping::core::LiveLoopingEngine;
+using livelooping::core::MidiMapper;
+using livelooping::core::WidgetEvent;
+using livelooping::core::WidgetEventType;
+using livelooping::core::makeMicKaossPadProfile;
+using livelooping::core::makeSynthKaossPadProfile;
+using livelooping::core::makeYaeltexLiveLoopingProfile;
+using livelooping::core::toString;
 
 namespace {
 
@@ -28,6 +38,10 @@ void printHelp()
         << "  yaeltex clear <track 1-4>\n"
         << "  yaeltex resample selected|all|off\n"
         << "  yaeltex reset looper|all\n"
+        << "  layout\n"
+        << "  layout <mic|synth|yaeltex>\n"
+        << "  press <mic|synth|yaeltex> <widget-id>\n"
+        << "  change <mic|synth|yaeltex> <widget-id> <0..1>\n"
         << "  show\n"
         << "  quit\n";
 }
@@ -43,11 +57,41 @@ InputTarget parseInputTarget(const std::string& token)
     throw std::runtime_error("expected mic or synth");
 }
 
+void printLayout(const MidiMapper& mapper)
+{
+    const auto& profile = mapper.profile();
+    std::cout << profile.displayName << " [" << profile.id << "]\n";
+    for (const auto& widget : profile.widgets) {
+        std::cout << "  " << widget.id
+                  << " label=\"" << widget.label << "\""
+                  << " type=" << toString(widget.type)
+                  << " group=" << widget.group
+                  << " pos=" << widget.row << "," << widget.column
+                  << " size=" << widget.width << "x" << widget.height
+                  << "\n";
+    }
+}
+
+void applyMappedCommand(LiveLoopingEngine& engine, const std::optional<ControllerCommand>& command)
+{
+    if (!command.has_value()) {
+        std::cout << "no command emitted\n";
+        return;
+    }
+    engine.handle(command.value());
+    std::cout << engine.renderTextSnapshot() << std::endl;
+}
+
 } // namespace
 
 int main()
 {
     LiveLoopingEngine engine;
+    std::map<std::string, MidiMapper> mappers;
+    mappers.emplace("mic", MidiMapper(makeMicKaossPadProfile()));
+    mappers.emplace("synth", MidiMapper(makeSynthKaossPadProfile()));
+    mappers.emplace("yaeltex", MidiMapper(makeYaeltexLiveLoopingProfile()));
+
     printHelp();
     std::cout << engine.renderTextSnapshot() << std::endl;
 
@@ -63,6 +107,35 @@ int main()
             }
             if (device == "help") {
                 printHelp();
+                continue;
+            }
+            if (device == "layout") {
+                std::string profileName;
+                input >> profileName;
+                if (profileName.empty()) {
+                    for (const auto& mapper : mappers) {
+                        printLayout(mapper.second);
+                    }
+                } else {
+                    printLayout(mappers.at(profileName));
+                }
+                continue;
+            }
+            if (device == "press" || device == "change") {
+                std::string profileName;
+                std::string widgetId;
+                input >> profileName >> widgetId;
+                float value = 1.0F;
+                if (device == "change") {
+                    input >> value;
+                }
+                applyMappedCommand(
+                    engine,
+                    mappers.at(profileName).mapWidget({
+                        widgetId,
+                        device == "change" ? WidgetEventType::Change : WidgetEventType::Press,
+                        value,
+                    }));
                 continue;
             }
             if (device == "show" || device.empty()) {
@@ -149,4 +222,3 @@ int main()
 
     return 0;
 }
-

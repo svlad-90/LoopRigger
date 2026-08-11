@@ -37,6 +37,11 @@ struct ControllerWidget {
     std::string id;
     std::string label;
     WidgetType type = WidgetType::Button;
+    std::string group;
+    int row = 0;
+    int column = 0;
+    int width = 1;
+    int height = 1;
 };
 
 struct WidgetEvent {
@@ -91,6 +96,6 @@ ControllerProfile makeSynthKaossPadProfile();
 ControllerProfile makeYaeltexLiveLoopingProfile();
 
 float normalizeMidiValue(int value);
+std::string toString(WidgetType type);
 
 } // namespace livelooping::core
-

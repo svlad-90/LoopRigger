@@ -133,6 +133,8 @@ void testKaossPadMapping()
 void testYaeltexMapping()
 {
     const MidiMapper mapper(makeYaeltexLiveLoopingProfile());
+    expect(!mapper.profile().widgets.empty(), "Yaeltex profile should expose widgets");
+    expect(mapper.profile().widgets.front().group == "looper_select", "Yaeltex widgets should carry layout groups");
 
     const auto mappedLooper = mapper.mapMidi({MidiMessageType::Note, 0, 61, 127});
     expect(mappedLooper.has_value(), "Yaeltex looper note should map to a command");

@@ -7,14 +7,36 @@ namespace livelooping::core {
 
 namespace {
 
-ControllerWidget button(std::string id, std::string label)
+ControllerWidget widget(
+    std::string id,
+    std::string label,
+    WidgetType type,
+    std::string group,
+    int row,
+    int column,
+    int width = 1,
+    int height = 1)
 {
-    return {std::move(id), std::move(label), WidgetType::Button};
+    ControllerWidget result;
+    result.id = std::move(id);
+    result.label = std::move(label);
+    result.type = type;
+    result.group = std::move(group);
+    result.row = row;
+    result.column = column;
+    result.width = width;
+    result.height = height;
+    return result;
 }
 
-ControllerWidget knob(std::string id, std::string label)
+ControllerWidget button(std::string id, std::string label, std::string group, int row, int column, int width = 1)
 {
-    return {std::move(id), std::move(label), WidgetType::Knob};
+    return widget(std::move(id), std::move(label), WidgetType::Button, std::move(group), row, column, width);
+}
+
+ControllerWidget knob(std::string id, std::string label, std::string group, int row, int column)
+{
+    return widget(std::move(id), std::move(label), WidgetType::Knob, std::move(group), row, column);
 }
 
 ControlBinding widgetBinding(
@@ -127,7 +149,7 @@ ControllerProfile makeKaossPadInputProfile(
     profile.controller = controller;
 
     for (int preset = 0; preset < 8; ++preset) {
-        profile.widgets.push_back(button("preset_" + std::to_string(preset + 1), std::to_string(preset + 1)));
+        profile.widgets.push_back(button("preset_" + std::to_string(preset + 1), std::to_string(preset + 1), "presets", 0, preset));
         profile.bindings.push_back(midiBinding(
             "preset_" + std::to_string(preset + 1),
             MidiMessageType::ControlChange,
@@ -139,7 +161,7 @@ ControllerProfile makeKaossPadInputProfile(
     }
 
     for (int page = 0; page < 4; ++page) {
-        profile.widgets.push_back(button("page_" + std::to_string(page + 1), "Page " + std::to_string(page + 1)));
+        profile.widgets.push_back(button("page_" + std::to_string(page + 1), "Page " + std::to_string(page + 1), "pages", 0, page));
         profile.bindings.push_back(widgetBinding(
             "page_" + std::to_string(page + 1),
             CommandType::SelectInputPresetPage,
@@ -148,7 +170,7 @@ ControllerProfile makeKaossPadInputProfile(
             target));
     }
 
-    profile.widgets.push_back(knob("input_volume", "Input volume"));
+    profile.widgets.push_back(knob("input_volume", "Input volume", "levels", 0, 0));
     profile.bindings.push_back(midiBinding(
         "input_volume",
         MidiMessageType::ControlChange,
@@ -159,7 +181,7 @@ ControllerProfile makeKaossPadInputProfile(
         target,
         true));
 
-    profile.widgets.push_back(knob("fx_level", "FX level"));
+    profile.widgets.push_back(knob("fx_level", "FX level", "levels", 0, 1));
     profile.bindings.push_back(widgetBinding(
         "fx_level",
         CommandType::SetInputFxLevel,
@@ -169,7 +191,7 @@ ControllerProfile makeKaossPadInputProfile(
         true));
 
     for (int parameter = 0; parameter < 8; ++parameter) {
-        profile.widgets.push_back(knob("fx_parameter_" + std::to_string(parameter + 1), "FX " + std::to_string(parameter + 1)));
+        profile.widgets.push_back(knob("fx_parameter_" + std::to_string(parameter + 1), "FX " + std::to_string(parameter + 1), "fx_parameters", 0, parameter));
         profile.bindings.push_back(midiBinding(
             "fx_parameter_" + std::to_string(parameter + 1),
             MidiMessageType::ControlChange,
@@ -203,7 +225,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
     profile.controller = ControllerId::Yaeltex;
 
     for (int looper = 0; looper < 4; ++looper) {
-        profile.widgets.push_back(button("looper_" + std::to_string(looper + 1), "Looper " + std::to_string(looper + 1)));
+        profile.widgets.push_back(button("looper_" + std::to_string(looper + 1), "Looper " + std::to_string(looper + 1), "looper_select", 0, looper));
         profile.bindings.push_back(midiBinding(
             "looper_" + std::to_string(looper + 1),
             MidiMessageType::Note,
@@ -215,7 +237,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
 
     const int lengths[] = {1, 2, 4, 8, 16, 32, 64, 128};
     for (int i = 0; i < 8; ++i) {
-        profile.widgets.push_back(button("sample_length_" + std::to_string(lengths[i]), std::to_string(lengths[i])));
+        profile.widgets.push_back(button("sample_length_" + std::to_string(lengths[i]), std::to_string(lengths[i]), "sample_length", i / 4, i % 4));
         profile.bindings.push_back(midiBinding(
             "sample_length_" + std::to_string(lengths[i]),
             MidiMessageType::Note,
@@ -226,7 +248,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
     }
 
     for (int track = 0; track < 4; ++track) {
-        profile.widgets.push_back(button("record_t" + std::to_string(track + 1), "Record T" + std::to_string(track + 1)));
+        profile.widgets.push_back(button("record_t" + std::to_string(track + 1), "Record T" + std::to_string(track + 1), "track_record", 0, track));
         profile.bindings.push_back(midiBinding(
             "record_t" + std::to_string(track + 1),
             MidiMessageType::Note,
@@ -235,7 +257,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
             CommandType::ToggleTrackRecording,
             track));
 
-        profile.widgets.push_back(button("clear_t" + std::to_string(track + 1), "Clear T" + std::to_string(track + 1)));
+        profile.widgets.push_back(button("clear_t" + std::to_string(track + 1), "Clear T" + std::to_string(track + 1), "track_clear", 0, track));
         profile.bindings.push_back(midiBinding(
             "clear_t" + std::to_string(track + 1),
             MidiMessageType::Note,
@@ -244,7 +266,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
             CommandType::ClearTrack,
             track));
 
-        profile.widgets.push_back(knob("vol_pan_t" + std::to_string(track + 1), "Vol/Pan T" + std::to_string(track + 1)));
+        profile.widgets.push_back(knob("vol_pan_t" + std::to_string(track + 1), "Vol/Pan T" + std::to_string(track + 1), "track_volume_pan", 0, track));
         profile.bindings.push_back(widgetBinding(
             "vol_pan_t" + std::to_string(track + 1),
             CommandType::SetTrackVolume,
@@ -254,7 +276,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
             true));
     }
 
-    profile.widgets.push_back(button("resample_selected", "Resample L"));
+    profile.widgets.push_back(button("resample_selected", "Resample L", "resampling", 0, 0));
     profile.bindings.push_back(midiBinding(
         "resample_selected",
         MidiMessageType::Note,
@@ -262,7 +284,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         90,
         CommandType::StartResampleSelectedLooper));
 
-    profile.widgets.push_back(button("resample_all", "Resample all"));
+    profile.widgets.push_back(button("resample_all", "Resample all", "resampling", 0, 1));
     profile.bindings.push_back(midiBinding(
         "resample_all",
         MidiMessageType::Note,
@@ -270,7 +292,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         91,
         CommandType::StartResampleAllLoopers));
 
-    profile.widgets.push_back(button("reset_all", "Clear"));
+    profile.widgets.push_back(button("reset_all", "Clear", "session", 0, 1));
     profile.bindings.push_back(midiBinding(
         "reset_all",
         MidiMessageType::Note,
@@ -288,5 +310,19 @@ float normalizeMidiValue(int value)
     return static_cast<float>(clamped) / 127.0F;
 }
 
-} // namespace livelooping::core
+std::string toString(WidgetType type)
+{
+    switch (type) {
+    case WidgetType::Button:
+        return "button";
+    case WidgetType::Knob:
+        return "knob";
+    case WidgetType::Fader:
+        return "fader";
+    case WidgetType::Joystick:
+        return "joystick";
+    }
+    return "unknown";
+}
 
+} // namespace livelooping::core

@@ -31,6 +31,19 @@ cmake --build build --target livelooping_sim_cli
 ./build/livelooping_sim_cli
 ```
 
+The CLI simulator accepts direct logical commands and profile-driven pseudo
+device commands:
+
+```text
+layout yaeltex
+press mic preset_3
+press synth page_2
+press yaeltex looper_2
+press yaeltex sample_length_8
+press yaeltex record_t1
+change yaeltex vol_pan_t3 0.42
+```
+
 Run the core smoke tests:
 
 ```sh
