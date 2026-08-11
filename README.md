@@ -12,6 +12,9 @@ The project is split into:
 - `livelooping_product`: optional JUCE app shell with separate Product and
   Pseudo Devices windows.
 
+See `docs/control-surfaces.md` for the controller abstraction model and the
+initial Korg Kaoss Pad / Yaeltex control groups.
+
 The intended production stack is CMake + C++17 + JUCE. JUCE is selected because
 it supports standalone audio apps, audio/MIDI device handling, plugin hosting,
 and GUI on Windows, macOS, and Linux.
