@@ -11,6 +11,7 @@ option(LIVELOOPING_BUILD_JUCE_APP "Build the JUCE product shell" OFF)
 set(LIVELOOPING_JUCE_DIR "" CACHE PATH "Path to a local JUCE checkout")
 
 add_library(livelooping_core
+    src/ControlMapping.cpp
     src/LiveLoopingEngine.cpp
 )
 

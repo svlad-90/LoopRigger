@@ -1,3 +1,4 @@
+#include "livelooping/core/ControlMapping.h"
 #include "livelooping/core/LiveLoopingEngine.h"
 
 #include <cstdlib>
@@ -9,8 +10,17 @@ using livelooping::core::ControllerCommand;
 using livelooping::core::ControllerId;
 using livelooping::core::InputTarget;
 using livelooping::core::LiveLoopingEngine;
+using livelooping::core::MidiEvent;
+using livelooping::core::MidiMapper;
+using livelooping::core::MidiMessageType;
 using livelooping::core::ResampleMode;
 using livelooping::core::TrackState;
+using livelooping::core::WidgetEvent;
+using livelooping::core::WidgetEventType;
+using livelooping::core::makeMicKaossPadProfile;
+using livelooping::core::makeSynthKaossPadProfile;
+using livelooping::core::makeYaeltexLiveLoopingProfile;
+using livelooping::core::normalizeMidiValue;
 
 namespace {
 
@@ -93,12 +103,71 @@ void testYaeltexLooperCommands()
     expect(state.loopers[1].tracks[1].state == TrackState::Empty, "reset looper clears L2 T2");
 }
 
+void testKaossPadMapping()
+{
+    const MidiMapper micMapper(makeMicKaossPadProfile());
+    const auto mappedPreset = micMapper.mapMidi({MidiMessageType::ControlChange, 0, 51, 127});
+    expect(mappedPreset.has_value(), "mic preset MIDI event should map to a command");
+    expect(mappedPreset->controller == ControllerId::MicKaossPad, "mic preset command should carry mic controller id");
+    expect(mappedPreset->inputTarget == InputTarget::Mic, "mic preset command should target mic input");
+    expect(mappedPreset->type == CommandType::SelectInputPreset, "mic preset MIDI should select input preset");
+    expect(mappedPreset->index == 2, "CC 51 should map to preset 3");
+
+    const auto ignoredRelease = micMapper.mapMidi({MidiMessageType::ControlChange, 0, 51, 0});
+    expect(!ignoredRelease.has_value(), "zero-valued button release should not emit a command");
+
+    const auto mappedVolume = micMapper.mapMidi({MidiMessageType::ControlChange, 0, 93, 64});
+    expect(mappedVolume.has_value(), "mic volume CC should map to a command");
+    expect(mappedVolume->type == CommandType::SetInputVolume, "mic volume CC should set input volume");
+    expect(mappedVolume->value > 0.50F && mappedVolume->value < 0.51F, "MIDI 64 should normalize close to 0.5");
+
+    const MidiMapper synthMapper(makeSynthKaossPadProfile());
+    const auto mappedWidget = synthMapper.mapWidget({"page_2", WidgetEventType::Press, 1.0F});
+    expect(mappedWidget.has_value(), "synth page widget should map to a command");
+    expect(mappedWidget->controller == ControllerId::SynthKaossPad, "synth widget command should carry synth controller id");
+    expect(mappedWidget->inputTarget == InputTarget::Synth, "synth page widget should target synth input");
+    expect(mappedWidget->type == CommandType::SelectInputPresetPage, "synth page widget should select page");
+    expect(mappedWidget->index == 1, "page_2 should map to zero-based page 2");
+}
+
+void testYaeltexMapping()
+{
+    const MidiMapper mapper(makeYaeltexLiveLoopingProfile());
+
+    const auto mappedLooper = mapper.mapMidi({MidiMessageType::Note, 0, 61, 127});
+    expect(mappedLooper.has_value(), "Yaeltex looper note should map to a command");
+    expect(mappedLooper->controller == ControllerId::Yaeltex, "Yaeltex command should carry Yaeltex controller id");
+    expect(mappedLooper->type == CommandType::SelectLooper, "Yaeltex looper note should select looper");
+    expect(mappedLooper->index == 1, "note 61 should map to looper 2");
+
+    const auto mappedLength = mapper.mapMidi({MidiMessageType::Note, 0, 75, 127});
+    expect(mappedLength.has_value(), "Yaeltex sample length note should map to a command");
+    expect(mappedLength->type == CommandType::SelectSampleLength, "Yaeltex length note should select sample length");
+    expect(mappedLength->index == 8, "note 75 should map to 8 beats");
+
+    const auto mappedRecord = mapper.mapMidi({MidiMessageType::Note, 0, 80, 127});
+    expect(mappedRecord.has_value(), "Yaeltex record note should map to a command");
+    expect(mappedRecord->type == CommandType::ToggleTrackRecording, "Yaeltex record note should toggle recording");
+    expect(mappedRecord->index == 0, "note 80 should map to track 1");
+
+    const auto mappedPseudoKnob = mapper.mapWidget({"vol_pan_t3", WidgetEventType::Change, 0.25F});
+    expect(mappedPseudoKnob.has_value(), "Yaeltex pseudo knob should map to a command");
+    expect(mappedPseudoKnob->type == CommandType::SetTrackVolume, "Vol/Pan T3 should set track volume initially");
+    expect(mappedPseudoKnob->index == 2, "Vol/Pan T3 should target zero-based track 3");
+    expect(mappedPseudoKnob->value == 0.25F, "pseudo knob value should pass through");
+
+    expect(normalizeMidiValue(-10) == 0.0F, "negative MIDI values should clamp to zero");
+    expect(normalizeMidiValue(200) == 1.0F, "large MIDI values should clamp to one");
+}
+
 } // namespace
 
 int main()
 {
     testInputControllerCommands();
     testYaeltexLooperCommands();
+    testKaossPadMapping();
+    testYaeltexMapping();
 
     if (failures != 0) {
         std::cerr << failures << " smoke test assertion(s) failed\n";
@@ -108,4 +177,3 @@ int main()
     std::cout << "core smoke tests passed\n";
     return EXIT_SUCCESS;
 }
-

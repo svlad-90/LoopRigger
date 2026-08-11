@@ -7,6 +7,8 @@ The project is split into:
 
 - `livelooping_core`: controller commands and performance state, with no GUI or
   audio dependency.
+- built-in controller profile factories for the mic Kaoss Pad, synth Kaoss Pad,
+  and Yaeltex LiveLooping surface.
 - `livelooping_sim_cli`: local command-line simulator that can run in the Linux
   VM without real MIDI hardware.
 - `livelooping_product`: optional JUCE app shell with separate Product and
@@ -52,3 +54,8 @@ the control model:
 - two Kaoss Pad roles for mic and synth input-controller presets;
 - Yaeltex role for loop recording, routing, resampling, and sound manipulation;
 - pseudo-device input path that uses the same command API as real MIDI.
+- data-driven controller mapping from MIDI or pseudo-GUI widget events to
+  logical commands.
+
+The controller profiles are currently compiled into the core. A file-backed
+profile format will be added after the action and widget model stabilizes.
