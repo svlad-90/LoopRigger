@@ -35,6 +35,7 @@ struct SurfaceElement {
     std::string widgetId;
     std::string label;
     std::string group;
+    std::string variant;
     SurfaceBounds bounds;
 };
 

@@ -248,6 +248,7 @@ SurfaceElement parseSurfaceElement(const json& value)
     element.widgetId = value.value("widgetId", "");
     element.label = value.value("label", "");
     element.group = value.value("group", "");
+    element.variant = value.value("variant", "");
     element.bounds = parseSurfaceBounds(value.at("bounds"));
     return element;
 }

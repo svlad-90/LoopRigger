@@ -211,6 +211,18 @@ void expectLayoutWidgetsBelongToProfile(
     }
 }
 
+void expectLayoutElementsStayInsideCanvas(const livelooping::profile::ControlSurfaceLayout& layout)
+{
+    for (const auto& element : layout.elements) {
+        expect(element.bounds.width >= 0.0F, "layout element should have non-negative width: " + element.id);
+        expect(element.bounds.height >= 0.0F, "layout element should have non-negative height: " + element.id);
+        expect(element.bounds.x >= 0.0F, "layout element should stay inside canvas horizontally: " + element.id);
+        expect(element.bounds.y >= 0.0F, "layout element should stay inside canvas vertically: " + element.id);
+        expect(element.bounds.x + element.bounds.width <= static_cast<float>(layout.baseWidth), "layout element should not exceed canvas width: " + element.id);
+        expect(element.bounds.y + element.bounds.height <= static_cast<float>(layout.baseHeight), "layout element should not exceed canvas height: " + element.id);
+    }
+}
+
 void testJsonProfileLoading()
 {
     const MidiMapper micMapper(loadControllerProfileFromFile(profilePath("kaoss_mic.json")));
@@ -248,9 +260,11 @@ void testJsonSurfaceLayoutLoading()
     expect(kaossLayout.id == "kaoss_pad_kp3", "Kaoss layout should load id");
     expect(kaossLayout.baseWidth == 1200, "Kaoss layout should expose base width");
     expect(kaossLayout.baseHeight == 820, "Kaoss layout should expose base height");
-    expect(kaossLayout.elements.size() >= 20, "Kaoss layout should include hardware and widget elements");
+    expect(kaossLayout.elements.size() >= 35, "Kaoss layout should include hardware and widget elements");
+    expect(!kaossLayout.elements.front().variant.empty(), "layout elements should load render variants");
 
     const auto micProfile = loadControllerProfileFromFile(profilePath("kaoss_mic.json"));
+    expectLayoutElementsStayInsideCanvas(kaossLayout);
     expectLayoutWidgetsBelongToProfile(kaossLayout, micProfile);
 
     const auto yaeltexLayout = loadControlSurfaceLayoutFromFile(layoutPath("yaeltex_livelooping.json"));
@@ -258,8 +272,10 @@ void testJsonSurfaceLayoutLoading()
     expect(yaeltexLayout.profileId == "yaeltex.livelooping", "Yaeltex layout should target Yaeltex profile");
     expect(yaeltexLayout.baseWidth == 1520, "Yaeltex layout should expose base width");
     expect(yaeltexLayout.baseHeight == 900, "Yaeltex layout should expose base height");
+    expect(yaeltexLayout.elements.size() >= 80, "Yaeltex layout should include dense faceplate elements");
 
     const auto yaeltexProfile = loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json"));
+    expectLayoutElementsStayInsideCanvas(yaeltexLayout);
     expectLayoutWidgetsBelongToProfile(yaeltexLayout, yaeltexProfile);
 }
 #endif

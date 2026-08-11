@@ -228,52 +228,157 @@ private:
     void paintLayoutDecoration(juce::Graphics& graphics, const SurfaceElement& element)
     {
         const auto bounds = scaledBounds(element.bounds);
+        const auto variant = juce::String(element.variant);
         const auto darkPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colours::black : juce::Colour(0xff1d2023);
+        const auto softPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff101010) : juce::Colour(0xff252b30);
         const auto border = kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xffd00010) : juce::Colour(0xff454b4f);
 
         switch (element.shape) {
         case SurfaceElementShape::RoundRect:
-            graphics.setColour(element.id == "wood_frame" ? juce::Colour(0xffc6904d) : darkPanel);
-            graphics.fillRoundedRectangle(bounds.toFloat(), 14.0F);
-            graphics.setColour(element.id == "wood_frame" ? juce::Colour(0xff7a4b21) : border);
-            graphics.drawRoundedRectangle(bounds.toFloat(), 14.0F, 2.0F);
+            if (variant == "wood_frame") {
+                graphics.setColour(juce::Colour(0xffc6904d));
+                graphics.fillRoundedRectangle(bounds.toFloat(), 18.0F);
+                graphics.setColour(juce::Colour(0xff7a4b21));
+                graphics.drawRoundedRectangle(bounds.toFloat(), 18.0F, 4.0F);
+            } else if (variant == "hardware_button") {
+                drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xffe9edee), juce::Colours::black, 5.0F);
+            } else if (variant == "kaoss_button") {
+                drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xff8090a0), juce::Colours::black, 6.0F);
+            } else if (variant == "kaoss_light_button") {
+                drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xffbfc6db), juce::Colours::black, 6.0F);
+            } else if (variant == "kaoss_red_button") {
+                drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xffd35a70), juce::Colours::black, 30.0F);
+            } else if (variant.startsWith("arcade_")) {
+                drawYaeltexArcadeButton(graphics, bounds.getX(), bounds.getY(), arcadeColour(variant), element.label);
+            } else {
+                graphics.setColour(variant == "top_deck" ? softPanel : darkPanel);
+                graphics.fillRoundedRectangle(bounds.toFloat(), variant == "top_deck" ? 6.0F : 14.0F);
+                graphics.setColour(border);
+                graphics.drawRoundedRectangle(bounds.toFloat(), variant == "top_deck" ? 6.0F : 14.0F, 2.0F);
+            }
             break;
         case SurfaceElementShape::Rect:
-            graphics.setColour(element.id == "xy_pad" ? juce::Colour(0xff090b0e) : darkPanel);
-            graphics.fillRect(bounds);
-            graphics.setColour(element.id == "xy_pad" ? juce::Colour(0xffd01824) : border);
-            graphics.drawRect(bounds, 2);
+            if (variant == "xy_pad") {
+                drawKaossPad(graphics, bounds);
+            } else {
+                graphics.setColour(variant == "inner_panel" ? juce::Colour(0xff131619) : darkPanel);
+                graphics.fillRect(bounds);
+                graphics.setColour(variant == "inner_panel" ? juce::Colour(0xff131619) : border);
+                graphics.drawRect(bounds, variant == "faceplate" ? 2 : 1);
+            }
             break;
         case SurfaceElementShape::Text:
             graphics.setColour(juce::Colours::white);
-            graphics.setFont(juce::Font(juce::FontOptions(28.0F).withStyle("Bold")));
+            graphics.setFont(layoutFont(variant));
             graphics.drawText(element.label, bounds, juce::Justification::centredLeft);
             break;
         case SurfaceElementShape::Circle:
-            graphics.setColour(darkPanel);
-            graphics.fillEllipse(bounds.toFloat());
-            graphics.setColour(border);
-            graphics.drawEllipse(bounds.toFloat(), 2.0F);
+            if (variant == "screw") {
+                drawScrew(graphics, bounds.getCentreX(), bounds.getCentreY());
+            } else if (variant == "led_red") {
+                graphics.setColour(juce::Colour(0xffff3648));
+                graphics.fillEllipse(bounds.toFloat());
+            } else {
+                graphics.setColour(darkPanel);
+                graphics.fillEllipse(bounds.toFloat());
+                graphics.setColour(border);
+                graphics.drawEllipse(bounds.toFloat(), 2.0F);
+            }
             break;
         case SurfaceElementShape::Line:
             graphics.setColour(juce::Colour(0xffeeeeee));
-            graphics.drawLine(bounds.getX(), bounds.getY(), bounds.getRight(), bounds.getBottom(), 2.0F);
+            graphics.drawLine(
+                static_cast<float>(bounds.getX()),
+                static_cast<float>(bounds.getY()),
+                static_cast<float>(bounds.getRight()),
+                static_cast<float>(bounds.getBottom()),
+                2.0F);
             break;
         case SurfaceElementShape::Knob:
-        case SurfaceElementShape::Fader:
-        case SurfaceElementShape::Joystick:
-            graphics.setColour(border);
-            graphics.drawRect(bounds, 1);
+            if (variant == "metal_knob") {
+                drawKaossMetalKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), bounds.getWidth() / 2, element.label);
+            } else {
+                drawKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2, element.label);
+            }
             break;
-        }
-
-        if (element.id == "display") {
-            graphics.setColour(juce::Colour(0xffff3155));
-            graphics.setFont(juce::Font(juce::FontOptions(30.0F).withStyle("Bold")));
-            graphics.drawText(element.label, bounds, juce::Justification::centred);
+        case SurfaceElementShape::Fader:
+            drawFader(graphics, bounds);
+            break;
+        case SurfaceElementShape::Joystick:
+            drawJoystick(graphics, bounds, element.label, variant == "joystick_value_2" ? "Value 2" : "Value 1");
+            break;
         }
     }
 #endif
+
+    juce::Font layoutFont(const juce::String& variant) const
+    {
+        if (variant == "brand") {
+            return juce::Font(juce::FontOptions(34.0F).withStyle("Bold"));
+        }
+        if (variant == "brand_sub") {
+            return juce::Font(juce::FontOptions(18.0F).withStyle("Bold"));
+        }
+        if (variant == "display_text") {
+            return juce::Font(juce::FontOptions(30.0F).withStyle("Bold"));
+        }
+        if (variant == "panel_label") {
+            return juce::Font(juce::FontOptions(12.0F).withStyle("Bold"));
+        }
+        return juce::Font(juce::FontOptions(24.0F).withStyle("Bold"));
+    }
+
+    juce::Colour arcadeColour(const juce::String& variant) const
+    {
+        if (variant == "arcade_red") {
+            return juce::Colour(0xffe32626);
+        }
+        if (variant == "arcade_blue") {
+            return juce::Colour(0xff20aeea);
+        }
+        if (variant == "arcade_yellow") {
+            return juce::Colour(0xffffd21f);
+        }
+        return juce::Colour(0xff24d947);
+    }
+
+    void drawFader(juce::Graphics& graphics, juce::Rectangle<int> area)
+    {
+        const auto rail = area.withSizeKeepingCentre(18, area.getHeight());
+        graphics.setColour(juce::Colour(0xff050505));
+        graphics.fillRoundedRectangle(rail.toFloat(), 5.0F);
+        graphics.setColour(juce::Colour(0xffd8d0c6));
+        graphics.fillRoundedRectangle(area.withHeight(18).translated(0, area.getHeight() / 2 - 9).toFloat(), 3.0F);
+    }
+
+    void drawKaossPad(juce::Graphics& graphics, juce::Rectangle<int> pad)
+    {
+        graphics.setColour(juce::Colour(0xff2e3337));
+        graphics.fillRoundedRectangle(pad.expanded(42, 38).toFloat(), 8.0F);
+        graphics.setColour(juce::Colour(0xff090b0e));
+        graphics.fillRoundedRectangle(pad.toFloat(), 8.0F);
+        graphics.setColour(juce::Colour(0xffd01824));
+        graphics.drawRoundedRectangle(pad.toFloat(), 8.0F, 4.0F);
+        graphics.setColour(juce::Colour(0x55d01824));
+        for (int x = 1; x < 8; ++x) {
+            const auto gx = pad.getX() + x * pad.getWidth() / 8;
+            graphics.drawVerticalLine(gx, static_cast<float>(pad.getY()), static_cast<float>(pad.getBottom()));
+        }
+        for (int y = 1; y < 6; ++y) {
+            const auto gy = pad.getY() + y * pad.getHeight() / 6;
+            graphics.drawHorizontalLine(gy, static_cast<float>(pad.getX()), static_cast<float>(pad.getRight()));
+        }
+        graphics.setColour(juce::Colour(0x77ff2638));
+        for (int index = 0; index < 16; ++index) {
+            const auto cellX = index % 8;
+            const auto cellY = (index * 5) % 6;
+            graphics.fillRect(
+                pad.getX() + cellX * pad.getWidth() / 8 + 4,
+                pad.getY() + cellY * pad.getHeight() / 6 + 4,
+                pad.getWidth() / 8 - 8,
+                pad.getHeight() / 6 - 8);
+        }
+    }
 
     void drawScrew(juce::Graphics& graphics, int x, int y)
     {
