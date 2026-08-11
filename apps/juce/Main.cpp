@@ -191,11 +191,16 @@ private:
         const auto area = getLocalBounds();
         const auto scaleX = layout_->baseWidth > 0 ? static_cast<float>(area.getWidth()) / static_cast<float>(layout_->baseWidth) : 1.0F;
         const auto scaleY = layout_->baseHeight > 0 ? static_cast<float>(area.getHeight()) / static_cast<float>(layout_->baseHeight) : 1.0F;
+        const auto scale = juce::jmin(scaleX, scaleY);
+        const auto canvasWidth = static_cast<float>(layout_->baseWidth) * scale;
+        const auto canvasHeight = static_cast<float>(layout_->baseHeight) * scale;
+        const auto offsetX = static_cast<float>(area.getX()) + (static_cast<float>(area.getWidth()) - canvasWidth) * 0.5F;
+        const auto offsetY = static_cast<float>(area.getY()) + (static_cast<float>(area.getHeight()) - canvasHeight) * 0.5F;
         return {
-            area.getX() + static_cast<int>(std::round(bounds.x * scaleX)),
-            area.getY() + static_cast<int>(std::round(bounds.y * scaleY)),
-            static_cast<int>(std::round(bounds.width * scaleX)),
-            static_cast<int>(std::round(bounds.height * scaleY)),
+            static_cast<int>(std::round(offsetX + bounds.x * scale)),
+            static_cast<int>(std::round(offsetY + bounds.y * scale)),
+            static_cast<int>(std::round(bounds.width * scale)),
+            static_cast<int>(std::round(bounds.height * scale)),
         };
     }
 
@@ -251,7 +256,7 @@ private:
             } else if (variant.startsWith("arcade_")) {
                 drawYaeltexArcadeButton(graphics, bounds.getX(), bounds.getY(), arcadeColour(variant), element.label);
             } else {
-                graphics.setColour(variant == "top_deck" ? softPanel : darkPanel);
+                graphics.setColour(variant == "display" ? juce::Colours::black : (variant == "top_deck" ? softPanel : darkPanel));
                 graphics.fillRoundedRectangle(bounds.toFloat(), variant == "top_deck" ? 6.0F : 14.0F);
                 graphics.setColour(border);
                 graphics.drawRoundedRectangle(bounds.toFloat(), variant == "top_deck" ? 6.0F : 14.0F, 2.0F);
