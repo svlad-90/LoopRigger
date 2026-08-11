@@ -131,7 +131,7 @@ private:
         slider->setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
         slider->setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(0xff8a8f95));
         slider->setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(0xff151a1f));
-        if (widget.type == WidgetType::Fader) {
+        if (widget.type == WidgetType::Fader || (kind_ == SurfaceKind::Kaoss && widget.group == "levels")) {
             slider->setSliderStyle(juce::Slider::LinearVertical);
         } else {
             slider->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -276,8 +276,8 @@ private:
         graphics.setColour(juce::Colour(0xff252b30));
         graphics.fillRoundedRectangle(topDeck.toFloat(), 6.0F);
 
-        drawKaossMetalKnob(graphics, body.getX() + 88, body.getY() + 116, 34, "INPUT\nVOLUME");
-        drawKaossMetalKnob(graphics, body.getX() + 88, body.getY() + 254, 34, "FX DEPTH");
+        drawPanelLabel(graphics, "INPUT VOLUME", {body.getX() + 40, body.getY() + 52, 110, 22}, 11.0F);
+        drawPanelLabel(graphics, "FX DEPTH", {body.getX() + 40, body.getY() + 186, 110, 22}, 11.0F);
         drawKaossMetalKnob(graphics, body.getRight() - 88, body.getY() + 116, 34, "PROGRAM\nBPM");
 
         graphics.setColour(juce::Colour(0xff070707));
@@ -341,11 +341,7 @@ private:
         drawHardwareButton(graphics, {body.getRight() - 118, body.getY() + 514, 78, 44}, "MUTE", juce::Colour(0xff8090a0), juce::Colours::black, 6.0F);
         drawHardwareButton(graphics, {body.getRight() - 128, body.getY() + 618, 92, 50}, "SAMPLING", juce::Colour(0xff6d7f90), juce::Colours::black, 6.0F);
 
-        drawPanelLabel(graphics, "SAMPLE BANK", {body.getX() + 335, body.getBottom() - 138, 420, 18}, 12.0F);
-        drawHardwareButton(graphics, {body.getX() + 320, body.getBottom() - 94, 92, 52}, "A", juce::Colour(0xff3ccc78), juce::Colours::black, 6.0F);
-        drawHardwareButton(graphics, {body.getX() + 470, body.getBottom() - 94, 92, 52}, "B", juce::Colour(0xffe38298), juce::Colours::black, 6.0F);
-        drawHardwareButton(graphics, {body.getX() + 620, body.getBottom() - 94, 92, 52}, "C", juce::Colour(0xffe38298), juce::Colours::black, 6.0F);
-        drawHardwareButton(graphics, {body.getX() + 770, body.getBottom() - 94, 92, 52}, "D", juce::Colour(0xffffd27d), juce::Colours::black, 6.0F);
+        drawPanelLabel(graphics, "SAMPLE BANK", {body.getX() + 360, body.getBottom() - 154, 420, 18}, 12.0F);
     }
 
     void paintYaeltex(juce::Graphics& graphics)
@@ -394,7 +390,7 @@ private:
         for (int i = 0; i < 4; ++i) {
             drawKnob(graphics, body.getX() + 650 + i * 120, body.getY() + 262, 24, i == 0 ? "Dry/Wet" : (i == 1 ? "LFO1 Speed" : (i == 2 ? "LFO2 Speed" : "Drop FX")));
             drawKnob(graphics, body.getX() + 875 + i * 120, body.getY() + 110, 24, i == 0 ? "Vol/Drop" : (i == 1 ? "Reverb" : (i == 2 ? "Transpose" : "Phaser")));
-            drawKnob(graphics, body.getX() + 100 + i * 145, body.getY() + 620, 28, "Vol/Pan T" + juce::String(i + 1));
+            drawKnob(graphics, body.getX() + 105 + i * 145, body.getY() + 705, 28, "Vol/Pan T" + juce::String(i + 1));
             drawKnob(graphics, body.getX() + 665 + i * 116, body.getY() + 744, 23, "Sidechain");
         }
 
@@ -461,13 +457,13 @@ private:
             return {body.getX() + 58, body.getY() + 604, 76, 48};
         }
         if (groupName == "track_volume_pan") {
-            return {body.getX() + 82, body.getY() + 694, 78, 78};
+            return {body.getX() + 66, body.getY() + 666, 78, 78};
         }
         if (groupName == "resampling") {
-            return {body.getX() + 424, body.getY() + 688, 104, 54};
+            return {body.getX() + 360, body.getY() + 794, 104, 54};
         }
         if (groupName == "session") {
-            return {body.getX() + 650, body.getY() + 54, 76, 54};
+            return {body.getX() + 404, body.getY() + 54, 76, 54};
         }
         return {body.getX() + 40, body.getY() + 650, 90, 56};
     }
@@ -476,16 +472,16 @@ private:
     {
         const auto body = surfaceBodyBounds();
         if (groupName == "presets") {
-            return {body.getX() + 275, body.getY() + 225, 68, 44};
+            return {body.getX() + 300, body.getY() + 225, 68, 44};
         }
         if (groupName == "pages") {
-            return {body.getX() + 300, body.getBottom() - 94, 92, 52};
+            return {body.getX() + 320, body.getBottom() - 94, 92, 52};
         }
         if (groupName == "levels") {
-            return {body.getX() + 48, body.getY() + 78, 80, 90};
+            return {body.getX() + 62, body.getY() + 76, 44, 110};
         }
         if (groupName == "fx_parameters") {
-            return {body.getX() + 270, body.getY() + 600, 78, 82};
+            return {body.getX() + 382, body.getY() + 600, 78, 82};
         }
         return {body.getX() + 40, body.getY() + 620, 92, 58};
     }
@@ -495,10 +491,10 @@ private:
         if (kind_ == SurfaceKind::Kaoss) {
             const auto body = surfaceBodyBounds();
             if (control.id == "input_volume") {
-                return {body.getX() + 48, body.getY() + 76, 80, 100};
+                return {body.getX() + 72, body.getY() + 78, 24, 112};
             }
             if (control.id == "fx_level") {
-                return {body.getX() + 48, body.getY() + 214, 80, 100};
+                return {body.getX() + 72, body.getY() + 214, 24, 112};
             }
             if (control.group == "pages") {
                 return gridCell(kaossGroupOrigin(control.group), 0, control.column, 58, 0, control.width, control.height);
@@ -516,7 +512,7 @@ private:
             return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 12, 12, control.width, control.height);
         }
         if (control.group == "track_volume_pan") {
-            return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 66, 10, control.width, control.height);
+            return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 67, 10, control.width, control.height);
         }
         if (control.group == "resampling") {
             return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 18, 10, control.width, control.height);
