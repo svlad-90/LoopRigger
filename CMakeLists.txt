@@ -77,6 +77,7 @@ if(BUILD_TESTING)
     target_compile_definitions(livelooping_core_smoke_tests
         PRIVATE
             LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/profiles"
+            LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/layouts"
     )
 
     if(LIVELOOPING_BUILD_PROFILE_IO)

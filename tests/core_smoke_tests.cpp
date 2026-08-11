@@ -6,6 +6,7 @@
 #endif
 
 #include <cstdlib>
+#include <set>
 #include <iostream>
 #include <string>
 
@@ -27,6 +28,7 @@ using livelooping::core::makeYaeltexLiveLoopingProfile;
 using livelooping::core::normalizeMidiValue;
 #if LIVELOOPING_HAS_PROFILE_IO
 using livelooping::profile::loadControllerProfileFromFile;
+using livelooping::profile::loadControlSurfaceLayoutFromFile;
 #endif
 
 namespace {
@@ -175,6 +177,40 @@ std::string profilePath(const std::string& fileName)
     return std::string(LIVELOOPING_PROFILE_DIR) + "/" + fileName;
 }
 
+std::string layoutPath(const std::string& fileName)
+{
+    return std::string(LIVELOOPING_LAYOUT_DIR) + "/" + fileName;
+}
+
+std::set<std::string> widgetIds(const livelooping::core::ControllerProfile& profile)
+{
+    std::set<std::string> ids;
+    for (const auto& widget : profile.widgets) {
+        ids.insert(widget.id);
+    }
+    return ids;
+}
+
+void expectLayoutWidgetsBelongToProfile(
+    const livelooping::profile::ControlSurfaceLayout& layout,
+    const livelooping::core::ControllerProfile& profile)
+{
+    const auto ids = widgetIds(profile);
+    for (const auto& element : layout.elements) {
+        if (element.role != livelooping::profile::SurfaceElementRole::Widget) {
+            continue;
+        }
+        expect(!element.widgetId.empty(), "layout widget elements should name a profile widget");
+        expect(ids.count(element.widgetId) == 1, "layout widget should exist in controller profile: " + element.widgetId);
+        expect(element.bounds.width > 0.0F, "layout widget should have positive width: " + element.id);
+        expect(element.bounds.height > 0.0F, "layout widget should have positive height: " + element.id);
+        expect(element.bounds.x >= 0.0F, "layout widget should stay inside canvas horizontally: " + element.id);
+        expect(element.bounds.y >= 0.0F, "layout widget should stay inside canvas vertically: " + element.id);
+        expect(element.bounds.x + element.bounds.width <= static_cast<float>(layout.baseWidth), "layout widget should not exceed canvas width: " + element.id);
+        expect(element.bounds.y + element.bounds.height <= static_cast<float>(layout.baseHeight), "layout widget should not exceed canvas height: " + element.id);
+    }
+}
+
 void testJsonProfileLoading()
 {
     const MidiMapper micMapper(loadControllerProfileFromFile(profilePath("kaoss_mic.json")));
@@ -205,6 +241,27 @@ void testJsonProfileLoading()
     expect(mappedKnob->index == 2, "JSON Vol/Pan T3 should target zero-based track 3");
     expect(mappedKnob->value == 0.42F, "JSON pseudo knob value should pass through");
 }
+
+void testJsonSurfaceLayoutLoading()
+{
+    const auto kaossLayout = loadControlSurfaceLayoutFromFile(layoutPath("kaoss_pad.json"));
+    expect(kaossLayout.id == "kaoss_pad_kp3", "Kaoss layout should load id");
+    expect(kaossLayout.baseWidth == 1200, "Kaoss layout should expose base width");
+    expect(kaossLayout.baseHeight == 820, "Kaoss layout should expose base height");
+    expect(kaossLayout.elements.size() >= 20, "Kaoss layout should include hardware and widget elements");
+
+    const auto micProfile = loadControllerProfileFromFile(profilePath("kaoss_mic.json"));
+    expectLayoutWidgetsBelongToProfile(kaossLayout, micProfile);
+
+    const auto yaeltexLayout = loadControlSurfaceLayoutFromFile(layoutPath("yaeltex_livelooping.json"));
+    expect(yaeltexLayout.id == "yaeltex_livelooping", "Yaeltex layout should load id");
+    expect(yaeltexLayout.profileId == "yaeltex.livelooping", "Yaeltex layout should target Yaeltex profile");
+    expect(yaeltexLayout.baseWidth == 1520, "Yaeltex layout should expose base width");
+    expect(yaeltexLayout.baseHeight == 900, "Yaeltex layout should expose base height");
+
+    const auto yaeltexProfile = loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json"));
+    expectLayoutWidgetsBelongToProfile(yaeltexLayout, yaeltexProfile);
+}
 #endif
 
 } // namespace
@@ -217,6 +274,7 @@ int main()
     testYaeltexMapping();
 #if LIVELOOPING_HAS_PROFILE_IO
     testJsonProfileLoading();
+    testJsonSurfaceLayoutLoading();
 #endif
 
     if (failures != 0) {

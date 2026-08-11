@@ -55,6 +55,46 @@ core::MidiMessageType parseMidiMessageType(const std::string& value)
     throw std::runtime_error("unknown MIDI message type: " + value);
 }
 
+SurfaceElementRole parseSurfaceElementRole(const std::string& value)
+{
+    if (value == "decoration") {
+        return SurfaceElementRole::Decoration;
+    }
+    if (value == "widget") {
+        return SurfaceElementRole::Widget;
+    }
+    throw std::runtime_error("unknown surface element role: " + value);
+}
+
+SurfaceElementShape parseSurfaceElementShape(const std::string& value)
+{
+    if (value == "rect") {
+        return SurfaceElementShape::Rect;
+    }
+    if (value == "round_rect") {
+        return SurfaceElementShape::RoundRect;
+    }
+    if (value == "circle") {
+        return SurfaceElementShape::Circle;
+    }
+    if (value == "text") {
+        return SurfaceElementShape::Text;
+    }
+    if (value == "line") {
+        return SurfaceElementShape::Line;
+    }
+    if (value == "knob") {
+        return SurfaceElementShape::Knob;
+    }
+    if (value == "fader") {
+        return SurfaceElementShape::Fader;
+    }
+    if (value == "joystick") {
+        return SurfaceElementShape::Joystick;
+    }
+    throw std::runtime_error("unknown surface element shape: " + value);
+}
+
 core::ControllerId parseControllerId(const std::string& value)
 {
     if (value == "pseudo_gui") {
@@ -189,6 +229,29 @@ core::ControlBinding parseBinding(const json& value, core::ControllerId controll
     return binding;
 }
 
+SurfaceBounds parseSurfaceBounds(const json& value)
+{
+    SurfaceBounds bounds;
+    bounds.x = value.at("x").get<float>();
+    bounds.y = value.at("y").get<float>();
+    bounds.width = value.at("width").get<float>();
+    bounds.height = value.at("height").get<float>();
+    return bounds;
+}
+
+SurfaceElement parseSurfaceElement(const json& value)
+{
+    SurfaceElement element;
+    element.id = value.at("id").get<std::string>();
+    element.role = parseSurfaceElementRole(value.value("role", "decoration"));
+    element.shape = parseSurfaceElementShape(value.at("shape").get<std::string>());
+    element.widgetId = value.value("widgetId", "");
+    element.label = value.value("label", "");
+    element.group = value.value("group", "");
+    element.bounds = parseSurfaceBounds(value.at("bounds"));
+    return element;
+}
+
 } // namespace
 
 core::ControllerProfile loadControllerProfileFromJson(const std::string& jsonText)
@@ -218,6 +281,34 @@ core::ControllerProfile loadControllerProfileFromFile(const std::string& path)
     }
 
     return loadControllerProfileFromJson(std::string(
+        std::istreambuf_iterator<char>(input),
+        std::istreambuf_iterator<char>()));
+}
+
+ControlSurfaceLayout loadControlSurfaceLayoutFromJson(const std::string& jsonText)
+{
+    const auto document = json::parse(jsonText);
+    ControlSurfaceLayout layout;
+    layout.id = document.at("id").get<std::string>();
+    layout.profileId = document.at("profileId").get<std::string>();
+    layout.baseWidth = document.at("baseWidth").get<int>();
+    layout.baseHeight = document.at("baseHeight").get<int>();
+
+    for (const auto& element : document.at("elements")) {
+        layout.elements.push_back(parseSurfaceElement(element));
+    }
+
+    return layout;
+}
+
+ControlSurfaceLayout loadControlSurfaceLayoutFromFile(const std::string& path)
+{
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("failed to open control surface layout: " + path);
+    }
+
+    return loadControlSurfaceLayoutFromJson(std::string(
         std::istreambuf_iterator<char>(input),
         std::istreambuf_iterator<char>()));
 }
