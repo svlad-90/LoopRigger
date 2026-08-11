@@ -1,11 +1,16 @@
 #include "livelooping/core/ControlMapping.h"
 #include "livelooping/core/LiveLoopingEngine.h"
 
+#if LIVELOOPING_HAS_PROFILE_IO
+#include "livelooping/profile/ProfileLoader.h"
+#endif
+
 #include <juce_gui_extra/juce_gui_extra.h>
 
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -19,6 +24,14 @@ using livelooping::core::WidgetType;
 using livelooping::core::makeMicKaossPadProfile;
 using livelooping::core::makeSynthKaossPadProfile;
 using livelooping::core::makeYaeltexLiveLoopingProfile;
+#if LIVELOOPING_HAS_PROFILE_IO
+using livelooping::profile::ControlSurfaceLayout;
+using livelooping::profile::SurfaceBounds;
+using livelooping::profile::SurfaceElement;
+using livelooping::profile::SurfaceElementShape;
+using livelooping::profile::SurfaceElementRole;
+using livelooping::profile::loadControlSurfaceLayoutFromFile;
+#endif
 
 namespace {
 
@@ -29,12 +42,34 @@ juce::String displayGroupName(juce::String group)
     return group.replaceCharacter('_', ' ');
 }
 
+#if LIVELOOPING_HAS_PROFILE_IO
+std::optional<ControlSurfaceLayout> loadOptionalLayout(const char* fileName)
+{
+    try {
+        return loadControlSurfaceLayoutFromFile(std::string(LIVELOOPING_LAYOUT_DIR) + "/" + fileName);
+    } catch (const std::exception&) {
+        return std::nullopt;
+    }
+}
+#endif
+
 class ProfileSurfaceComponent final : public juce::Component {
 public:
-    ProfileSurfaceComponent(LiveLoopingEngine& engine, ControllerProfile profile)
+    ProfileSurfaceComponent(
+        LiveLoopingEngine& engine,
+        ControllerProfile profile
+#if LIVELOOPING_HAS_PROFILE_IO
+        ,
+        std::optional<ControlSurfaceLayout> layout = std::nullopt
+#endif
+        )
         : engine_(engine),
           mapper_(std::move(profile)),
           kind_(mapper_.profile().id.find("yaeltex") != std::string::npos ? SurfaceKind::Yaeltex : SurfaceKind::Kaoss)
+#if LIVELOOPING_HAS_PROFILE_IO
+          ,
+          layout_(std::move(layout))
+#endif
     {
         for (const auto& widget : mapper_.profile().widgets) {
             addWidget(widget);
@@ -43,6 +78,12 @@ public:
 
     void paint(juce::Graphics& graphics) override
     {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value()) {
+            paintLayoutSurface(graphics);
+            return;
+        }
+#endif
         if (kind_ == SurfaceKind::Yaeltex) {
             paintYaeltex(graphics);
         } else {
@@ -143,6 +184,96 @@ private:
         controls_.push_back(makeControl(*slider, widget));
         sliders_.push_back(std::move(slider));
     }
+
+#if LIVELOOPING_HAS_PROFILE_IO
+    juce::Rectangle<int> scaledBounds(const SurfaceBounds& bounds) const
+    {
+        const auto area = getLocalBounds();
+        const auto scaleX = layout_->baseWidth > 0 ? static_cast<float>(area.getWidth()) / static_cast<float>(layout_->baseWidth) : 1.0F;
+        const auto scaleY = layout_->baseHeight > 0 ? static_cast<float>(area.getHeight()) / static_cast<float>(layout_->baseHeight) : 1.0F;
+        return {
+            area.getX() + static_cast<int>(std::round(bounds.x * scaleX)),
+            area.getY() + static_cast<int>(std::round(bounds.y * scaleY)),
+            static_cast<int>(std::round(bounds.width * scaleX)),
+            static_cast<int>(std::round(bounds.height * scaleY)),
+        };
+    }
+
+    const SurfaceElement* findLayoutWidget(const juce::String& widgetId) const
+    {
+        if (!layout_.has_value()) {
+            return nullptr;
+        }
+
+        for (const auto& element : layout_->elements) {
+            if (element.role == SurfaceElementRole::Widget && element.widgetId == widgetId.toStdString()) {
+                return &element;
+            }
+        }
+        return nullptr;
+    }
+
+    void paintLayoutSurface(juce::Graphics& graphics)
+    {
+        graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
+
+        for (const auto& element : layout_->elements) {
+            if (element.role == SurfaceElementRole::Widget) {
+                continue;
+            }
+            paintLayoutDecoration(graphics, element);
+        }
+    }
+
+    void paintLayoutDecoration(juce::Graphics& graphics, const SurfaceElement& element)
+    {
+        const auto bounds = scaledBounds(element.bounds);
+        const auto darkPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colours::black : juce::Colour(0xff1d2023);
+        const auto border = kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xffd00010) : juce::Colour(0xff454b4f);
+
+        switch (element.shape) {
+        case SurfaceElementShape::RoundRect:
+            graphics.setColour(element.id == "wood_frame" ? juce::Colour(0xffc6904d) : darkPanel);
+            graphics.fillRoundedRectangle(bounds.toFloat(), 14.0F);
+            graphics.setColour(element.id == "wood_frame" ? juce::Colour(0xff7a4b21) : border);
+            graphics.drawRoundedRectangle(bounds.toFloat(), 14.0F, 2.0F);
+            break;
+        case SurfaceElementShape::Rect:
+            graphics.setColour(element.id == "xy_pad" ? juce::Colour(0xff090b0e) : darkPanel);
+            graphics.fillRect(bounds);
+            graphics.setColour(element.id == "xy_pad" ? juce::Colour(0xffd01824) : border);
+            graphics.drawRect(bounds, 2);
+            break;
+        case SurfaceElementShape::Text:
+            graphics.setColour(juce::Colours::white);
+            graphics.setFont(juce::Font(juce::FontOptions(28.0F).withStyle("Bold")));
+            graphics.drawText(element.label, bounds, juce::Justification::centredLeft);
+            break;
+        case SurfaceElementShape::Circle:
+            graphics.setColour(darkPanel);
+            graphics.fillEllipse(bounds.toFloat());
+            graphics.setColour(border);
+            graphics.drawEllipse(bounds.toFloat(), 2.0F);
+            break;
+        case SurfaceElementShape::Line:
+            graphics.setColour(juce::Colour(0xffeeeeee));
+            graphics.drawLine(bounds.getX(), bounds.getY(), bounds.getRight(), bounds.getBottom(), 2.0F);
+            break;
+        case SurfaceElementShape::Knob:
+        case SurfaceElementShape::Fader:
+        case SurfaceElementShape::Joystick:
+            graphics.setColour(border);
+            graphics.drawRect(bounds, 1);
+            break;
+        }
+
+        if (element.id == "display") {
+            graphics.setColour(juce::Colour(0xffff3155));
+            graphics.setFont(juce::Font(juce::FontOptions(30.0F).withStyle("Bold")));
+            graphics.drawText(element.label, bounds, juce::Justification::centred);
+        }
+    }
+#endif
 
     void drawScrew(juce::Graphics& graphics, int x, int y)
     {
@@ -488,6 +619,11 @@ private:
 
     juce::Rectangle<int> controlBounds(const Control& control, int horizontalGap, int verticalGap) const
     {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (const auto* element = findLayoutWidget(control.id)) {
+            return scaledBounds(element->bounds);
+        }
+#endif
         if (kind_ == SurfaceKind::Kaoss) {
             const auto body = surfaceBodyBounds();
             if (control.id == "input_volume") {
@@ -565,6 +701,9 @@ private:
     LiveLoopingEngine& engine_;
     MidiMapper mapper_;
     SurfaceKind kind_ = SurfaceKind::Kaoss;
+#if LIVELOOPING_HAS_PROFILE_IO
+    std::optional<ControlSurfaceLayout> layout_;
+#endif
     std::vector<Group> groups_;
     std::vector<Control> controls_;
     std::vector<std::unique_ptr<juce::TextButton>> buttons_;
@@ -599,17 +738,33 @@ private:
     juce::TextEditor snapshot_;
 };
 
+std::unique_ptr<ProfileSurfaceComponent> makeProfileSurface(
+    LiveLoopingEngine& engine,
+    ControllerProfile profile,
+    const char* layoutFileName)
+{
+#if LIVELOOPING_HAS_PROFILE_IO
+    return std::make_unique<ProfileSurfaceComponent>(engine, std::move(profile), loadOptionalLayout(layoutFileName));
+#else
+    juce::ignoreUnused(layoutFileName);
+    return std::make_unique<ProfileSurfaceComponent>(engine, std::move(profile));
+#endif
+}
+
 class PseudoDevicesComponent final : public juce::Component {
 public:
     explicit PseudoDevicesComponent(LiveLoopingEngine& engine)
     {
         tabs_.setTabBarDepth(28);
         tabs_.addTab("Mic Kaoss", juce::Colours::darkslategrey,
-            std::make_unique<ProfileSurfaceComponent>(engine, makeMicKaossPadProfile()).release(), true);
+            makeProfileSurface(engine, makeMicKaossPadProfile(), "kaoss_pad.json").release(),
+            true);
         tabs_.addTab("Synth Kaoss", juce::Colours::darkslategrey,
-            std::make_unique<ProfileSurfaceComponent>(engine, makeSynthKaossPadProfile()).release(), true);
+            makeProfileSurface(engine, makeSynthKaossPadProfile(), "kaoss_pad.json").release(),
+            true);
         tabs_.addTab("Yaeltex", juce::Colours::darkslategrey,
-            std::make_unique<ProfileSurfaceComponent>(engine, makeYaeltexLiveLoopingProfile()).release(), true);
+            makeProfileSurface(engine, makeYaeltexLiveLoopingProfile(), "yaeltex_livelooping.json").release(),
+            true);
         addAndMakeVisible(tabs_);
     }
 

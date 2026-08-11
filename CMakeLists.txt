@@ -109,6 +109,15 @@ if(LIVELOOPING_BUILD_JUCE_APP)
             juce::juce_gui_extra
     )
 
+    if(LIVELOOPING_BUILD_PROFILE_IO)
+        target_link_libraries(livelooping_product PRIVATE livelooping_profile_io)
+        target_compile_definitions(livelooping_product
+            PRIVATE
+                LIVELOOPING_HAS_PROFILE_IO=1
+                LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/layouts"
+        )
+    endif()
+
     target_compile_definitions(livelooping_product
         PRIVATE
             JUCE_WEB_BROWSER=0
