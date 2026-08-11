@@ -1,14 +1,162 @@
+#include "livelooping/core/ControlMapping.h"
 #include "livelooping/core/LiveLoopingEngine.h"
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-using livelooping::core::CommandType;
-using livelooping::core::ControllerCommand;
-using livelooping::core::ControllerId;
-using livelooping::core::InputTarget;
+#include <memory>
+#include <utility>
+#include <vector>
+
+using livelooping::core::ControllerProfile;
+using livelooping::core::ControllerWidget;
 using livelooping::core::LiveLoopingEngine;
+using livelooping::core::MidiMapper;
+using livelooping::core::WidgetEvent;
+using livelooping::core::WidgetEventType;
+using livelooping::core::WidgetType;
+using livelooping::core::makeMicKaossPadProfile;
+using livelooping::core::makeSynthKaossPadProfile;
+using livelooping::core::makeYaeltexLiveLoopingProfile;
 
 namespace {
+
+constexpr int kCellWidth = 92;
+constexpr int kCellHeight = 58;
+constexpr int kGap = 8;
+constexpr int kGroupHeaderHeight = 22;
+
+class ProfileSurfaceComponent final : public juce::Component {
+public:
+    ProfileSurfaceComponent(LiveLoopingEngine& engine, ControllerProfile profile)
+        : engine_(engine),
+          mapper_(std::move(profile))
+    {
+        for (const auto& widget : mapper_.profile().widgets) {
+            addWidget(widget);
+        }
+    }
+
+    void resized() override
+    {
+        auto area = getLocalBounds().reduced(10);
+        for (auto& group : groups_) {
+            const auto groupHeight = group.requiredRows * kCellHeight + kGroupHeaderHeight + kGap;
+            auto groupArea = area.removeFromTop(groupHeight).reduced(0, 3);
+            group.label->setBounds(groupArea.removeFromTop(kGroupHeaderHeight));
+            const auto gridArea = groupArea.reduced(0, 2);
+
+            for (auto& control : controls_) {
+                if (control.group != group.name) {
+                    continue;
+                }
+
+                auto bounds = juce::Rectangle<int>(
+                    gridArea.getX() + control.column * kCellWidth,
+                    gridArea.getY() + control.row * kCellHeight,
+                    control.width * kCellWidth - kGap,
+                    control.height * kCellHeight - kGap);
+                control.component->setBounds(bounds);
+            }
+        }
+    }
+
+private:
+    struct Group {
+        juce::String name;
+        std::unique_ptr<juce::Label> label;
+        int requiredRows = 1;
+    };
+
+    struct Control {
+        juce::Component* component = nullptr;
+        juce::String group;
+        int row = 0;
+        int column = 0;
+        int width = 1;
+        int height = 1;
+    };
+
+    Group& ensureGroup(const ControllerWidget& widget)
+    {
+        const auto groupName = juce::String(widget.group);
+        for (auto& group : groups_) {
+            if (group.name == groupName) {
+                group.requiredRows = juce::jmax(group.requiredRows, widget.row + widget.height);
+                return group;
+            }
+        }
+
+        groups_.push_back({});
+        auto& group = groups_.back();
+        group.name = groupName;
+        group.requiredRows = juce::jmax(1, widget.row + widget.height);
+        group.label = std::make_unique<juce::Label>();
+        group.label->setText(groupName, juce::dontSendNotification);
+        group.label->setJustificationType(juce::Justification::centredLeft);
+        group.label->setColour(juce::Label::textColourId, juce::Colours::white);
+        addAndMakeVisible(*group.label);
+        return group;
+    }
+
+    void addWidget(const ControllerWidget& widget)
+    {
+        ensureGroup(widget);
+
+        if (widget.type == WidgetType::Button) {
+            auto button = std::make_unique<juce::TextButton>(widget.label);
+            button->onClick = [this, id = widget.id] {
+                dispatch({id, WidgetEventType::Press, 1.0F});
+            };
+            addAndMakeVisible(*button);
+            controls_.push_back(makeControl(*button, widget));
+            buttons_.push_back(std::move(button));
+            return;
+        }
+
+        auto slider = std::make_unique<juce::Slider>();
+        slider->setRange(0.0, 1.0, 0.001);
+        slider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 64, 18);
+        slider->setName(widget.label);
+        if (widget.type == WidgetType::Fader) {
+            slider->setSliderStyle(juce::Slider::LinearVertical);
+        } else {
+            slider->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        }
+        slider->onValueChange = [this, id = widget.id, slider = slider.get()] {
+            dispatch({id, WidgetEventType::Change, static_cast<float>(slider->getValue())});
+        };
+        addAndMakeVisible(*slider);
+        controls_.push_back(makeControl(*slider, widget));
+        sliders_.push_back(std::move(slider));
+    }
+
+    Control makeControl(juce::Component& component, const ControllerWidget& widget) const
+    {
+        return Control{
+            &component,
+            juce::String(widget.group),
+            widget.row,
+            widget.column,
+            widget.width,
+            widget.height,
+        };
+    }
+
+    void dispatch(const WidgetEvent& event)
+    {
+        const auto command = mapper_.mapWidget(event);
+        if (command.has_value()) {
+            engine_.handle(command.value());
+        }
+    }
+
+    LiveLoopingEngine& engine_;
+    MidiMapper mapper_;
+    std::vector<Group> groups_;
+    std::vector<Control> controls_;
+    std::vector<std::unique_ptr<juce::TextButton>> buttons_;
+    std::vector<std::unique_ptr<juce::Slider>> sliders_;
+};
 
 class ProductComponent final : public juce::Component,
                                private juce::Timer {
@@ -41,76 +189,24 @@ private:
 class PseudoDevicesComponent final : public juce::Component {
 public:
     explicit PseudoDevicesComponent(LiveLoopingEngine& engine)
-        : engine_(engine)
     {
-        addInputSection("Mic Kaoss", InputTarget::Mic);
-        addInputSection("Synth Kaoss", InputTarget::Synth);
-        addYaeltexSection();
+        tabs_.setTabBarDepth(28);
+        tabs_.addTab("Mic Kaoss", juce::Colours::darkslategrey,
+            std::make_unique<ProfileSurfaceComponent>(engine, makeMicKaossPadProfile()).release(), true);
+        tabs_.addTab("Synth Kaoss", juce::Colours::darkslategrey,
+            std::make_unique<ProfileSurfaceComponent>(engine, makeSynthKaossPadProfile()).release(), true);
+        tabs_.addTab("Yaeltex", juce::Colours::darkslategrey,
+            std::make_unique<ProfileSurfaceComponent>(engine, makeYaeltexLiveLoopingProfile()).release(), true);
+        addAndMakeVisible(tabs_);
     }
 
     void resized() override
     {
-        auto area = getLocalBounds().reduced(10);
-        const auto rowHeight = 34;
-        for (auto* child : getChildren()) {
-            child->setBounds(area.removeFromTop(rowHeight).reduced(0, 3));
-        }
+        tabs_.setBounds(getLocalBounds());
     }
 
 private:
-    void addButton(const juce::String& text, std::function<void()> action)
-    {
-        auto button = std::make_unique<juce::TextButton>(text);
-        button->onClick = std::move(action);
-        addAndMakeVisible(*button);
-        buttons_.push_back(std::move(button));
-    }
-
-    void addInputSection(const juce::String& name, InputTarget target)
-    {
-        addButton(name + " page 1", [this, target] {
-            handle({ControllerId::PseudoGui, CommandType::SelectInputPresetPage, target, 0});
-        });
-        addButton(name + " preset 1", [this, target] {
-            handle({ControllerId::PseudoGui, CommandType::SelectInputPreset, target, 0});
-        });
-        addButton(name + " preset 2", [this, target] {
-            handle({ControllerId::PseudoGui, CommandType::SelectInputPreset, target, 1});
-        });
-    }
-
-    void addYaeltexSection()
-    {
-        addButton("Yaeltex looper 1", [this] {
-            handle({ControllerId::Yaeltex, CommandType::SelectLooper, InputTarget::Mic, 0});
-        });
-        addButton("Yaeltex looper 2", [this] {
-            handle({ControllerId::Yaeltex, CommandType::SelectLooper, InputTarget::Mic, 1});
-        });
-        addButton("Yaeltex length 8", [this] {
-            handle({ControllerId::Yaeltex, CommandType::SelectSampleLength, InputTarget::Mic, 8});
-        });
-        addButton("Yaeltex record T1", [this] {
-            handle({ControllerId::Yaeltex, CommandType::ToggleTrackRecording, InputTarget::Mic, 0});
-        });
-        addButton("Yaeltex clear T1", [this] {
-            handle({ControllerId::Yaeltex, CommandType::ClearTrack, InputTarget::Mic, 0});
-        });
-        addButton("Yaeltex resample all", [this] {
-            handle({ControllerId::Yaeltex, CommandType::StartResampleAllLoopers});
-        });
-        addButton("Reset all", [this] {
-            handle({ControllerId::PseudoGui, CommandType::ResetAll});
-        });
-    }
-
-    void handle(const ControllerCommand& command)
-    {
-        engine_.handle(command);
-    }
-
-    LiveLoopingEngine& engine_;
-    std::vector<std::unique_ptr<juce::TextButton>> buttons_;
+    juce::TabbedComponent tabs_{juce::TabbedButtonBar::TabsAtTop};
 };
 
 class Window final : public juce::DocumentWindow {
@@ -146,6 +242,7 @@ public:
     {
         productWindow_ = std::make_unique<Window>("LiveLooping Product", std::make_unique<ProductComponent>(engine_));
         pseudoDevicesWindow_ = std::make_unique<Window>("Pseudo Devices", std::make_unique<PseudoDevicesComponent>(engine_));
+        pseudoDevicesWindow_->setSize(920, 720);
         pseudoDevicesWindow_->setTopLeftPosition(productWindow_->getRight() + 20, productWindow_->getY());
     }
 
@@ -164,4 +261,3 @@ private:
 } // namespace
 
 START_JUCE_APPLICATION(App)
-

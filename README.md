@@ -50,7 +50,15 @@ Run the core smoke tests:
 ctest --test-dir build --output-on-failure
 ```
 
-Build the JUCE product shell after providing a local JUCE checkout:
+Build the JUCE product shell. By default CMake fetches the pinned JUCE tag only
+when `LIVELOOPING_BUILD_JUCE_APP=ON`:
+
+```sh
+cmake -S . -B build-juce -DLIVELOOPING_BUILD_JUCE_APP=ON
+cmake --build build-juce --target livelooping_product
+```
+
+Use a local JUCE checkout instead of network fetches when needed:
 
 ```sh
 cmake -S . -B build-juce \
@@ -58,6 +66,12 @@ cmake -S . -B build-juce \
   -DLIVELOOPING_JUCE_DIR=/path/to/JUCE
 cmake --build build-juce --target livelooping_product
 ```
+
+On Linux, JUCE still needs system development packages from the distro. The
+minimal set for this shell starts with `libfreetype-dev` or
+`libfreetype6-dev`, `libfontconfig1-dev`, and the X11 development packages.
+The later audio/VST host work will also need audio/plugin dependencies such as
+`libasound2-dev`, `libjack-jackd2-dev`, and `ladspa-sdk`.
 
 ## Current Scope
 
