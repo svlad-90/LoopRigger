@@ -69,7 +69,9 @@ private:
 
     struct Control {
         juce::Component* component = nullptr;
+        juce::String id;
         juce::String group;
+        WidgetType type = WidgetType::Button;
         int row = 0;
         int column = 0;
         int width = 1;
@@ -121,7 +123,7 @@ private:
 
         auto slider = std::make_unique<juce::Slider>();
         slider->setRange(0.0, 1.0, 0.001);
-        slider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 64, 18);
+        slider->setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         slider->setName(widget.label);
         slider->setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xffcf141c));
         slider->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff5e666c));
@@ -262,7 +264,7 @@ private:
     {
         graphics.fillAll(juce::Colour(0xfff5f5f5));
 
-        auto body = getLocalBounds().reduced(22);
+        auto body = surfaceBodyBounds();
         graphics.setColour(juce::Colour(0xff1d2023));
         graphics.fillRoundedRectangle(body.toFloat(), 18.0F);
         graphics.setColour(juce::Colour(0xff454b4f));
@@ -356,7 +358,7 @@ private:
         graphics.setColour(juce::Colour(0xff7a4b21));
         graphics.drawRoundedRectangle(frame.toFloat(), 18.0F, 4.0F);
 
-        auto body = frame.reduced(26);
+        auto body = surfaceBodyBounds();
         graphics.setColour(juce::Colours::black);
         graphics.fillRect(body);
         graphics.setColour(juce::Colour(0xffd00010));
@@ -421,56 +423,114 @@ private:
 
     juce::Rectangle<int> kaossPadBounds() const
     {
-        auto area = getLocalBounds().reduced(24);
-        return {area.getX() + 250, area.getY() + 220, 430, 300};
+        const auto body = surfaceBodyBounds();
+        return {body.getX() + 270, body.getY() + 320, 560, 300};
     }
 
-    juce::Rectangle<int> groupOrigin(const juce::String& groupName) const
+    juce::Rectangle<int> surfaceBodyBounds() const
     {
-        if (kind_ == SurfaceKind::Kaoss) {
-            if (groupName == "presets") {
-                return {285, 225, 68, 44};
-            }
-            if (groupName == "pages") {
-                return {285, 730, 86, 48};
-            }
-            if (groupName == "levels") {
-                return {64, 100, 78, 90};
-            }
-            if (groupName == "fx_parameters") {
-                return {292, 612, 78, 82};
-            }
-            return {40, 620, 92, 58};
+        if (kind_ == SurfaceKind::Yaeltex) {
+            return getLocalBounds().reduced(18).reduced(26);
         }
+        return getLocalBounds().reduced(22);
+    }
 
+    juce::Rectangle<int> gridCell(const juce::Rectangle<int>& origin, int row, int column, int horizontalGap, int verticalGap, int width = 1, int height = 1) const
+    {
+        return {
+            origin.getX() + column * (origin.getWidth() + horizontalGap),
+            origin.getY() + row * (origin.getHeight() + verticalGap),
+            width * origin.getWidth() + (width - 1) * horizontalGap,
+            height * origin.getHeight() + (height - 1) * verticalGap,
+        };
+    }
+
+    juce::Rectangle<int> yaeltexGroupOrigin(const juce::String& groupName) const
+    {
+        const auto body = surfaceBodyBounds();
         if (groupName == "looper_select") {
-            return {64, 330, 82, 72};
+            return {body.getX() + 58, body.getY() + 308, 76, 64};
         }
         if (groupName == "sample_length") {
-            return {64, 420, 56, 46};
+            return {body.getX() + 58, body.getY() + 406, 52, 40};
         }
         if (groupName == "track_record") {
-            return {64, 525, 82, 62};
+            return {body.getX() + 58, body.getY() + 512, 76, 56};
         }
         if (groupName == "track_clear") {
-            return {64, 618, 82, 54};
+            return {body.getX() + 58, body.getY() + 604, 76, 48};
         }
         if (groupName == "track_volume_pan") {
-            return {88, 702, 94, 86};
+            return {body.getX() + 82, body.getY() + 694, 78, 78};
         }
         if (groupName == "resampling") {
-            return {430, 692, 108, 58};
+            return {body.getX() + 424, body.getY() + 688, 104, 54};
         }
         if (groupName == "session") {
-            return {760, 72, 82, 54};
+            return {body.getX() + 650, body.getY() + 54, 76, 54};
         }
-        return {32, 650, 110, 70};
+        return {body.getX() + 40, body.getY() + 650, 90, 56};
+    }
+
+    juce::Rectangle<int> kaossGroupOrigin(const juce::String& groupName) const
+    {
+        const auto body = surfaceBodyBounds();
+        if (groupName == "presets") {
+            return {body.getX() + 275, body.getY() + 225, 68, 44};
+        }
+        if (groupName == "pages") {
+            return {body.getX() + 300, body.getBottom() - 94, 92, 52};
+        }
+        if (groupName == "levels") {
+            return {body.getX() + 48, body.getY() + 78, 80, 90};
+        }
+        if (groupName == "fx_parameters") {
+            return {body.getX() + 270, body.getY() + 600, 78, 82};
+        }
+        return {body.getX() + 40, body.getY() + 620, 92, 58};
+    }
+
+    juce::Rectangle<int> controlBounds(const Control& control, int horizontalGap, int verticalGap) const
+    {
+        if (kind_ == SurfaceKind::Kaoss) {
+            const auto body = surfaceBodyBounds();
+            if (control.id == "input_volume") {
+                return {body.getX() + 48, body.getY() + 76, 80, 100};
+            }
+            if (control.id == "fx_level") {
+                return {body.getX() + 48, body.getY() + 214, 80, 100};
+            }
+            if (control.group == "pages") {
+                return gridCell(kaossGroupOrigin(control.group), 0, control.column, 58, 0, control.width, control.height);
+            }
+            if (control.group == "presets") {
+                return gridCell(kaossGroupOrigin(control.group), control.row, control.column, 12, 8, control.width, control.height);
+            }
+            if (control.group == "fx_parameters") {
+                return gridCell(kaossGroupOrigin(control.group), control.row, control.column, 13, 8, control.width, control.height);
+            }
+            return gridCell(kaossGroupOrigin(control.group), control.row, control.column, horizontalGap, verticalGap, control.width, control.height);
+        }
+
+        if (control.group == "sample_length") {
+            return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 12, 12, control.width, control.height);
+        }
+        if (control.group == "track_volume_pan") {
+            return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 66, 10, control.width, control.height);
+        }
+        if (control.group == "resampling") {
+            return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 18, 10, control.width, control.height);
+        }
+        if (control.group == "session") {
+            return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 20, 10, control.width, control.height);
+        }
+        return gridCell(yaeltexGroupOrigin(control.group), control.row, control.column, 14, 10, control.width, control.height);
     }
 
     void layoutByGroup(int horizontalGap, int verticalGap)
     {
         for (auto& group : groups_) {
-            const auto origin = groupOrigin(group.name);
+            const auto origin = kind_ == SurfaceKind::Kaoss ? kaossGroupOrigin(group.name) : yaeltexGroupOrigin(group.name);
             group.label->setVisible(false);
             group.label->setBounds(origin.getX(), std::max(18, origin.getY() - kGroupHeaderHeight - 8), 260, kGroupHeaderHeight);
 
@@ -479,9 +539,7 @@ private:
                     continue;
                 }
 
-                const auto x = origin.getX() + control.column * (origin.getWidth() + horizontalGap);
-                const auto y = origin.getY() + control.row * (origin.getHeight() + verticalGap);
-                control.component->setBounds(x, y, control.width * origin.getWidth(), control.height * origin.getHeight());
+                control.component->setBounds(controlBounds(control, horizontalGap, verticalGap));
             }
         }
     }
@@ -490,7 +548,9 @@ private:
     {
         return Control{
             &component,
+            juce::String(widget.id),
             juce::String(widget.group),
+            widget.type,
             widget.row,
             widget.column,
             widget.width,
