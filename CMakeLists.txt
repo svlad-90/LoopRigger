@@ -6,11 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(LiveLoopingDependencies)
 
 option(LIVELOOPING_BUILD_JUCE_APP "Build the JUCE product shell" OFF)
 set(LIVELOOPING_JUCE_DIR "" CACHE PATH "Path to a local JUCE checkout")
 option(LIVELOOPING_FETCH_JUCE "Fetch JUCE with CMake when LIVELOOPING_JUCE_DIR is not set" ON)
 set(LIVELOOPING_JUCE_TAG "9.0.0" CACHE STRING "JUCE git tag used by FetchContent")
+option(LIVELOOPING_SKIP_JUCE_PLATFORM_CHECK "Skip platform package checks for JUCE targets" OFF)
 
 add_library(livelooping_core
     src/ControlMapping.cpp
@@ -43,19 +46,8 @@ if(BUILD_TESTING)
 endif()
 
 if(LIVELOOPING_BUILD_JUCE_APP)
-    if(LIVELOOPING_JUCE_DIR)
-        add_subdirectory(${LIVELOOPING_JUCE_DIR} ${CMAKE_BINARY_DIR}/JUCE)
-    elseif(LIVELOOPING_FETCH_JUCE)
-        include(FetchContent)
-        FetchContent_Declare(JUCE
-            GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-            GIT_TAG ${LIVELOOPING_JUCE_TAG}
-            GIT_SHALLOW TRUE
-        )
-        FetchContent_MakeAvailable(JUCE)
-    else()
-        message(FATAL_ERROR "Set LIVELOOPING_JUCE_DIR or enable LIVELOOPING_FETCH_JUCE")
-    endif()
+    livelooping_check_linux_juce_gui_dependencies()
+    livelooping_add_juce_dependency()
 
     juce_add_gui_app(livelooping_product
         PRODUCT_NAME "LiveLooping"
@@ -72,8 +64,6 @@ if(LIVELOOPING_BUILD_JUCE_APP)
         PRIVATE
             livelooping_core
             juce::juce_gui_extra
-            juce::juce_audio_utils
-            juce::juce_audio_processors
     )
 
     target_compile_definitions(livelooping_product

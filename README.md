@@ -67,11 +67,18 @@ cmake -S . -B build-juce \
 cmake --build build-juce --target livelooping_product
 ```
 
-On Linux, JUCE still needs system development packages from the distro. The
-minimal set for this shell starts with `libfreetype-dev` or
-`libfreetype6-dev`, `libfontconfig1-dev`, and the X11 development packages.
-The later audio/VST host work will also need audio/plugin dependencies such as
-`libasound2-dev`, `libjack-jackd2-dev`, and `ladspa-sdk`.
+On Linux, CMake checks the system packages required by the JUCE GUI target
+before fetching/building JUCE. Ubuntu/Debian setup:
+
+```sh
+sudo apt install pkg-config libfreetype-dev libfontconfig1-dev \
+  libx11-dev libxcomposite-dev libxcursor-dev libxext-dev \
+  libxinerama-dev libxrandr-dev libxrender-dev libxi-dev
+```
+
+The later audio/VST host target will add its own CMake option and preflight for
+audio/plugin dependencies such as `libasound2-dev`, `libjack-jackd2-dev`, and
+`ladspa-sdk`.
 
 ## Current Scope
 
