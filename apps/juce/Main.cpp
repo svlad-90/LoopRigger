@@ -207,7 +207,7 @@ private:
         return {area.getX() + 250, area.getY() + 220, 430, 300};
     }
 
-    juce::Rectangle<int> groupOrigin(juce::StringRef groupName) const
+    juce::Rectangle<int> groupOrigin(const juce::String& groupName) const
     {
         if (kind_ == SurfaceKind::Kaoss) {
             if (groupName == "presets") {
