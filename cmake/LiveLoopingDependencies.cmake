@@ -52,6 +52,16 @@ function(livelooping_check_linux_juce_gui_dependencies)
     endif()
 endfunction()
 
+function(livelooping_add_json_dependency)
+    include(FetchContent)
+    FetchContent_Declare(nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG ${LIVELOOPING_NLOHMANN_JSON_TAG}
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+endfunction()
+
 function(livelooping_add_juce_dependency)
     if(LIVELOOPING_JUCE_DIR)
         add_subdirectory("${LIVELOOPING_JUCE_DIR}" "${CMAKE_BINARY_DIR}/JUCE")

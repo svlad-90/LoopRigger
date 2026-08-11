@@ -7,6 +7,7 @@ The project is split into:
 
 - `livelooping_core`: controller commands and performance state, with no GUI or
   audio dependency.
+- `livelooping_profile_io`: optional JSON controller profile loader.
 - built-in controller profile factories for the mic Kaoss Pad, synth Kaoss Pad,
   and Yaeltex LiveLooping surface.
 - `livelooping_sim_cli`: local command-line simulator that can run in the Linux
@@ -32,7 +33,9 @@ cmake --build build --target livelooping_sim_cli
 ```
 
 The CLI simulator accepts direct logical commands and profile-driven pseudo
-device commands:
+device commands. When `LIVELOOPING_BUILD_PROFILE_IO=ON`, the profile-driven
+commands load `profiles/*.json` instead of using compiled-in controller
+profiles:
 
 ```text
 layout yaeltex
@@ -92,4 +95,5 @@ the control model:
   logical commands.
 
 The controller profiles are currently compiled into the core. A file-backed
-profile format will be added after the action and widget model stabilizes.
+profile format now exists under `profiles/`; the compiled profiles remain as
+fallback/reference data while the schema stabilizes.

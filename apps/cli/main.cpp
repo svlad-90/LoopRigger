@@ -1,6 +1,10 @@
 #include "livelooping/core/ControlMapping.h"
 #include "livelooping/core/LiveLoopingEngine.h"
 
+#if LIVELOOPING_HAS_PROFILE_IO
+#include "livelooping/profile/ProfileLoader.h"
+#endif
+
 #include <iostream>
 #include <map>
 #include <optional>
@@ -19,6 +23,9 @@ using livelooping::core::makeMicKaossPadProfile;
 using livelooping::core::makeSynthKaossPadProfile;
 using livelooping::core::makeYaeltexLiveLoopingProfile;
 using livelooping::core::toString;
+#if LIVELOOPING_HAS_PROFILE_IO
+using livelooping::profile::loadControllerProfileFromFile;
+#endif
 
 namespace {
 
@@ -82,15 +89,26 @@ void applyMappedCommand(LiveLoopingEngine& engine, const std::optional<Controlle
     std::cout << engine.renderTextSnapshot() << std::endl;
 }
 
+std::string profilePath(const std::string& fileName)
+{
+    return std::string(LIVELOOPING_PROFILE_DIR) + "/" + fileName;
+}
+
 } // namespace
 
 int main()
 {
     LiveLoopingEngine engine;
     std::map<std::string, MidiMapper> mappers;
+#if LIVELOOPING_HAS_PROFILE_IO
+    mappers.emplace("mic", MidiMapper(loadControllerProfileFromFile(profilePath("kaoss_mic.json"))));
+    mappers.emplace("synth", MidiMapper(loadControllerProfileFromFile(profilePath("kaoss_synth.json"))));
+    mappers.emplace("yaeltex", MidiMapper(loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json"))));
+#else
     mappers.emplace("mic", MidiMapper(makeMicKaossPadProfile()));
     mappers.emplace("synth", MidiMapper(makeSynthKaossPadProfile()));
     mappers.emplace("yaeltex", MidiMapper(makeYaeltexLiveLoopingProfile()));
+#endif
 
     printHelp();
     std::cout << engine.renderTextSnapshot() << std::endl;

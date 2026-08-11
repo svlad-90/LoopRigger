@@ -1,6 +1,10 @@
 #include "livelooping/core/ControlMapping.h"
 #include "livelooping/core/LiveLoopingEngine.h"
 
+#if LIVELOOPING_HAS_PROFILE_IO
+#include "livelooping/profile/ProfileLoader.h"
+#endif
+
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -21,6 +25,9 @@ using livelooping::core::makeMicKaossPadProfile;
 using livelooping::core::makeSynthKaossPadProfile;
 using livelooping::core::makeYaeltexLiveLoopingProfile;
 using livelooping::core::normalizeMidiValue;
+#if LIVELOOPING_HAS_PROFILE_IO
+using livelooping::profile::loadControllerProfileFromFile;
+#endif
 
 namespace {
 
@@ -162,6 +169,44 @@ void testYaeltexMapping()
     expect(normalizeMidiValue(200) == 1.0F, "large MIDI values should clamp to one");
 }
 
+#if LIVELOOPING_HAS_PROFILE_IO
+std::string profilePath(const std::string& fileName)
+{
+    return std::string(LIVELOOPING_PROFILE_DIR) + "/" + fileName;
+}
+
+void testJsonProfileLoading()
+{
+    const MidiMapper micMapper(loadControllerProfileFromFile(profilePath("kaoss_mic.json")));
+    const auto mappedPreset = micMapper.mapMidi({MidiMessageType::ControlChange, 0, 51, 127});
+    expect(mappedPreset.has_value(), "JSON mic profile should map preset MIDI");
+    expect(mappedPreset->controller == ControllerId::MicKaossPad, "JSON mic command should carry mic controller id");
+    expect(mappedPreset->inputTarget == InputTarget::Mic, "JSON mic command should target mic input");
+    expect(mappedPreset->type == CommandType::SelectInputPreset, "JSON mic preset should select input preset");
+    expect(mappedPreset->index == 2, "JSON mic CC 51 should map to preset 3");
+
+    const MidiMapper synthMapper(loadControllerProfileFromFile(profilePath("kaoss_synth.json")));
+    const auto mappedPage = synthMapper.mapWidget({"page_2", WidgetEventType::Press, 1.0F});
+    expect(mappedPage.has_value(), "JSON synth profile should map page widget");
+    expect(mappedPage->controller == ControllerId::SynthKaossPad, "JSON synth command should carry synth controller id");
+    expect(mappedPage->inputTarget == InputTarget::Synth, "JSON synth page should target synth input");
+    expect(mappedPage->index == 1, "JSON synth page_2 should map to zero-based page 2");
+
+    const MidiMapper yaeltexMapper(loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json")));
+    const auto mappedLength = yaeltexMapper.mapMidi({MidiMessageType::Note, 0, 75, 127});
+    expect(mappedLength.has_value(), "JSON Yaeltex profile should map sample length note");
+    expect(mappedLength->controller == ControllerId::Yaeltex, "JSON Yaeltex command should carry Yaeltex controller id");
+    expect(mappedLength->type == CommandType::SelectSampleLength, "JSON Yaeltex length should select sample length");
+    expect(mappedLength->index == 8, "JSON Yaeltex note 75 should map to 8 beats");
+
+    const auto mappedKnob = yaeltexMapper.mapWidget({"vol_pan_t3", WidgetEventType::Change, 0.42F});
+    expect(mappedKnob.has_value(), "JSON Yaeltex profile should map pseudo knob");
+    expect(mappedKnob->type == CommandType::SetTrackVolume, "JSON Vol/Pan T3 should set track volume");
+    expect(mappedKnob->index == 2, "JSON Vol/Pan T3 should target zero-based track 3");
+    expect(mappedKnob->value == 0.42F, "JSON pseudo knob value should pass through");
+}
+#endif
+
 } // namespace
 
 int main()
@@ -170,6 +215,9 @@ int main()
     testYaeltexLooperCommands();
     testKaossPadMapping();
     testYaeltexMapping();
+#if LIVELOOPING_HAS_PROFILE_IO
+    testJsonProfileLoading();
+#endif
 
     if (failures != 0) {
         std::cerr << failures << " smoke test assertion(s) failed\n";

@@ -1,0 +1,225 @@
+#include "livelooping/profile/ProfileLoader.h"
+
+#include <nlohmann/json.hpp>
+
+#include <fstream>
+#include <iterator>
+#include <stdexcept>
+#include <utility>
+
+namespace livelooping::profile {
+
+namespace {
+
+using json = nlohmann::json;
+
+core::WidgetType parseWidgetType(const std::string& value)
+{
+    if (value == "button") {
+        return core::WidgetType::Button;
+    }
+    if (value == "knob") {
+        return core::WidgetType::Knob;
+    }
+    if (value == "fader") {
+        return core::WidgetType::Fader;
+    }
+    if (value == "joystick") {
+        return core::WidgetType::Joystick;
+    }
+    throw std::runtime_error("unknown widget type: " + value);
+}
+
+core::WidgetEventType parseWidgetEventType(const std::string& value)
+{
+    if (value == "press") {
+        return core::WidgetEventType::Press;
+    }
+    if (value == "release") {
+        return core::WidgetEventType::Release;
+    }
+    if (value == "change") {
+        return core::WidgetEventType::Change;
+    }
+    throw std::runtime_error("unknown widget event type: " + value);
+}
+
+core::MidiMessageType parseMidiMessageType(const std::string& value)
+{
+    if (value == "note") {
+        return core::MidiMessageType::Note;
+    }
+    if (value == "control_change") {
+        return core::MidiMessageType::ControlChange;
+    }
+    throw std::runtime_error("unknown MIDI message type: " + value);
+}
+
+core::ControllerId parseControllerId(const std::string& value)
+{
+    if (value == "pseudo_gui") {
+        return core::ControllerId::PseudoGui;
+    }
+    if (value == "mic_kaoss_pad") {
+        return core::ControllerId::MicKaossPad;
+    }
+    if (value == "synth_kaoss_pad") {
+        return core::ControllerId::SynthKaossPad;
+    }
+    if (value == "yaeltex") {
+        return core::ControllerId::Yaeltex;
+    }
+    throw std::runtime_error("unknown controller id: " + value);
+}
+
+core::InputTarget parseInputTarget(const std::string& value)
+{
+    if (value == "mic") {
+        return core::InputTarget::Mic;
+    }
+    if (value == "synth") {
+        return core::InputTarget::Synth;
+    }
+    throw std::runtime_error("unknown input target: " + value);
+}
+
+core::CommandType parseCommandType(const std::string& value)
+{
+    if (value == "select_input_preset_page") {
+        return core::CommandType::SelectInputPresetPage;
+    }
+    if (value == "select_input_preset") {
+        return core::CommandType::SelectInputPreset;
+    }
+    if (value == "set_input_volume") {
+        return core::CommandType::SetInputVolume;
+    }
+    if (value == "set_input_fx_level") {
+        return core::CommandType::SetInputFxLevel;
+    }
+    if (value == "set_input_fx_parameter") {
+        return core::CommandType::SetInputFxParameter;
+    }
+    if (value == "select_looper") {
+        return core::CommandType::SelectLooper;
+    }
+    if (value == "select_sample_length") {
+        return core::CommandType::SelectSampleLength;
+    }
+    if (value == "toggle_track_recording") {
+        return core::CommandType::ToggleTrackRecording;
+    }
+    if (value == "clear_track") {
+        return core::CommandType::ClearTrack;
+    }
+    if (value == "start_resample_selected_looper") {
+        return core::CommandType::StartResampleSelectedLooper;
+    }
+    if (value == "start_resample_all_loopers") {
+        return core::CommandType::StartResampleAllLoopers;
+    }
+    if (value == "stop_resampling") {
+        return core::CommandType::StopResampling;
+    }
+    if (value == "reset_looper") {
+        return core::CommandType::ResetLooper;
+    }
+    if (value == "reset_all") {
+        return core::CommandType::ResetAll;
+    }
+    if (value == "set_track_volume") {
+        return core::CommandType::SetTrackVolume;
+    }
+    if (value == "set_track_pan") {
+        return core::CommandType::SetTrackPan;
+    }
+    if (value == "set_looper_volume") {
+        return core::CommandType::SetLooperVolume;
+    }
+    throw std::runtime_error("unknown command type: " + value);
+}
+
+core::ControllerWidget parseWidget(const json& value)
+{
+    core::ControllerWidget widget;
+    widget.id = value.at("id").get<std::string>();
+    widget.label = value.at("label").get<std::string>();
+    widget.type = parseWidgetType(value.at("type").get<std::string>());
+    widget.group = value.value("group", "");
+    widget.row = value.value("row", 0);
+    widget.column = value.value("column", 0);
+    widget.width = value.value("width", 1);
+    widget.height = value.value("height", 1);
+    return widget;
+}
+
+core::MidiBinding parseMidiBinding(const json& value)
+{
+    core::MidiBinding binding;
+    binding.type = parseMidiMessageType(value.at("type").get<std::string>());
+    binding.channel = value.value("channel", 0);
+    binding.number = value.at("number").get<int>();
+    return binding;
+}
+
+core::ControllerCommand parseCommand(const json& value, core::ControllerId controller)
+{
+    core::ControllerCommand command;
+    command.controller = controller;
+    command.type = parseCommandType(value.at("type").get<std::string>());
+    command.inputTarget = parseInputTarget(value.value("inputTarget", "mic"));
+    command.index = value.value("index", 0);
+    command.value = value.value("value", 0.0F);
+    return command;
+}
+
+core::ControlBinding parseBinding(const json& value, core::ControllerId controller)
+{
+    core::ControlBinding binding;
+    binding.widgetId = value.at("widgetId").get<std::string>();
+    binding.widgetEventType = parseWidgetEventType(value.value("widgetEventType", "press"));
+    binding.command = parseCommand(value.at("command"), controller);
+    binding.useEventValue = value.value("useEventValue", false);
+    binding.triggerOnNonZero = value.value("triggerOnNonZero", true);
+
+    if (value.contains("midi")) {
+        binding.midi = parseMidiBinding(value.at("midi"));
+    }
+
+    return binding;
+}
+
+} // namespace
+
+core::ControllerProfile loadControllerProfileFromJson(const std::string& jsonText)
+{
+    const auto document = json::parse(jsonText);
+    core::ControllerProfile profile;
+    profile.id = document.at("id").get<std::string>();
+    profile.displayName = document.at("displayName").get<std::string>();
+    profile.controller = parseControllerId(document.at("controller").get<std::string>());
+
+    for (const auto& widget : document.at("widgets")) {
+        profile.widgets.push_back(parseWidget(widget));
+    }
+
+    for (const auto& binding : document.at("bindings")) {
+        profile.bindings.push_back(parseBinding(binding, profile.controller));
+    }
+
+    return profile;
+}
+
+core::ControllerProfile loadControllerProfileFromFile(const std::string& path)
+{
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("failed to open controller profile: " + path);
+    }
+
+    return loadControllerProfileFromJson(std::string(
+        std::istreambuf_iterator<char>(input),
+        std::istreambuf_iterator<char>()));
+}
+
+} // namespace livelooping::profile

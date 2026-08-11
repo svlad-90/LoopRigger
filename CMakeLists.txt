@@ -10,9 +10,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(LiveLoopingDependencies)
 
 option(LIVELOOPING_BUILD_JUCE_APP "Build the JUCE product shell" OFF)
+option(LIVELOOPING_BUILD_PROFILE_IO "Build JSON controller profile loading support" ON)
 set(LIVELOOPING_JUCE_DIR "" CACHE PATH "Path to a local JUCE checkout")
 option(LIVELOOPING_FETCH_JUCE "Fetch JUCE with CMake when LIVELOOPING_JUCE_DIR is not set" ON)
 set(LIVELOOPING_JUCE_TAG "9.0.0" CACHE STRING "JUCE git tag used by FetchContent")
+set(LIVELOOPING_NLOHMANN_JSON_TAG "v3.11.3" CACHE STRING "nlohmann/json git tag used by FetchContent")
 option(LIVELOOPING_SKIP_JUCE_PLATFORM_CHECK "Skip platform package checks for JUCE targets" OFF)
 
 add_library(livelooping_core
@@ -27,11 +29,42 @@ target_include_directories(livelooping_core
 
 target_compile_features(livelooping_core PUBLIC cxx_std_17)
 
+if(LIVELOOPING_BUILD_PROFILE_IO)
+    livelooping_add_json_dependency()
+
+    add_library(livelooping_profile_io
+        src/ProfileLoader.cpp
+    )
+
+    target_include_directories(livelooping_profile_io
+        PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    target_link_libraries(livelooping_profile_io
+        PUBLIC
+            livelooping_core
+        PRIVATE
+            nlohmann_json::nlohmann_json
+    )
+
+    target_compile_features(livelooping_profile_io PUBLIC cxx_std_17)
+endif()
+
 add_executable(livelooping_sim_cli
     apps/cli/main.cpp
 )
 
 target_link_libraries(livelooping_sim_cli PRIVATE livelooping_core)
+target_compile_definitions(livelooping_sim_cli
+    PRIVATE
+        LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/profiles"
+)
+
+if(LIVELOOPING_BUILD_PROFILE_IO)
+    target_link_libraries(livelooping_sim_cli PRIVATE livelooping_profile_io)
+    target_compile_definitions(livelooping_sim_cli PRIVATE LIVELOOPING_HAS_PROFILE_IO=1)
+endif()
 
 include(CTest)
 
@@ -41,6 +74,15 @@ if(BUILD_TESTING)
     )
 
     target_link_libraries(livelooping_core_smoke_tests PRIVATE livelooping_core)
+    target_compile_definitions(livelooping_core_smoke_tests
+        PRIVATE
+            LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/profiles"
+    )
+
+    if(LIVELOOPING_BUILD_PROFILE_IO)
+        target_link_libraries(livelooping_core_smoke_tests PRIVATE livelooping_profile_io)
+        target_compile_definitions(livelooping_core_smoke_tests PRIVATE LIVELOOPING_HAS_PROFILE_IO=1)
+    endif()
 
     add_test(NAME livelooping_core_smoke_tests COMMAND livelooping_core_smoke_tests)
 endif()
