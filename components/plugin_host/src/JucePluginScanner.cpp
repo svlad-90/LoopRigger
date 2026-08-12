@@ -44,7 +44,7 @@ class JucePluginScanner final : public PluginScanner {
 public:
     JucePluginScanner()
     {
-        formatManager_.addDefaultFormats();
+        juce::addHeadlessDefaultFormatsToManager(formatManager_);
     }
 
     PluginScanResult scan(const PluginScanRequest& request) override
