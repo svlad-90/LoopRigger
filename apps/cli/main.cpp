@@ -1,8 +1,8 @@
-#include "livelooping/core/ControlMapping.h"
-#include "livelooping/core/LiveLoopingEngine.h"
+#include "loop_rigger/control/ControlMapping.h"
+#include "loop_rigger/core/LiveLoopingEngine.h"
 
 #if LIVELOOPING_HAS_PROFILE_IO
-#include "livelooping/profile/ProfileLoader.h"
+#include "loop_rigger/profile_io/ProfileLoader.h"
 #endif
 
 #include <iostream>
@@ -11,20 +11,20 @@
 #include <sstream>
 #include <string>
 
-using livelooping::core::CommandType;
-using livelooping::core::ControllerCommand;
-using livelooping::core::ControllerId;
-using livelooping::core::InputTarget;
-using livelooping::core::LiveLoopingEngine;
-using livelooping::core::MidiMapper;
-using livelooping::core::WidgetEvent;
-using livelooping::core::WidgetEventType;
-using livelooping::core::makeMicKaossPadProfile;
-using livelooping::core::makeSynthKaossPadProfile;
-using livelooping::core::makeYaeltexLiveLoopingProfile;
-using livelooping::core::toString;
+using loop_rigger::core::CommandType;
+using loop_rigger::core::ControllerCommand;
+using loop_rigger::core::ControllerId;
+using loop_rigger::core::InputTarget;
+using loop_rigger::core::LiveLoopingEngine;
+using loop_rigger::control::MidiMapper;
+using loop_rigger::control::WidgetEvent;
+using loop_rigger::control::WidgetEventType;
+using loop_rigger::control::makeMicKaossPadProfile;
+using loop_rigger::control::makeSynthKaossPadProfile;
+using loop_rigger::control::makeYaeltexLiveLoopingProfile;
+using loop_rigger::control::toString;
 #if LIVELOOPING_HAS_PROFILE_IO
-using livelooping::profile::loadControllerProfileFromFile;
+using loop_rigger::profile_io::loadControllerProfileFromFile;
 #endif
 
 namespace {

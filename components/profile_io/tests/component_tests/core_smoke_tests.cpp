@@ -1,8 +1,8 @@
-#include "livelooping/core/ControlMapping.h"
-#include "livelooping/core/LiveLoopingEngine.h"
+#include "loop_rigger/control/ControlMapping.h"
+#include "loop_rigger/core/LiveLoopingEngine.h"
 
 #if LIVELOOPING_HAS_PROFILE_IO
-#include "livelooping/profile/ProfileLoader.h"
+#include "loop_rigger/profile_io/ProfileLoader.h"
 #endif
 
 #include <cstdlib>
@@ -10,25 +10,25 @@
 #include <iostream>
 #include <string>
 
-using livelooping::core::CommandType;
-using livelooping::core::ControllerCommand;
-using livelooping::core::ControllerId;
-using livelooping::core::InputTarget;
-using livelooping::core::LiveLoopingEngine;
-using livelooping::core::MidiEvent;
-using livelooping::core::MidiMapper;
-using livelooping::core::MidiMessageType;
-using livelooping::core::ResampleMode;
-using livelooping::core::TrackState;
-using livelooping::core::WidgetEvent;
-using livelooping::core::WidgetEventType;
-using livelooping::core::makeMicKaossPadProfile;
-using livelooping::core::makeSynthKaossPadProfile;
-using livelooping::core::makeYaeltexLiveLoopingProfile;
-using livelooping::core::normalizeMidiValue;
+using loop_rigger::core::CommandType;
+using loop_rigger::core::ControllerCommand;
+using loop_rigger::core::ControllerId;
+using loop_rigger::core::InputTarget;
+using loop_rigger::core::LiveLoopingEngine;
+using loop_rigger::control::MidiEvent;
+using loop_rigger::control::MidiMapper;
+using loop_rigger::control::MidiMessageType;
+using loop_rigger::core::ResampleMode;
+using loop_rigger::core::TrackState;
+using loop_rigger::control::WidgetEvent;
+using loop_rigger::control::WidgetEventType;
+using loop_rigger::control::makeMicKaossPadProfile;
+using loop_rigger::control::makeSynthKaossPadProfile;
+using loop_rigger::control::makeYaeltexLiveLoopingProfile;
+using loop_rigger::control::normalizeMidiValue;
 #if LIVELOOPING_HAS_PROFILE_IO
-using livelooping::profile::loadControllerProfileFromFile;
-using livelooping::profile::loadControlSurfaceLayoutFromFile;
+using loop_rigger::profile_io::loadControllerProfileFromFile;
+using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
 #endif
 
 namespace {
@@ -182,7 +182,7 @@ std::string layoutPath(const std::string& fileName)
     return std::string(LIVELOOPING_LAYOUT_DIR) + "/" + fileName;
 }
 
-std::set<std::string> widgetIds(const livelooping::core::ControllerProfile& profile)
+std::set<std::string> widgetIds(const loop_rigger::control::ControllerProfile& profile)
 {
     std::set<std::string> ids;
     for (const auto& widget : profile.widgets) {
@@ -192,12 +192,12 @@ std::set<std::string> widgetIds(const livelooping::core::ControllerProfile& prof
 }
 
 void expectLayoutWidgetsBelongToProfile(
-    const livelooping::profile::ControlSurfaceLayout& layout,
-    const livelooping::core::ControllerProfile& profile)
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const loop_rigger::control::ControllerProfile& profile)
 {
     const auto ids = widgetIds(profile);
     for (const auto& element : layout.elements) {
-        if (element.role != livelooping::profile::SurfaceElementRole::Widget) {
+        if (element.role != loop_rigger::profile_io::SurfaceElementRole::Widget) {
             continue;
         }
         expect(!element.widgetId.empty(), "layout widget elements should name a profile widget");
@@ -211,7 +211,7 @@ void expectLayoutWidgetsBelongToProfile(
     }
 }
 
-void expectLayoutElementsStayInsideCanvas(const livelooping::profile::ControlSurfaceLayout& layout)
+void expectLayoutElementsStayInsideCanvas(const loop_rigger::profile_io::ControlSurfaceLayout& layout)
 {
     for (const auto& element : layout.elements) {
         expect(element.bounds.width >= 0.0F, "layout element should have non-negative width: " + element.id);

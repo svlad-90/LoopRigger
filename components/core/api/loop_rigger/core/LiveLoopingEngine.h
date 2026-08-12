@@ -1,11 +1,11 @@
 #pragma once
 
-#include "livelooping/core/ControllerCommand.h"
-#include "livelooping/core/EngineState.h"
+#include "loop_rigger/core/ControllerCommand.h"
+#include "loop_rigger/core/EngineState.h"
 
 #include <string>
 
-namespace livelooping::core {
+namespace loop_rigger::core {
 
 class LiveLoopingEngine {
 public:
@@ -30,5 +30,5 @@ std::string toString(InputTarget target);
 std::string toString(TrackState state);
 std::string toString(ResampleMode mode);
 
-} // namespace livelooping::core
+} // namespace loop_rigger::core
 

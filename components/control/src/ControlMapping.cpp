@@ -1,9 +1,14 @@
-#include "livelooping/core/ControlMapping.h"
+#include "loop_rigger/control/ControlMapping.h"
 
 #include <algorithm>
 #include <utility>
 
-namespace livelooping::core {
+namespace loop_rigger::control {
+
+using core::CommandType;
+using core::ControllerCommand;
+using core::ControllerId;
+using core::InputTarget;
 
 namespace {
 
@@ -95,7 +100,7 @@ const ControllerProfile& MidiMapper::profile() const
     return profile_;
 }
 
-std::optional<ControllerCommand> MidiMapper::mapMidi(const MidiEvent& event) const
+std::optional<core::ControllerCommand> MidiMapper::mapMidi(const MidiEvent& event) const
 {
     for (const auto& binding : profile_.bindings) {
         if (!binding.midi.has_value()) {
@@ -118,7 +123,7 @@ std::optional<ControllerCommand> MidiMapper::mapMidi(const MidiEvent& event) con
     return std::nullopt;
 }
 
-std::optional<ControllerCommand> MidiMapper::mapWidget(const WidgetEvent& event) const
+std::optional<core::ControllerCommand> MidiMapper::mapWidget(const WidgetEvent& event) const
 {
     for (const auto& binding : profile_.bindings) {
         if (binding.widgetId != event.widgetId || binding.widgetEventType != event.type) {
@@ -325,4 +330,4 @@ std::string toString(WidgetType type)
     return "unknown";
 }
 
-} // namespace livelooping::core
+} // namespace loop_rigger::control

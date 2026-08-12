@@ -1,12 +1,12 @@
 #pragma once
 
-#include "livelooping/core/ControllerCommand.h"
+#include "loop_rigger/core/ControllerCommand.h"
 
 #include <optional>
 #include <string>
 #include <vector>
 
-namespace livelooping::core {
+namespace loop_rigger::control {
 
 enum class WidgetType {
     Button,
@@ -60,7 +60,7 @@ struct ControlBinding {
     std::string widgetId;
     WidgetEventType widgetEventType = WidgetEventType::Press;
     std::optional<MidiBinding> midi;
-    ControllerCommand command;
+    core::ControllerCommand command;
     bool useEventValue = false;
     bool triggerOnNonZero = true;
 };
@@ -68,7 +68,7 @@ struct ControlBinding {
 struct ControllerProfile {
     std::string id;
     std::string displayName;
-    ControllerId controller = ControllerId::PseudoGui;
+    core::ControllerId controller = core::ControllerId::PseudoGui;
     std::vector<ControllerWidget> widgets;
     std::vector<ControlBinding> bindings;
 };
@@ -78,8 +78,8 @@ public:
     explicit MidiMapper(ControllerProfile profile);
 
     const ControllerProfile& profile() const;
-    std::optional<ControllerCommand> mapMidi(const MidiEvent& event) const;
-    std::optional<ControllerCommand> mapWidget(const WidgetEvent& event) const;
+    std::optional<core::ControllerCommand> mapMidi(const MidiEvent& event) const;
+    std::optional<core::ControllerCommand> mapWidget(const WidgetEvent& event) const;
 
 private:
     ControllerProfile profile_;
@@ -88,8 +88,8 @@ private:
 ControllerProfile makeKaossPadInputProfile(
     std::string id,
     std::string displayName,
-    ControllerId controller,
-    InputTarget target);
+    core::ControllerId controller,
+    core::InputTarget target);
 
 ControllerProfile makeMicKaossPadProfile();
 ControllerProfile makeSynthKaossPadProfile();
@@ -98,4 +98,4 @@ ControllerProfile makeYaeltexLiveLoopingProfile();
 float normalizeMidiValue(int value);
 std::string toString(WidgetType type);
 
-} // namespace livelooping::core
+} // namespace loop_rigger::control

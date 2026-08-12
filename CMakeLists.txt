@@ -18,32 +18,48 @@ set(LIVELOOPING_NLOHMANN_JSON_TAG "v3.11.3" CACHE STRING "nlohmann/json git tag 
 option(LIVELOOPING_SKIP_JUCE_PLATFORM_CHECK "Skip platform package checks for JUCE targets" OFF)
 
 add_library(livelooping_core
-    src/ControlMapping.cpp
-    src/LiveLoopingEngine.cpp
+    components/core/src/LiveLoopingEngine.cpp
 )
 
 target_include_directories(livelooping_core
     PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/core/api
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_compile_features(livelooping_core PUBLIC cxx_std_17)
 
+add_library(livelooping_control
+    components/control/src/ControlMapping.cpp
+)
+
+target_include_directories(livelooping_control
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/control/api
+)
+
+target_link_libraries(livelooping_control
+    PUBLIC
+        livelooping_core
+)
+
+target_compile_features(livelooping_control PUBLIC cxx_std_17)
+
 if(LIVELOOPING_BUILD_PROFILE_IO)
     livelooping_add_json_dependency()
 
     add_library(livelooping_profile_io
-        src/ProfileLoader.cpp
+        components/profile_io/src/ProfileLoader.cpp
     )
 
     target_include_directories(livelooping_profile_io
         PUBLIC
-            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/components/profile_io/api
     )
 
     target_link_libraries(livelooping_profile_io
         PUBLIC
-            livelooping_core
+            livelooping_control
         PRIVATE
             nlohmann_json::nlohmann_json
     )
@@ -56,9 +72,10 @@ add_executable(livelooping_sim_cli
 )
 
 target_link_libraries(livelooping_sim_cli PRIVATE livelooping_core)
+target_link_libraries(livelooping_sim_cli PRIVATE livelooping_control)
 target_compile_definitions(livelooping_sim_cli
     PRIVATE
-        LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/profiles"
+        LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/controller_profiles"
 )
 
 if(LIVELOOPING_BUILD_PROFILE_IO)
@@ -70,14 +87,15 @@ include(CTest)
 
 if(BUILD_TESTING)
     add_executable(livelooping_core_smoke_tests
-        tests/core_smoke_tests.cpp
+        components/profile_io/tests/component_tests/core_smoke_tests.cpp
     )
 
     target_link_libraries(livelooping_core_smoke_tests PRIVATE livelooping_core)
+    target_link_libraries(livelooping_core_smoke_tests PRIVATE livelooping_control)
     target_compile_definitions(livelooping_core_smoke_tests
         PRIVATE
-            LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/profiles"
-            LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/layouts"
+            LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/controller_profiles"
+            LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/control_surfaces"
     )
 
     if(LIVELOOPING_BUILD_PROFILE_IO)
@@ -106,6 +124,7 @@ if(LIVELOOPING_BUILD_JUCE_APP)
     target_link_libraries(livelooping_product
         PRIVATE
             livelooping_core
+            livelooping_control
             juce::juce_gui_extra
     )
 
@@ -114,7 +133,7 @@ if(LIVELOOPING_BUILD_JUCE_APP)
         target_compile_definitions(livelooping_product
             PRIVATE
                 LIVELOOPING_HAS_PROFILE_IO=1
-                LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/layouts"
+                LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/control_surfaces"
         )
     endif()
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace livelooping::core {
+namespace loop_rigger::core {
 
 constexpr int kInputPresetPages = 4;
 constexpr int kInputPresetsPerPage = 8;
@@ -56,5 +56,5 @@ struct EngineState {
     std::vector<std::string> eventLog;
 };
 
-} // namespace livelooping::core
+} // namespace loop_rigger::core
 

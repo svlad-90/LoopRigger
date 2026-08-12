@@ -1,4 +1,4 @@
-#include "livelooping/profile/ProfileLoader.h"
+#include "loop_rigger/profile_io/ProfileLoader.h"
 
 #include <nlohmann/json.hpp>
 
@@ -7,50 +7,50 @@
 #include <stdexcept>
 #include <utility>
 
-namespace livelooping::profile {
+namespace loop_rigger::profile_io {
 
 namespace {
 
 using json = nlohmann::json;
 
-core::WidgetType parseWidgetType(const std::string& value)
+control::WidgetType parseWidgetType(const std::string& value)
 {
     if (value == "button") {
-        return core::WidgetType::Button;
+        return control::WidgetType::Button;
     }
     if (value == "knob") {
-        return core::WidgetType::Knob;
+        return control::WidgetType::Knob;
     }
     if (value == "fader") {
-        return core::WidgetType::Fader;
+        return control::WidgetType::Fader;
     }
     if (value == "joystick") {
-        return core::WidgetType::Joystick;
+        return control::WidgetType::Joystick;
     }
     throw std::runtime_error("unknown widget type: " + value);
 }
 
-core::WidgetEventType parseWidgetEventType(const std::string& value)
+control::WidgetEventType parseWidgetEventType(const std::string& value)
 {
     if (value == "press") {
-        return core::WidgetEventType::Press;
+        return control::WidgetEventType::Press;
     }
     if (value == "release") {
-        return core::WidgetEventType::Release;
+        return control::WidgetEventType::Release;
     }
     if (value == "change") {
-        return core::WidgetEventType::Change;
+        return control::WidgetEventType::Change;
     }
     throw std::runtime_error("unknown widget event type: " + value);
 }
 
-core::MidiMessageType parseMidiMessageType(const std::string& value)
+control::MidiMessageType parseMidiMessageType(const std::string& value)
 {
     if (value == "note") {
-        return core::MidiMessageType::Note;
+        return control::MidiMessageType::Note;
     }
     if (value == "control_change") {
-        return core::MidiMessageType::ControlChange;
+        return control::MidiMessageType::ControlChange;
     }
     throw std::runtime_error("unknown MIDI message type: " + value);
 }
@@ -179,9 +179,9 @@ core::CommandType parseCommandType(const std::string& value)
     throw std::runtime_error("unknown command type: " + value);
 }
 
-core::ControllerWidget parseWidget(const json& value)
+control::ControllerWidget parseWidget(const json& value)
 {
-    core::ControllerWidget widget;
+    control::ControllerWidget widget;
     widget.id = value.at("id").get<std::string>();
     widget.label = value.at("label").get<std::string>();
     widget.type = parseWidgetType(value.at("type").get<std::string>());
@@ -193,9 +193,9 @@ core::ControllerWidget parseWidget(const json& value)
     return widget;
 }
 
-core::MidiBinding parseMidiBinding(const json& value)
+control::MidiBinding parseMidiBinding(const json& value)
 {
-    core::MidiBinding binding;
+    control::MidiBinding binding;
     binding.type = parseMidiMessageType(value.at("type").get<std::string>());
     binding.channel = value.value("channel", 0);
     binding.number = value.at("number").get<int>();
@@ -213,9 +213,9 @@ core::ControllerCommand parseCommand(const json& value, core::ControllerId contr
     return command;
 }
 
-core::ControlBinding parseBinding(const json& value, core::ControllerId controller)
+control::ControlBinding parseBinding(const json& value, core::ControllerId controller)
 {
-    core::ControlBinding binding;
+    control::ControlBinding binding;
     binding.widgetId = value.at("widgetId").get<std::string>();
     binding.widgetEventType = parseWidgetEventType(value.value("widgetEventType", "press"));
     binding.command = parseCommand(value.at("command"), controller);
@@ -255,10 +255,10 @@ SurfaceElement parseSurfaceElement(const json& value)
 
 } // namespace
 
-core::ControllerProfile loadControllerProfileFromJson(const std::string& jsonText)
+control::ControllerProfile loadControllerProfileFromJson(const std::string& jsonText)
 {
     const auto document = json::parse(jsonText);
-    core::ControllerProfile profile;
+    control::ControllerProfile profile;
     profile.id = document.at("id").get<std::string>();
     profile.displayName = document.at("displayName").get<std::string>();
     profile.controller = parseControllerId(document.at("controller").get<std::string>());
@@ -274,7 +274,7 @@ core::ControllerProfile loadControllerProfileFromJson(const std::string& jsonTex
     return profile;
 }
 
-core::ControllerProfile loadControllerProfileFromFile(const std::string& path)
+control::ControllerProfile loadControllerProfileFromFile(const std::string& path)
 {
     std::ifstream input(path);
     if (!input) {
@@ -314,4 +314,4 @@ ControlSurfaceLayout loadControlSurfaceLayoutFromFile(const std::string& path)
         std::istreambuf_iterator<char>()));
 }
 
-} // namespace livelooping::profile
+} // namespace loop_rigger::profile_io

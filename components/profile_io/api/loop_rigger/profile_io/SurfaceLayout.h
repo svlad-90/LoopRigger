@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace livelooping::profile {
+namespace loop_rigger::profile_io {
 
 struct SurfaceBounds {
     float x = 0.0F;
@@ -47,4 +47,4 @@ struct ControlSurfaceLayout {
     std::vector<SurfaceElement> elements;
 };
 
-} // namespace livelooping::profile
+} // namespace loop_rigger::profile_io

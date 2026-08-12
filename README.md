@@ -7,6 +7,8 @@ The project is split into:
 
 - `livelooping_core`: controller commands and performance state, with no GUI or
   audio dependency.
+- `livelooping_control`: controller widgets, MIDI/widget events, controller
+  profiles, and event-to-command mapping.
 - `livelooping_profile_io`: optional JSON controller profile loader.
 - built-in controller profile factories for the mic Kaoss Pad, synth Kaoss Pad,
   and Yaeltex LiveLooping surface.
@@ -15,8 +17,9 @@ The project is split into:
 - `livelooping_product`: optional JUCE app shell with separate Product and
   Pseudo Devices windows.
 
-See `docs/control-surfaces.md` for the controller abstraction model and the
-initial Korg Kaoss Pad / Yaeltex control groups.
+See `docs/architecture.md` for the component layout and Python scripting
+direction. See `docs/control-surfaces.md` for the controller abstraction model
+and the initial Korg Kaoss Pad / Yaeltex control groups.
 
 The intended production stack is CMake + C++17 + JUCE. JUCE is selected because
 it supports standalone audio apps, audio/MIDI device handling, plugin hosting,
@@ -34,8 +37,8 @@ cmake --build build --target livelooping_sim_cli
 
 The CLI simulator accepts direct logical commands and profile-driven pseudo
 device commands. When `LIVELOOPING_BUILD_PROFILE_IO=ON`, the profile-driven
-commands load `profiles/*.json` instead of using compiled-in controller
-profiles:
+commands load `data/controller_profiles/*.json` instead of using compiled-in
+controller profiles:
 
 ```text
 layout yaeltex
@@ -94,6 +97,7 @@ the control model:
 - data-driven controller mapping from MIDI or pseudo-GUI widget events to
   logical commands.
 
-The controller profiles are currently compiled into the core. A file-backed
-profile format now exists under `profiles/`; the compiled profiles remain as
-fallback/reference data while the schema stabilizes.
+The controller profiles are currently compiled into the control component. A
+file-backed profile format now exists under `data/controller_profiles/`, and
+control-surface layouts live under `data/control_surfaces/`. The compiled
+profiles remain as fallback/reference data while the schema stabilizes.

@@ -1,11 +1,11 @@
-#include "livelooping/core/LiveLoopingEngine.h"
+#include "loop_rigger/core/LiveLoopingEngine.h"
 
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
 
-namespace livelooping::core {
+namespace loop_rigger::core {
 
 namespace {
 
@@ -272,5 +272,5 @@ std::string toString(ResampleMode mode)
     return "unknown";
 }
 
-} // namespace livelooping::core
+} // namespace loop_rigger::core
 

@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace livelooping::core {
+namespace loop_rigger::core {
 
 enum class ControllerId {
     MicKaossPad,
@@ -46,5 +46,5 @@ struct ControllerCommand {
     float value = 0.0F;
 };
 
-} // namespace livelooping::core
+} // namespace loop_rigger::core
 
