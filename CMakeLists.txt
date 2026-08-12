@@ -66,6 +66,16 @@ target_compile_features(livelooping_scripting PUBLIC cxx_std_17)
 if(LIVELOOPING_BUILD_PYTHON_SCRIPTING)
     find_package(Python3 REQUIRED COMPONENTS Development.Embed)
 
+    if(WIN32)
+        get_target_property(LIVELOOPING_PYTHON_RUNTIME Python3::Python IMPORTED_LOCATION_RELEASE)
+        if(NOT LIVELOOPING_PYTHON_RUNTIME)
+            get_target_property(LIVELOOPING_PYTHON_RUNTIME Python3::Python IMPORTED_LOCATION)
+        endif()
+        if(LIVELOOPING_PYTHON_RUNTIME)
+            get_filename_component(LIVELOOPING_PYTHON_RUNTIME_DIR "${LIVELOOPING_PYTHON_RUNTIME}" DIRECTORY)
+        endif()
+    endif()
+
     add_library(livelooping_python_scripting
         components/scripting/src/PythonScriptHost.cpp
     )
@@ -182,6 +192,12 @@ if(BUILD_TESTING)
         )
 
         add_test(NAME livelooping_python_scripting_unit_tests COMMAND livelooping_python_scripting_unit_tests)
+        if(WIN32 AND LIVELOOPING_PYTHON_RUNTIME_DIR)
+            set_tests_properties(livelooping_python_scripting_unit_tests
+                PROPERTIES
+                    ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${LIVELOOPING_PYTHON_RUNTIME_DIR}"
+            )
+        endif()
     endif()
 
     add_executable(livelooping_virtual_devices_unit_tests
