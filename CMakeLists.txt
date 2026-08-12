@@ -11,6 +11,7 @@ include(LiveLoopingDependencies)
 
 option(LIVELOOPING_BUILD_JUCE_APP "Build the JUCE product shell" OFF)
 option(LIVELOOPING_BUILD_PROFILE_IO "Build JSON controller profile loading support" ON)
+option(LIVELOOPING_BUILD_PYTHON_SCRIPTING "Build embedded Python device scripting support" OFF)
 set(LIVELOOPING_JUCE_DIR "" CACHE PATH "Path to a local JUCE checkout")
 option(LIVELOOPING_FETCH_JUCE "Fetch JUCE with CMake when LIVELOOPING_JUCE_DIR is not set" ON)
 set(LIVELOOPING_JUCE_TAG "9.0.0" CACHE STRING "JUCE git tag used by FetchContent")
@@ -61,6 +62,28 @@ target_link_libraries(livelooping_scripting
 )
 
 target_compile_features(livelooping_scripting PUBLIC cxx_std_17)
+
+if(LIVELOOPING_BUILD_PYTHON_SCRIPTING)
+    find_package(Python3 REQUIRED COMPONENTS Development.Embed)
+
+    add_library(livelooping_python_scripting
+        components/scripting/src/PythonScriptHost.cpp
+    )
+
+    target_include_directories(livelooping_python_scripting
+        PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/components/scripting/api
+    )
+
+    target_link_libraries(livelooping_python_scripting
+        PUBLIC
+            livelooping_scripting
+        PRIVATE
+            Python3::Python
+    )
+
+    target_compile_features(livelooping_python_scripting PUBLIC cxx_std_17)
+endif()
 
 add_library(livelooping_virtual_devices
     components/virtual_devices/src/VirtualDeviceRegistry.cpp
@@ -146,6 +169,20 @@ if(BUILD_TESTING)
     target_link_libraries(livelooping_scripting_unit_tests PRIVATE livelooping_scripting)
 
     add_test(NAME livelooping_scripting_unit_tests COMMAND livelooping_scripting_unit_tests)
+
+    if(LIVELOOPING_BUILD_PYTHON_SCRIPTING)
+        add_executable(livelooping_python_scripting_unit_tests
+            components/scripting/tests/unit_tests/python_script_host_tests.cpp
+        )
+
+        target_link_libraries(livelooping_python_scripting_unit_tests PRIVATE livelooping_python_scripting)
+        target_compile_definitions(livelooping_python_scripting_unit_tests
+            PRIVATE
+                LIVELOOPING_SCRIPTING_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/components/scripting/tests/unit_tests"
+        )
+
+        add_test(NAME livelooping_python_scripting_unit_tests COMMAND livelooping_python_scripting_unit_tests)
+    endif()
 
     add_executable(livelooping_virtual_devices_unit_tests
         components/virtual_devices/tests/unit_tests/virtual_device_registry_tests.cpp

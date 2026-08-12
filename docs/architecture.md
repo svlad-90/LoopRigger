@@ -94,9 +94,10 @@ pseudo widget event -> virtual_devices -> scripting -> control command -> core
 engine state change -> scripting -> MIDI/pseudo feedback
 ```
 
-The first scripting implementation should be embedded Python with a narrow C++
-host API. Dynamic C++ device plugins are intentionally deferred because a
-cross-platform C++ DLL/SO ABI would add packaging and compatibility cost early.
+The first scripting implementation is an optional embedded Python target behind
+the narrow C++ `ScriptHost` API. Dynamic C++ device plugins are intentionally
+deferred because a cross-platform C++ DLL/SO ABI would add packaging and
+compatibility cost early.
 
 ## Data Ownership
 

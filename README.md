@@ -11,6 +11,8 @@ The project is split into:
   profiles, and event-to-command mapping.
 - `livelooping_profile_io`: optional JSON controller profile loader.
 - `livelooping_scripting`: C++ contract for future Python device scripts.
+- `livelooping_python_scripting`: optional embedded-Python implementation of
+  the script host.
 - `livelooping_virtual_devices`: renderer-independent pseudo-device
   descriptors and events.
 - built-in controller profile factories for the mic Kaoss Pad, synth Kaoss Pad,
@@ -57,6 +59,14 @@ Run the core smoke tests:
 
 ```sh
 ctest --test-dir build --output-on-failure
+```
+
+Build and test the optional embedded-Python script host:
+
+```sh
+cmake -S . -B build-python -DLIVELOOPING_BUILD_PYTHON_SCRIPTING=ON
+cmake --build build-python --target livelooping_python_scripting_unit_tests
+ctest --test-dir build-python --output-on-failure
 ```
 
 Build the JUCE product shell. By default CMake fetches the pinned JUCE tag only
