@@ -104,3 +104,7 @@ The controller profiles are currently compiled into the control component. A
 file-backed profile format now exists under `data/controller_profiles/`, and
 control-surface layouts live under `data/control_surfaces/`. The compiled
 profiles remain as fallback/reference data while the schema stabilizes.
+
+Device packages live under `devices/<device-id>/device.json`. A package points
+at its controller profile, control-surface layout, and optional `script.py`.
+The Python files are placeholders until the embedded script host is connected.

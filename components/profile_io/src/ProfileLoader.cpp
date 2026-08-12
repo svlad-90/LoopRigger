@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
@@ -253,7 +254,37 @@ SurfaceElement parseSurfaceElement(const json& value)
     return element;
 }
 
+std::string readTextFile(const std::string& path)
+{
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("failed to open file: " + path);
+    }
+
+    return std::string(
+        std::istreambuf_iterator<char>(input),
+        std::istreambuf_iterator<char>());
+}
+
+std::string resolvePackagePath(const std::filesystem::path& rootPath, const std::string& value)
+{
+    if (value.empty()) {
+        return {};
+    }
+
+    const std::filesystem::path path(value);
+    if (path.is_absolute()) {
+        return path.lexically_normal().string();
+    }
+    return (rootPath / path).lexically_normal().string();
+}
+
 } // namespace
+
+bool hasScript(const DevicePackageManifest& manifest)
+{
+    return !manifest.scriptPath.empty();
+}
 
 control::ControllerProfile loadControllerProfileFromJson(const std::string& jsonText)
 {
@@ -276,14 +307,7 @@ control::ControllerProfile loadControllerProfileFromJson(const std::string& json
 
 control::ControllerProfile loadControllerProfileFromFile(const std::string& path)
 {
-    std::ifstream input(path);
-    if (!input) {
-        throw std::runtime_error("failed to open controller profile: " + path);
-    }
-
-    return loadControllerProfileFromJson(std::string(
-        std::istreambuf_iterator<char>(input),
-        std::istreambuf_iterator<char>()));
+    return loadControllerProfileFromJson(readTextFile(path));
 }
 
 ControlSurfaceLayout loadControlSurfaceLayoutFromJson(const std::string& jsonText)
@@ -304,14 +328,38 @@ ControlSurfaceLayout loadControlSurfaceLayoutFromJson(const std::string& jsonTex
 
 ControlSurfaceLayout loadControlSurfaceLayoutFromFile(const std::string& path)
 {
-    std::ifstream input(path);
-    if (!input) {
-        throw std::runtime_error("failed to open control surface layout: " + path);
-    }
+    return loadControlSurfaceLayoutFromJson(readTextFile(path));
+}
 
-    return loadControlSurfaceLayoutFromJson(std::string(
-        std::istreambuf_iterator<char>(input),
-        std::istreambuf_iterator<char>()));
+DevicePackageManifest loadDevicePackageManifestFromJson(const std::string& jsonText, const std::string& rootPath)
+{
+    const auto document = json::parse(jsonText);
+    const std::filesystem::path packageRoot(rootPath);
+
+    DevicePackageManifest manifest;
+    manifest.id = document.at("id").get<std::string>();
+    manifest.displayName = document.at("displayName").get<std::string>();
+    manifest.rootPath = packageRoot.lexically_normal().string();
+    manifest.controllerProfilePath = resolvePackagePath(packageRoot, document.at("controllerProfile").get<std::string>());
+    manifest.controlSurfaceLayoutPath = resolvePackagePath(packageRoot, document.at("controlSurface").get<std::string>());
+    manifest.scriptPath = resolvePackagePath(packageRoot, document.value("script", ""));
+    return manifest;
+}
+
+DevicePackageManifest loadDevicePackageManifestFromFile(const std::string& path)
+{
+    const auto rootPath = std::filesystem::path(path).parent_path();
+    return loadDevicePackageManifestFromJson(readTextFile(path), rootPath.string());
+}
+
+LoadedDevicePackage loadDevicePackageFromDirectory(const std::string& directoryPath)
+{
+    const auto manifestPath = std::filesystem::path(directoryPath) / "device.json";
+    LoadedDevicePackage package;
+    package.manifest = loadDevicePackageManifestFromFile(manifestPath.string());
+    package.controllerProfile = loadControllerProfileFromFile(package.manifest.controllerProfilePath);
+    package.controlSurfaceLayout = loadControlSurfaceLayoutFromFile(package.manifest.controlSurfaceLayoutPath);
+    return package;
 }
 
 } // namespace loop_rigger::profile_io

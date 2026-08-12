@@ -1,0 +1,7 @@
+{
+  "id": "yaeltex.livelooping",
+  "displayName": "Yaeltex LiveLooping",
+  "controllerProfile": "../../data/controller_profiles/yaeltex_livelooping.json",
+  "controlSurface": "../../data/control_surfaces/yaeltex_livelooping.json",
+  "script": "script.py"
+}

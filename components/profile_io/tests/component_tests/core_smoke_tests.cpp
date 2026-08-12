@@ -29,6 +29,8 @@ using loop_rigger::control::normalizeMidiValue;
 #if LIVELOOPING_HAS_PROFILE_IO
 using loop_rigger::profile_io::loadControllerProfileFromFile;
 using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
+using loop_rigger::profile_io::loadDevicePackageFromDirectory;
+using loop_rigger::profile_io::hasScript;
 #endif
 
 namespace {
@@ -182,6 +184,11 @@ std::string layoutPath(const std::string& fileName)
     return std::string(LIVELOOPING_LAYOUT_DIR) + "/" + fileName;
 }
 
+std::string devicePath(const std::string& directoryName)
+{
+    return std::string(LIVELOOPING_DEVICE_DIR) + "/" + directoryName;
+}
+
 std::set<std::string> widgetIds(const loop_rigger::control::ControllerProfile& profile)
 {
     std::set<std::string> ids;
@@ -278,6 +285,26 @@ void testJsonSurfaceLayoutLoading()
     expectLayoutElementsStayInsideCanvas(yaeltexLayout);
     expectLayoutWidgetsBelongToProfile(yaeltexLayout, yaeltexProfile);
 }
+
+void testDevicePackageLoading()
+{
+    const auto micPackage = loadDevicePackageFromDirectory(devicePath("kaoss_mic"));
+    expect(micPackage.manifest.id == "kaoss.mic", "mic package should load id");
+    expect(micPackage.controllerProfile.id == "kaoss.mic", "mic package should load matching controller profile");
+    expect(micPackage.controlSurfaceLayout.id == "kaoss_pad_kp3", "mic package should load shared Kaoss layout");
+    expect(hasScript(micPackage.manifest), "mic package should expose placeholder script path");
+
+    const auto synthPackage = loadDevicePackageFromDirectory(devicePath("kaoss_synth"));
+    expect(synthPackage.manifest.id == "kaoss.synth", "synth package should load id");
+    expect(synthPackage.controllerProfile.controller == ControllerId::SynthKaossPad, "synth package should load synth profile");
+    expect(synthPackage.controlSurfaceLayout.profileId == "kaoss.*", "synth package should use shared Kaoss layout profile id");
+
+    const auto yaeltexPackage = loadDevicePackageFromDirectory(devicePath("yaeltex_livelooping"));
+    expect(yaeltexPackage.manifest.id == "yaeltex.livelooping", "Yaeltex package should load id");
+    expect(yaeltexPackage.controllerProfile.id == "yaeltex.livelooping", "Yaeltex package should load matching profile");
+    expect(yaeltexPackage.controlSurfaceLayout.profileId == "yaeltex.livelooping", "Yaeltex package should load matching layout");
+    expect(!yaeltexPackage.manifest.scriptPath.empty(), "Yaeltex package should resolve script path");
+}
 #endif
 
 } // namespace
@@ -291,6 +318,7 @@ int main()
 #if LIVELOOPING_HAS_PROFILE_IO
     testJsonProfileLoading();
     testJsonSurfaceLayoutLoading();
+    testDevicePackageLoading();
 #endif
 
     if (failures != 0) {

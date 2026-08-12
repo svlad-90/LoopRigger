@@ -118,3 +118,16 @@ devices/<device-id>/
 
 The C++ product should continue to support declarative-only devices where no
 `script.py` is present.
+
+The initial package manifest may reference shared files while the schemas
+stabilize:
+
+```json
+{
+  "id": "yaeltex.livelooping",
+  "displayName": "Yaeltex LiveLooping",
+  "controllerProfile": "../../data/controller_profiles/yaeltex_livelooping.json",
+  "controlSurface": "../../data/control_surfaces/yaeltex_livelooping.json",
+  "script": "script.py"
+}
+```

@@ -1,0 +1,7 @@
+{
+  "id": "kaoss.synth",
+  "displayName": "Synth Kaoss Pad",
+  "controllerProfile": "../../data/controller_profiles/kaoss_synth.json",
+  "controlSurface": "../../data/control_surfaces/kaoss_pad.json",
+  "script": "script.py"
+}

@@ -129,6 +129,7 @@ if(BUILD_TESTING)
         PRIVATE
             LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/controller_profiles"
             LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/control_surfaces"
+            LIVELOOPING_DEVICE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/devices"
     )
 
     if(LIVELOOPING_BUILD_PROFILE_IO)

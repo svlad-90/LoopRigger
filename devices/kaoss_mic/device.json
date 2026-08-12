@@ -1,0 +1,7 @@
+{
+  "id": "kaoss.mic",
+  "displayName": "Mic Kaoss Pad",
+  "controllerProfile": "../../data/controller_profiles/kaoss_mic.json",
+  "controlSurface": "../../data/control_surfaces/kaoss_pad.json",
+  "script": "script.py"
+}
