@@ -15,6 +15,8 @@ The project is split into:
   the script host.
 - `livelooping_virtual_devices`: renderer-independent pseudo-device
   descriptors and events.
+- `livelooping_plugin_host`: plugin metadata catalog and scanner API.
+- `livelooping_juce_plugin_host`: optional JUCE plugin scanner implementation.
 - built-in controller profile factories for the mic Kaoss Pad, synth Kaoss Pad,
   and Yaeltex LiveLooping surface.
 - `livelooping_sim_cli`: local command-line simulator that can run in the Linux
@@ -67,6 +69,14 @@ Build and test the optional embedded-Python script host:
 cmake -S . -B build-python -DLIVELOOPING_BUILD_PYTHON_SCRIPTING=ON
 cmake --build build-python --target livelooping_python_scripting_unit_tests
 ctest --test-dir build-python --output-on-failure
+```
+
+Build and test the optional JUCE plugin scanner:
+
+```sh
+cmake -S . -B build-plugin-host -DLIVELOOPING_BUILD_JUCE_PLUGIN_HOST=ON
+cmake --build build-plugin-host --target livelooping_juce_plugin_host_unit_tests
+ctest --test-dir build-plugin-host --output-on-failure
 ```
 
 Build the JUCE product shell. By default CMake fetches the pinned JUCE tag only

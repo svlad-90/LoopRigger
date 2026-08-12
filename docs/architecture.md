@@ -27,12 +27,13 @@ Current components:
 - `scripting`: Python control-adapter host for FL Studio-style device scripts.
 - `virtual_devices`: device descriptors, virtual surfaces, and pseudo-device
   events independent of a concrete renderer.
+- `plugin_host`: plugin metadata catalog and scanner API, with optional JUCE
+  scanner implementation.
 
 Reserved components:
 
 - `midi`: physical MIDI input/output ports, device matching, and MIDI learn.
 - `audio`: realtime audio engine, loop buffers, transport, and routing.
-- `plugin_host`: VST/AU plugin scanning, chains, parameters, and snapshots.
 - `ui_model`: product state snapshots prepared for UI renderers.
 - `juce_app`: JUCE standalone product window and pseudo-device renderer.
 

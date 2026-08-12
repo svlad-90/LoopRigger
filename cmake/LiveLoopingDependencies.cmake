@@ -52,6 +52,53 @@ function(livelooping_check_linux_juce_gui_dependencies)
     endif()
 endfunction()
 
+function(livelooping_check_linux_juce_plugin_host_dependencies)
+    if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        return()
+    endif()
+
+    if(LIVELOOPING_SKIP_JUCE_PLATFORM_CHECK)
+        message(WARNING "Skipping Linux JUCE plugin-host dependency checks")
+        return()
+    endif()
+
+    find_package(PkgConfig QUIET)
+    if(NOT PkgConfig_FOUND)
+        message(FATAL_ERROR
+            "pkg-config is required to configure the JUCE plugin-host target on Linux.\n"
+            "Ubuntu/Debian package: pkg-config\n"
+            "Pass -DLIVELOOPING_SKIP_JUCE_PLATFORM_CHECK=ON to bypass this check.")
+    endif()
+
+    set(required_modules
+        alsa
+        freetype2
+        fontconfig
+        x11
+        xext
+        xrender
+    )
+
+    set(missing_modules "")
+    foreach(module IN LISTS required_modules)
+        string(MAKE_C_IDENTIFIER "${module}" module_var)
+        pkg_check_modules("LIVELOOPING_PLUGIN_DEP_${module_var}" QUIET "${module}")
+        if(NOT LIVELOOPING_PLUGIN_DEP_${module_var}_FOUND)
+            list(APPEND missing_modules "${module}")
+        endif()
+    endforeach()
+
+    if(missing_modules)
+        string(JOIN ", " missing_text ${missing_modules})
+        message(FATAL_ERROR
+            "Missing Linux development packages for the JUCE plugin-host target: ${missing_text}\n"
+            "Ubuntu/Debian packages:\n"
+            "  sudo apt install pkg-config libasound2-dev libfreetype-dev "
+            "libfontconfig1-dev libx11-dev libxext-dev libxrender-dev\n"
+            "Pass -DLIVELOOPING_SKIP_JUCE_PLATFORM_CHECK=ON to bypass this check.")
+    endif()
+endfunction()
+
 function(livelooping_add_json_dependency)
     include(FetchContent)
     FetchContent_Declare(nlohmann_json

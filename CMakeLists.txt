@@ -12,6 +12,7 @@ include(LiveLoopingDependencies)
 option(LIVELOOPING_BUILD_JUCE_APP "Build the JUCE product shell" OFF)
 option(LIVELOOPING_BUILD_PROFILE_IO "Build JSON controller profile loading support" ON)
 option(LIVELOOPING_BUILD_PYTHON_SCRIPTING "Build embedded Python device scripting support" OFF)
+option(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST "Build JUCE plugin scanning support" OFF)
 set(LIVELOOPING_JUCE_DIR "" CACHE PATH "Path to a local JUCE checkout")
 option(LIVELOOPING_FETCH_JUCE "Fetch JUCE with CMake when LIVELOOPING_JUCE_DIR is not set" ON)
 set(LIVELOOPING_JUCE_TAG "9.0.0" CACHE STRING "JUCE git tag used by FetchContent")
@@ -111,6 +112,48 @@ target_link_libraries(livelooping_virtual_devices
 
 target_compile_features(livelooping_virtual_devices PUBLIC cxx_std_17)
 
+add_library(livelooping_plugin_host
+    components/plugin_host/src/PluginCatalog.cpp
+)
+
+target_include_directories(livelooping_plugin_host
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/plugin_host/api
+)
+
+target_compile_features(livelooping_plugin_host PUBLIC cxx_std_17)
+
+if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
+    livelooping_check_linux_juce_plugin_host_dependencies()
+    livelooping_add_juce_dependency()
+
+    add_library(livelooping_juce_plugin_host
+        components/plugin_host/src/JucePluginScanner.cpp
+    )
+
+    target_include_directories(livelooping_juce_plugin_host
+        PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/components/plugin_host/api
+    )
+
+    target_link_libraries(livelooping_juce_plugin_host
+        PUBLIC
+            livelooping_plugin_host
+        PRIVATE
+            juce::juce_audio_processors
+    )
+
+    target_compile_definitions(livelooping_juce_plugin_host
+        PRIVATE
+            JUCE_PLUGINHOST_VST3=1
+            JUCE_PLUGINHOST_AU=1
+            JUCE_WEB_BROWSER=0
+            JUCE_USE_CURL=0
+    )
+
+    target_compile_features(livelooping_juce_plugin_host PUBLIC cxx_std_17)
+endif()
+
 if(LIVELOOPING_BUILD_PROFILE_IO)
     livelooping_add_json_dependency()
 
@@ -207,6 +250,24 @@ if(BUILD_TESTING)
     target_link_libraries(livelooping_virtual_devices_unit_tests PRIVATE livelooping_virtual_devices)
 
     add_test(NAME livelooping_virtual_devices_unit_tests COMMAND livelooping_virtual_devices_unit_tests)
+
+    add_executable(livelooping_plugin_host_unit_tests
+        components/plugin_host/tests/unit_tests/plugin_catalog_tests.cpp
+    )
+
+    target_link_libraries(livelooping_plugin_host_unit_tests PRIVATE livelooping_plugin_host)
+
+    add_test(NAME livelooping_plugin_host_unit_tests COMMAND livelooping_plugin_host_unit_tests)
+
+    if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
+        add_executable(livelooping_juce_plugin_host_unit_tests
+            components/plugin_host/tests/unit_tests/juce_plugin_scanner_tests.cpp
+        )
+
+        target_link_libraries(livelooping_juce_plugin_host_unit_tests PRIVATE livelooping_juce_plugin_host)
+
+        add_test(NAME livelooping_juce_plugin_host_unit_tests COMMAND livelooping_juce_plugin_host_unit_tests)
+    endif()
 endif()
 
 if(LIVELOOPING_BUILD_JUCE_APP)
