@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace loop_rigger::plugin_host {
 
@@ -56,6 +57,11 @@ void addDiagnostic(PluginScanResult& result, PluginScanDiagnosticLevel level, co
     result.diagnostics.push_back({level, message});
 }
 
+bool containsFormat(const std::vector<PluginFormat>& formats, PluginFormat format)
+{
+    return std::find(formats.begin(), formats.end(), format) != formats.end();
+}
+
 class JucePluginScanner final : public PluginScanner {
 public:
     JucePluginScanner()
@@ -66,6 +72,7 @@ public:
     PluginScanResult scan(const PluginScanRequest& request) override
     {
         PluginScanResult result;
+        reportUnavailableFormats(request, result);
         for (const auto& path : request.searchPaths) {
             scanPath(path, request, result);
         }
@@ -113,6 +120,36 @@ private:
                 if (description != nullptr) {
                     result.catalog.add(convertDescription(*description));
                 }
+            }
+        }
+    }
+
+    std::vector<PluginFormat> availableFormats() const
+    {
+        std::vector<PluginFormat> formats;
+        for (int index = 0; index < formatManager_.getNumFormats(); ++index) {
+            const auto* format = formatManager_.getFormat(index);
+            if (format == nullptr) {
+                continue;
+            }
+
+            const auto pluginFormat = pluginFormatFromName(format->getName());
+            if (pluginFormat != PluginFormat::Unknown && !containsFormat(formats, pluginFormat)) {
+                formats.push_back(pluginFormat);
+            }
+        }
+        return formats;
+    }
+
+    void reportUnavailableFormats(const PluginScanRequest& request, PluginScanResult& result) const
+    {
+        const auto formats = availableFormats();
+        for (const auto requestedFormat : request.formats) {
+            if (!containsFormat(formats, requestedFormat)) {
+                addDiagnostic(
+                    result,
+                    PluginScanDiagnosticLevel::Warning,
+                    "requested plugin format is not available in this build: " + toString(requestedFormat));
             }
         }
     }
