@@ -57,6 +57,7 @@ void testStringNames()
     using loop_rigger::plugin_host::PluginScanDiagnosticLevel;
     using loop_rigger::plugin_host::toString;
 
+    expect(toString(PluginFormat::Vst2) == "vst2", "VST2 format should stringify");
     expect(toString(PluginFormat::Vst3) == "vst3", "VST3 format should stringify");
     expect(toString(PluginFormat::AudioUnit) == "audio_unit", "AudioUnit format should stringify");
     expect(toString(PluginScanDiagnosticLevel::Warning) == "warning", "warning diagnostic should stringify");

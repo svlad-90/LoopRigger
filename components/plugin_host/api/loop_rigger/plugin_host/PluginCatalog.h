@@ -8,6 +8,7 @@ namespace loop_rigger::plugin_host {
 
 enum class PluginFormat {
     Unknown,
+    Vst2,
     Vst3,
     AudioUnit
 };

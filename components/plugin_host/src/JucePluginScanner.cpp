@@ -15,6 +15,9 @@ PluginFormat pluginFormatFromName(const juce::String& formatName)
     if (formatName.containsIgnoreCase("VST3")) {
         return PluginFormat::Vst3;
     }
+    if (formatName.containsIgnoreCase("VST")) {
+        return PluginFormat::Vst2;
+    }
     if (formatName.containsIgnoreCase("AudioUnit")) {
         return PluginFormat::AudioUnit;
     }
@@ -40,6 +43,19 @@ PluginDescription convertDescription(const juce::PluginDescription& description)
     return result;
 }
 
+bool isCandidatePath(const juce::File& file)
+{
+    const auto extension = file.getFileExtension();
+    return extension.equalsIgnoreCase(".vst3")
+        || extension.equalsIgnoreCase(".dll")
+        || extension.equalsIgnoreCase(".component");
+}
+
+void addDiagnostic(PluginScanResult& result, PluginScanDiagnosticLevel level, const std::string& message)
+{
+    result.diagnostics.push_back({level, message});
+}
+
 class JucePluginScanner final : public PluginScanner {
 public:
     JucePluginScanner()
@@ -59,7 +75,27 @@ public:
 private:
     void scanPath(const std::string& path, const PluginScanRequest& request, PluginScanResult& result)
     {
-        const juce::String jucePath(path);
+        const juce::File file(path);
+        if (!file.exists()) {
+            addDiagnostic(result, PluginScanDiagnosticLevel::Warning, "plugin search path does not exist: " + path);
+            return;
+        }
+
+        if (file.isDirectory() && !isCandidatePath(file)) {
+            for (const auto& child : file.findChildFiles(juce::File::findFilesAndDirectories, true)) {
+                if (isCandidatePath(child)) {
+                    scanPluginCandidate(child, request, result);
+                }
+            }
+            return;
+        }
+
+        scanPluginCandidate(file, request, result);
+    }
+
+    void scanPluginCandidate(const juce::File& file, const PluginScanRequest& request, PluginScanResult& result)
+    {
+        const auto jucePath = file.getFullPathName();
         for (int index = 0; index < formatManager_.getNumFormats(); ++index) {
             auto* format = formatManager_.getFormat(index);
             if (format == nullptr) {

@@ -152,6 +152,15 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
     )
 
     target_compile_features(livelooping_juce_plugin_host PUBLIC cxx_std_17)
+
+    add_executable(livelooping_plugin_scan_cli
+        apps/plugin_scan_cli/main.cpp
+    )
+
+    target_link_libraries(livelooping_plugin_scan_cli
+        PRIVATE
+            livelooping_juce_plugin_host
+    )
 endif()
 
 if(LIVELOOPING_BUILD_PROFILE_IO)

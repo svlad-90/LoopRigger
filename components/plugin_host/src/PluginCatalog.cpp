@@ -50,6 +50,8 @@ std::string toString(PluginFormat format)
     switch (format) {
     case PluginFormat::Unknown:
         return "unknown";
+    case PluginFormat::Vst2:
+        return "vst2";
     case PluginFormat::Vst3:
         return "vst3";
     case PluginFormat::AudioUnit:
