@@ -10,6 +10,9 @@ The project is split into:
 - `livelooping_control`: controller widgets, MIDI/widget events, controller
   profiles, and event-to-command mapping.
 - `livelooping_profile_io`: optional JSON controller profile loader.
+- `livelooping_scripting`: C++ contract for future Python device scripts.
+- `livelooping_virtual_devices`: renderer-independent pseudo-device
+  descriptors and events.
 - built-in controller profile factories for the mic Kaoss Pad, synth Kaoss Pad,
   and Yaeltex LiveLooping surface.
 - `livelooping_sim_cli`: local command-line simulator that can run in the Linux

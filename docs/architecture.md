@@ -24,12 +24,12 @@ Current components:
   event-to-command mapping.
 - `profile_io`: JSON loading for controller profiles and control-surface
   layouts.
-
-Reserved components:
-
 - `scripting`: Python control-adapter host for FL Studio-style device scripts.
 - `virtual_devices`: device descriptors, virtual surfaces, and pseudo-device
   events independent of a concrete renderer.
+
+Reserved components:
+
 - `midi`: physical MIDI input/output ports, device matching, and MIDI learn.
 - `audio`: realtime audio engine, loop buffers, transport, and routing.
 - `plugin_host`: VST/AU plugin scanning, chains, parameters, and snapshots.

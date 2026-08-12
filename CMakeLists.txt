@@ -45,6 +45,39 @@ target_link_libraries(livelooping_control
 
 target_compile_features(livelooping_control PUBLIC cxx_std_17)
 
+add_library(livelooping_scripting
+    components/scripting/src/ScriptDevice.cpp
+)
+
+target_include_directories(livelooping_scripting
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/scripting/api
+)
+
+target_link_libraries(livelooping_scripting
+    PUBLIC
+        livelooping_core
+        livelooping_control
+)
+
+target_compile_features(livelooping_scripting PUBLIC cxx_std_17)
+
+add_library(livelooping_virtual_devices
+    components/virtual_devices/src/VirtualDeviceRegistry.cpp
+)
+
+target_include_directories(livelooping_virtual_devices
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/virtual_devices/api
+)
+
+target_link_libraries(livelooping_virtual_devices
+    PUBLIC
+        livelooping_control
+)
+
+target_compile_features(livelooping_virtual_devices PUBLIC cxx_std_17)
+
 if(LIVELOOPING_BUILD_PROFILE_IO)
     livelooping_add_json_dependency()
 
@@ -104,6 +137,22 @@ if(BUILD_TESTING)
     endif()
 
     add_test(NAME livelooping_core_smoke_tests COMMAND livelooping_core_smoke_tests)
+
+    add_executable(livelooping_scripting_unit_tests
+        components/scripting/tests/unit_tests/script_api_tests.cpp
+    )
+
+    target_link_libraries(livelooping_scripting_unit_tests PRIVATE livelooping_scripting)
+
+    add_test(NAME livelooping_scripting_unit_tests COMMAND livelooping_scripting_unit_tests)
+
+    add_executable(livelooping_virtual_devices_unit_tests
+        components/virtual_devices/tests/unit_tests/virtual_device_registry_tests.cpp
+    )
+
+    target_link_libraries(livelooping_virtual_devices_unit_tests PRIVATE livelooping_virtual_devices)
+
+    add_test(NAME livelooping_virtual_devices_unit_tests COMMAND livelooping_virtual_devices_unit_tests)
 endif()
 
 if(LIVELOOPING_BUILD_JUCE_APP)
