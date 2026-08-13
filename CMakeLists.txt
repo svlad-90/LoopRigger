@@ -172,6 +172,24 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
             livelooping_juce_plugin_host
     )
 
+    add_executable(livelooping_plugin_process_cli
+        apps/plugin_process_cli/main.cpp
+    )
+
+    target_link_libraries(livelooping_plugin_process_cli
+        PRIVATE
+            livelooping_juce_plugin_host
+            juce::juce_audio_processors
+    )
+
+    target_compile_definitions(livelooping_plugin_process_cli
+        PRIVATE
+            JUCE_PLUGINHOST_VST3=1
+            JUCE_PLUGINHOST_AU=1
+            JUCE_WEB_BROWSER=0
+            JUCE_USE_CURL=0
+    )
+
     if(BUILD_TESTING)
         set(LIVELOOPING_PLUGIN_FIXTURE_DIR "${CMAKE_CURRENT_BINARY_DIR}/plugin-fixtures/vst3")
 

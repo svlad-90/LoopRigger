@@ -53,6 +53,12 @@ ProbeFixtureProcessor::ProbeFixtureProcessor()
           .withInput("Input", juce::AudioChannelSet::stereo(), true)
           .withOutput("Output", juce::AudioChannelSet::stereo(), true))
 {
+    gain_ = new juce::AudioParameterFloat(
+        juce::ParameterID("gain", 1),
+        "Gain",
+        juce::NormalisableRange<float>(0.0f, 1.0f, 0.001f),
+        0.5f);
+    addParameter(gain_);
 }
 
 const juce::String ProbeFixtureProcessor::getName() const
@@ -70,12 +76,12 @@ void ProbeFixtureProcessor::releaseResources()
 
 void ProbeFixtureProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
-    buffer.clear();
+    buffer.applyGain(gain_ != nullptr ? gain_->get() : 1.0f);
 }
 
 void ProbeFixtureProcessor::processBlock(juce::AudioBuffer<double>& buffer, juce::MidiBuffer&)
 {
-    buffer.clear();
+    buffer.applyGain(gain_ != nullptr ? static_cast<double>(gain_->get()) : 1.0);
 }
 
 bool ProbeFixtureProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const

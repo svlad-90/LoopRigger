@@ -27,6 +27,9 @@ public:
     void changeProgramName(int index, const juce::String& newName) override;
     void getStateInformation(juce::MemoryBlock& destinationData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
+
+private:
+    juce::AudioParameterFloat* gain_ = nullptr;
 };
 
 } // namespace loop_rigger::plugin_host::tests
