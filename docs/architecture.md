@@ -29,11 +29,12 @@ Current components:
   events independent of a concrete renderer.
 - `plugin_host`: plugin metadata catalog and scanner API, with optional JUCE
   scanner implementation.
+- `audio`: SDK-independent offline audio processing helpers, with realtime
+  engine, loop buffers, transport, and routing planned next.
 
 Reserved components:
 
 - `midi`: physical MIDI input/output ports, device matching, and MIDI learn.
-- `audio`: realtime audio engine, loop buffers, transport, and routing.
 - `ui_model`: product state snapshots prepared for UI renderers.
 - `juce_app`: JUCE standalone product window and pseudo-device renderer.
 

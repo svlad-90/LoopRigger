@@ -1,7 +1,8 @@
+#include "loop_rigger/audio/OfflineProcessing.h"
+
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include <algorithm>
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -147,27 +148,30 @@ bool setParameterByName(juce::AudioProcessor& processor, const juce::String& nam
     return false;
 }
 
-float peakMagnitude(const juce::AudioBuffer<float>& buffer)
+juce::AudioBuffer<float> toJuceBuffer(const loop_rigger::audio::AudioBlock& block)
 {
-    float peak = 0.0f;
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-        peak = std::max(peak, buffer.getMagnitude(channel, 0, buffer.getNumSamples()));
-    }
-    return peak;
-}
-
-float rmsMagnitude(const juce::AudioBuffer<float>& buffer)
-{
-    double sum = 0.0;
-    int count = 0;
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-        const auto* samples = buffer.getReadPointer(channel);
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-            sum += static_cast<double>(samples[sample]) * static_cast<double>(samples[sample]);
-            ++count;
+    const auto channels = static_cast<int>(block.size());
+    const auto samples = block.empty() ? 0 : static_cast<int>(block.front().size());
+    juce::AudioBuffer<float> buffer(channels, samples);
+    for (int channel = 0; channel < channels; ++channel) {
+        const auto& source = block[static_cast<std::size_t>(channel)];
+        for (int sample = 0; sample < samples; ++sample) {
+            buffer.setSample(channel, sample, source[static_cast<std::size_t>(sample)]);
         }
     }
-    return count > 0 ? static_cast<float>(std::sqrt(sum / static_cast<double>(count))) : 0.0f;
+    return buffer;
+}
+
+void copyFromJuceBuffer(const juce::AudioBuffer<float>& source, loop_rigger::audio::AudioBlock& target)
+{
+    const auto channels = std::min(source.getNumChannels(), static_cast<int>(target.size()));
+    for (int channel = 0; channel < channels; ++channel) {
+        auto& destination = target[static_cast<std::size_t>(channel)];
+        const auto samples = std::min(source.getNumSamples(), static_cast<int>(destination.size()));
+        for (int sample = 0; sample < samples; ++sample) {
+            destination[static_cast<std::size_t>(sample)] = source.getSample(channel, sample);
+        }
+    }
 }
 
 } // namespace
@@ -242,38 +246,41 @@ int main(int argc, char** argv)
     instance->setRateAndBufferSizeDetails(options.sampleRate, options.blockSize);
     instance->prepareToPlay(options.sampleRate, options.blockSize);
 
-    juce::AudioBuffer<float> buffer(std::max(1, instance->getTotalNumOutputChannels()), options.blockSize);
-    juce::MidiBuffer midi;
-    float outputPeak = 0.0f;
-    float outputRms = 0.0f;
-    for (int block = 0; block < options.blocks; ++block) {
-        for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-            buffer.clear(channel, 0, options.blockSize);
-            for (int sample = 0; sample < options.blockSize; ++sample) {
-                buffer.setSample(channel, sample, options.inputValue);
-            }
-        }
+    loop_rigger::audio::OfflineProcessingRequest request;
+    request.channels = std::max(1, instance->getTotalNumOutputChannels());
+    request.blockSize = options.blockSize;
+    request.blocks = options.blocks;
+    request.inputValue = options.inputValue;
+    request.expectedGain = options.gain;
 
-        instance->processBlock(buffer, midi);
-        outputPeak = peakMagnitude(buffer);
-        outputRms = rmsMagnitude(buffer);
-    }
+    const auto processResult = loop_rigger::audio::runOfflineProcessingSmoke(
+        request,
+        [&instance](loop_rigger::audio::AudioBlock& block, std::string& errorMessage) {
+            juce::AudioBuffer<float> buffer = toJuceBuffer(block);
+            juce::MidiBuffer midi;
+            instance->processBlock(buffer, midi);
+            copyFromJuceBuffer(buffer, block);
+            errorMessage.clear();
+            return true;
+        });
 
     instance->releaseResources();
 
-    const auto expectedPeak = std::abs(options.inputValue * options.gain);
-    const auto peakDelta = std::abs(outputPeak - expectedPeak);
-    const auto ok = gainSet && peakDelta < 0.0005f;
+    const auto ok = gainSet && processResult.processed && processResult.withinTolerance;
 
     std::cout << (ok ? "ok" : "failed") << "\t"
               << description.name << "\t"
-              << "channels=" << buffer.getNumChannels() << "\t"
+              << "channels=" << processResult.channels << "\t"
               << "blocks=" << options.blocks << "\t"
               << "gain_set=" << (gainSet ? "yes" : "no") << "\t"
-              << "input_peak=" << std::abs(options.inputValue) << "\t"
-              << "expected_peak=" << expectedPeak << "\t"
-              << "output_peak=" << outputPeak << "\t"
-              << "output_rms=" << outputRms << "\n";
+              << "input_peak=" << processResult.inputPeak << "\t"
+              << "expected_peak=" << processResult.expectedPeak << "\t"
+              << "output_peak=" << processResult.outputPeak << "\t"
+              << "output_rms=" << processResult.outputRms;
+    if (!processResult.errorMessage.empty()) {
+        std::cout << "\t" << processResult.errorMessage;
+    }
+    std::cout << "\n";
 
     return ok ? 0 : 1;
 }

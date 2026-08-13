@@ -123,6 +123,17 @@ target_include_directories(livelooping_plugin_host
 
 target_compile_features(livelooping_plugin_host PUBLIC cxx_std_17)
 
+add_library(livelooping_audio
+    components/audio/src/OfflineProcessing.cpp
+)
+
+target_include_directories(livelooping_audio
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/components/audio/api
+)
+
+target_compile_features(livelooping_audio PUBLIC cxx_std_17)
+
 if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
     livelooping_check_linux_juce_plugin_host_dependencies()
     livelooping_add_juce_dependency()
@@ -178,6 +189,7 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
 
     target_link_libraries(livelooping_plugin_process_cli
         PRIVATE
+            livelooping_audio
             livelooping_juce_plugin_host
             juce::juce_audio_processors
     )
@@ -362,6 +374,14 @@ if(BUILD_TESTING)
     target_link_libraries(livelooping_plugin_host_unit_tests PRIVATE livelooping_plugin_host)
 
     add_test(NAME livelooping_plugin_host_unit_tests COMMAND livelooping_plugin_host_unit_tests)
+
+    add_executable(livelooping_audio_unit_tests
+        components/audio/tests/unit_tests/offline_processing_tests.cpp
+    )
+
+    target_link_libraries(livelooping_audio_unit_tests PRIVATE livelooping_audio)
+
+    add_test(NAME livelooping_audio_unit_tests COMMAND livelooping_audio_unit_tests)
 
     if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
         add_executable(livelooping_juce_plugin_host_unit_tests
