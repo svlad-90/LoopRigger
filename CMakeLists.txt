@@ -171,6 +171,47 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
         PRIVATE
             livelooping_juce_plugin_host
     )
+
+    if(BUILD_TESTING)
+        set(LIVELOOPING_PLUGIN_FIXTURE_DIR "${CMAKE_CURRENT_BINARY_DIR}/plugin-fixtures/vst3")
+
+        juce_add_plugin(livelooping_probe_fixture_plugin
+            COMPANY_NAME "LoopRigger"
+            PRODUCT_NAME "LoopRigger Probe Fixture"
+            PLUGIN_MANUFACTURER_CODE LpRg
+            PLUGIN_CODE PrbF
+            FORMATS VST3
+            IS_SYNTH FALSE
+            NEEDS_MIDI_INPUT FALSE
+            NEEDS_MIDI_OUTPUT FALSE
+            COPY_PLUGIN_AFTER_BUILD TRUE
+            VST3_COPY_DIR "${LIVELOOPING_PLUGIN_FIXTURE_DIR}"
+            NEEDS_WEB_BROWSER FALSE
+            NEEDS_CURL FALSE
+        )
+
+        target_sources(livelooping_probe_fixture_plugin
+            PRIVATE
+                components/plugin_host/tests/fixtures/probe_vst3/ProbeFixtureProcessor.cpp
+        )
+
+        target_include_directories(livelooping_probe_fixture_plugin
+            PRIVATE
+                ${CMAKE_CURRENT_SOURCE_DIR}/components/plugin_host/tests/fixtures/probe_vst3
+        )
+
+        target_link_libraries(livelooping_probe_fixture_plugin
+            PRIVATE
+                juce::juce_audio_processors
+        )
+
+        target_compile_definitions(livelooping_probe_fixture_plugin
+            PUBLIC
+                JUCE_WEB_BROWSER=0
+                JUCE_USE_CURL=0
+                JUCE_VST3_CAN_REPLACE_VST2=0
+        )
+    endif()
 endif()
 
 if(LIVELOOPING_BUILD_PROFILE_IO)
