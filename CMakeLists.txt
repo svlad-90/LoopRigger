@@ -128,6 +128,7 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
     livelooping_add_juce_dependency()
 
     add_library(livelooping_juce_plugin_host
+        components/plugin_host/src/JucePluginProbe.cpp
         components/plugin_host/src/JucePluginScanner.cpp
     )
 
@@ -158,6 +159,15 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
     )
 
     target_link_libraries(livelooping_plugin_scan_cli
+        PRIVATE
+            livelooping_juce_plugin_host
+    )
+
+    add_executable(livelooping_plugin_probe_cli
+        apps/plugin_probe_cli/main.cpp
+    )
+
+    target_link_libraries(livelooping_plugin_probe_cli
         PRIVATE
             livelooping_juce_plugin_host
     )
@@ -276,6 +286,14 @@ if(BUILD_TESTING)
         target_link_libraries(livelooping_juce_plugin_host_unit_tests PRIVATE livelooping_juce_plugin_host)
 
         add_test(NAME livelooping_juce_plugin_host_unit_tests COMMAND livelooping_juce_plugin_host_unit_tests)
+
+        add_executable(livelooping_juce_plugin_probe_unit_tests
+            components/plugin_host/tests/unit_tests/juce_plugin_probe_tests.cpp
+        )
+
+        target_link_libraries(livelooping_juce_plugin_probe_unit_tests PRIVATE livelooping_juce_plugin_host)
+
+        add_test(NAME livelooping_juce_plugin_probe_unit_tests COMMAND livelooping_juce_plugin_probe_unit_tests)
     endif()
 endif()
 
