@@ -2,6 +2,52 @@
 
 namespace loop_rigger::plugin_host::tests {
 
+namespace {
+
+class ProbeFixtureEditor final : public juce::AudioProcessorEditor {
+public:
+    explicit ProbeFixtureEditor(ProbeFixtureProcessor& processor)
+        : AudioProcessorEditor(processor)
+    {
+        setSize(560, 320);
+    }
+
+    void paint(juce::Graphics& graphics) override
+    {
+        const auto bounds = getLocalBounds().toFloat();
+        graphics.fillAll(juce::Colour(0xff101519));
+
+        graphics.setColour(juce::Colour(0xff1f2b33));
+        graphics.fillRoundedRectangle(bounds.reduced(18.0f), 10.0f);
+
+        graphics.setColour(juce::Colour(0xff18c6a7));
+        graphics.drawRoundedRectangle(bounds.reduced(18.0f), 10.0f, 2.0f);
+
+        graphics.setColour(juce::Colours::white);
+        graphics.setFont(juce::FontOptions(32.0f, juce::Font::bold));
+        graphics.drawText("LoopRigger Probe Fixture", getLocalBounds().withTrimmedTop(48), juce::Justification::centredTop);
+
+        graphics.setFont(juce::FontOptions(18.0f));
+        graphics.setColour(juce::Colour(0xffc8d2d8));
+        graphics.drawText(
+            "VST3 editor smoke: GUI loaded inside LoopRigger host",
+            getLocalBounds().withTrimmedTop(102),
+            juce::Justification::centredTop);
+
+        const auto meter = juce::Rectangle<float>(110.0f, 180.0f, 340.0f, 32.0f);
+        graphics.setColour(juce::Colour(0xff0b0e10));
+        graphics.fillRoundedRectangle(meter, 6.0f);
+        graphics.setColour(juce::Colour(0xff18c6a7));
+        graphics.fillRoundedRectangle(meter.withWidth(230.0f), 6.0f);
+
+        graphics.setColour(juce::Colours::white);
+        graphics.setFont(juce::FontOptions(14.0f, juce::Font::bold));
+        graphics.drawText("2 IN / 2 OUT", getLocalBounds().withTrimmedTop(230), juce::Justification::centredTop);
+    }
+};
+
+} // namespace
+
 ProbeFixtureProcessor::ProbeFixtureProcessor()
     : AudioProcessor(BusesProperties()
           .withInput("Input", juce::AudioChannelSet::stereo(), true)
@@ -61,12 +107,12 @@ double ProbeFixtureProcessor::getTailLengthSeconds() const
 
 juce::AudioProcessorEditor* ProbeFixtureProcessor::createEditor()
 {
-    return nullptr;
+    return new ProbeFixtureEditor(*this);
 }
 
 bool ProbeFixtureProcessor::hasEditor() const
 {
-    return false;
+    return true;
 }
 
 int ProbeFixtureProcessor::getNumPrograms()

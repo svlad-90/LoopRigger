@@ -211,6 +211,32 @@ if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
                 JUCE_USE_CURL=0
                 JUCE_VST3_CAN_REPLACE_VST2=0
         )
+
+        juce_add_gui_app(livelooping_plugin_editor_host
+            PRODUCT_NAME "LoopRigger Plugin Editor Host"
+            COMPANY_NAME "LoopRigger"
+            BUNDLE_ID "com.looprigger.plugin-editor-host"
+        )
+
+        target_sources(livelooping_plugin_editor_host
+            PRIVATE
+                apps/plugin_editor_host/main.cpp
+        )
+
+        target_link_libraries(livelooping_plugin_editor_host
+            PRIVATE
+                juce::juce_audio_processors
+                juce::juce_gui_extra
+        )
+
+        target_compile_definitions(livelooping_plugin_editor_host
+            PRIVATE
+                LIVELOOPING_DEFAULT_PLUGIN_DIR="${LIVELOOPING_PLUGIN_FIXTURE_DIR}"
+                JUCE_PLUGINHOST_VST3=1
+                JUCE_PLUGINHOST_AU=1
+                JUCE_WEB_BROWSER=0
+                JUCE_USE_CURL=0
+        )
     endif()
 endif()
 
