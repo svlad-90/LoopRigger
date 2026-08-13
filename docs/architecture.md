@@ -5,6 +5,9 @@ its public component API, implementation, tests, and local documentation.
 The top-level `include/loop_rigger` directory is reserved for a future SDK
 facade, not for component internals.
 
+The FL Studio reference system and native replacement target are recorded in
+`docs/fl-studio-system-analysis.md`.
+
 ## Component Layout
 
 ```text
