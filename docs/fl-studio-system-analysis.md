@@ -197,8 +197,11 @@ looper[1..4]
 looper[1..4].track[1..4]
 
 recording_bus
-resample_bus.selected_looper
-resample_bus.all_loopers
+resample_bus.source
+resample_bus.post_fx
+resample_bus.target
+yaeltex.center_fx_bank
+sampler.slot[1..8]
 
 sidechain.looper1.track[1..4]
 drop_fx
@@ -244,11 +247,34 @@ cursor to clip start, then plays from there on a quantized boundary.
 Resampling should become more efficient and more flexible than the old FL
 routing trick.
 
+The Yaeltex controller defines the intended performance route: resampling is
+not a direct looper-to-looper copy. The selected source must pass through the
+central Yaeltex FX bank before it is captured into a loop track or sampler
+slot:
+
+```text
+MIC / SYNTH / selected looper / all loopers / recording bus
+        |
+routing matrix
+        |
+yaeltex.center_fx_bank
+        |
+resample recorder
+        |
+target looper track or sampler.slot[1..8]
+```
+
+The center FX bank is a native graph node that can host custom effects and
+performance macros, but the resample route itself belongs to LoopRigger. The
+bottom-right eight numbered Yaeltex controls are modeled as sampler or
+one-shot slots fed from the post-FX resample bus, not as more looper tracks.
+
 Required modes:
 
 - resample selected looper into a target track;
 - resample all loopers into a target track;
 - resample selected tracks into a target track;
+- resample selected source through the center FX bank into a sampler slot;
 - resample with or without selected FX chains;
 - keep source tracks;
 - clear source tracks after successful capture;

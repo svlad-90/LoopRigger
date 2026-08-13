@@ -23,6 +23,10 @@ Core entity
 The core only receives logical actions. It should not know whether an action
 came from a Korg Kaoss Pad, the Yaeltex controller, or a pseudo-device window.
 
+For the detailed button-by-button inventory of the supplied controller photos
+and the old FL Studio MIDI scripts, see
+`docs/controller-control-inventory.md`.
+
 ## Entity Actions
 
 ### Input Controller
@@ -166,6 +170,53 @@ Initial control groups from the supplied layout:
 
 These labels should become stable widget ids in a Yaeltex controller profile.
 The MIDI note/CC numbers can change without changing the logical action ids.
+
+### Yaeltex Resampling And Sampler Zones
+
+The Yaeltex layout should be treated as several performance zones, not as one
+flat button matrix:
+
+- the left side owns looper banks, active-bank tracks, track recording, clears,
+  track mutes, looper mutes, and per-track/per-looper volume or pan controls;
+- the center owns the performance FX bank used by resampling: `FX1..FX10`,
+  `B1..B5`, `Dry/Wet`, `LFO1 Speed`, `LFO2 Speed`, `Drop FX`, `Value 1`,
+  `Value 2`, `Range 1`, `Range 2`, and related animation/preset controls;
+- the right-middle source section selects what feeds the resample path: `MIC`,
+  `SYNTH`, `LOOPER ALL`, `LOOPER`, `LOOPER 2`, `LOOPER 3`, `LOOPER 4`, or the
+  recording bus;
+- the bottom-right eight large numbered controls are a sampler or one-shot
+  bank, not extra looper-track buttons.
+
+Resampling must pass through the center FX bank before it reaches a recording
+target:
+
+```text
+selected source
+  MIC / SYNTH / LOOPER 1..4 / LOOPER ALL / recording bus
+        |
+routing selection
+        |
+yaeltex.center_fx_bank
+        |
+resample recorder
+        |
+target loop track or sampler slot
+```
+
+`Resample L` and `Resample all` arm the source side of that path. Track select
+or sampler-slot selection chooses the target side. The core should preserve
+this route even when a specific resample mode bypasses some FX parameters, so
+hardware use, pseudo-device tests, and internal offline tests all exercise the
+same signal-flow model.
+
+The bottom-right sampler slots should support a separate command family from
+loop tracks:
+
+- play sampler slot `1..8`;
+- arm recording into a sampler slot from the post-FX resample bus;
+- clear a sampler slot;
+- later, assign sampler slots to one-shot, gated, or synchronized playback
+  modes.
 
 ## Profile Requirements
 
