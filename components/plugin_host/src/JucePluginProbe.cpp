@@ -56,6 +56,18 @@ bool isCandidatePath(const juce::File& file)
         || extension.equalsIgnoreCase(".component");
 }
 
+bool isNestedInsidePluginBundle(const juce::File& file)
+{
+    auto parent = file.getParentDirectory();
+    while (parent.exists() && parent != parent.getParentDirectory()) {
+        if (isCandidatePath(parent)) {
+            return true;
+        }
+        parent = parent.getParentDirectory();
+    }
+    return false;
+}
+
 void addDiagnostic(PluginProbeResult& result, PluginScanDiagnosticLevel level, const std::string& message)
 {
     result.diagnostics.push_back({level, message});
@@ -92,7 +104,7 @@ private:
 
         if (file.isDirectory() && !isCandidatePath(file)) {
             for (const auto& child : file.findChildFiles(juce::File::findFilesAndDirectories, true)) {
-                if (isCandidatePath(child)) {
+                if (isCandidatePath(child) && !isNestedInsidePluginBundle(child)) {
                     probeCandidate(child, request, result);
                     if (hasReachedLimit(request, result)) {
                         addDiagnostic(result, PluginScanDiagnosticLevel::Info, "plugin probe limit reached");
