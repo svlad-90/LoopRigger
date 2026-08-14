@@ -522,6 +522,11 @@ private:
     {
         graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
 
+        if (editMode_) {
+            graphics.setColour(juce::Colour(0xee151b20));
+            graphics.fillRect(getLocalBounds().withHeight(48));
+        }
+
         for (const auto& element : layout_->elements) {
             paintLayoutDecoration(graphics, element);
         }
@@ -533,12 +538,6 @@ private:
         if (!editMode_) {
             return;
         }
-
-        graphics.setColour(juce::Colour(0xcc182126));
-        graphics.fillRoundedRectangle(getLocalBounds().withSizeKeepingCentre(360, 30).withY(44).toFloat(), 5.0F);
-        graphics.setColour(juce::Colours::white);
-        graphics.setFont(juce::Font(juce::FontOptions(13.0F).withStyle("Bold")));
-        graphics.drawText(selectedElementSummary(), getLocalBounds().withSizeKeepingCentre(430, 30).withY(44), juce::Justification::centred);
 
         for (int index = 0; index < static_cast<int>(layout_->elements.size()); ++index) {
             const auto& element = layout_->elements[static_cast<size_t>(index)];
@@ -1221,7 +1220,7 @@ private:
         editorStatusLabel_ = std::make_unique<juce::Label>();
         editorStatusLabel_->setJustificationType(juce::Justification::centredLeft);
         editorStatusLabel_->setColour(juce::Label::textColourId, juce::Colours::white);
-        editorStatusLabel_->setColour(juce::Label::backgroundColourId, juce::Colour(0xcc182126));
+        editorStatusLabel_->setColour(juce::Label::backgroundColourId, juce::Colour(0x66182126));
         editorStatusLabel_->setFont(juce::Font(juce::FontOptions(13.0F)));
         addAndMakeVisible(*editorStatusLabel_);
 
@@ -1246,16 +1245,16 @@ private:
             return;
         }
 
-        auto toolbar = getLocalBounds().reduced(10).withHeight(28);
-        editModeButton_->setBounds(toolbar.removeFromLeft(64));
+        auto toolbar = getLocalBounds().reduced(10).withHeight(30).translated(0, 6);
+        editModeButton_->setBounds(toolbar.removeFromLeft(58));
         toolbar.removeFromLeft(8);
-        saveLayoutButton_->setBounds(toolbar.removeFromLeft(64));
+        saveLayoutButton_->setBounds(toolbar.removeFromLeft(58));
         toolbar.removeFromLeft(8);
-        undoButton_->setBounds(toolbar.removeFromLeft(64));
+        undoButton_->setBounds(toolbar.removeFromLeft(58));
         toolbar.removeFromLeft(8);
         snapButton_->setBounds(toolbar.removeFromLeft(72));
         toolbar.removeFromLeft(10);
-        editorStatusLabel_->setBounds(toolbar.removeFromLeft(420));
+        editorStatusLabel_->setBounds(toolbar);
     }
 
     void updateEditToolbar()
@@ -1270,6 +1269,7 @@ private:
         snapButton_->setEnabled(editMode_);
         snapButton_->setToggleState(snapToGrid_, juce::dontSendNotification);
         editorStatusLabel_->setText(editorStatus_.isNotEmpty() ? editorStatus_ : selectedElementSummary(), juce::dontSendNotification);
+        editorStatusLabel_->setTooltip("E edit, S save, Ctrl+Z undo, arrows move, Shift changes step, Alt resizes, Shift-drag bypasses snap");
     }
 
     juce::String selectedElementSummary() const
@@ -1317,7 +1317,9 @@ private:
         editMode_ = enabled;
         selectedElement_ = -1;
         editDragMode_ = EditDragMode::None;
-        editorStatus_ = editMode_ ? "Edit mode on" : "Edit mode off";
+        editorStatus_ = editMode_
+            ? "Edit mode: arrows move, Alt resizes, Shift changes step"
+            : "Edit mode off";
         for (auto& control : controls_) {
             if (control.component != nullptr) {
                 control.component->setInterceptsMouseClicks(!editMode_, !editMode_);
