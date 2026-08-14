@@ -39,6 +39,9 @@ using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
 namespace {
 
 constexpr int kGroupHeaderHeight = 22;
+#if LIVELOOPING_HAS_PROFILE_IO
+constexpr float kEditSnapStep = 4.0F;
+#endif
 
 juce::String displayGroupName(juce::String group)
 {
@@ -93,6 +96,7 @@ public:
         }
 #if LIVELOOPING_HAS_PROFILE_IO
         if (layout_.has_value()) {
+            setupEditToolbar();
             startTimerHz(30);
         }
 #endif
@@ -116,6 +120,9 @@ public:
     void resized() override
     {
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+#if LIVELOOPING_HAS_PROFILE_IO
+        layoutEditToolbar();
+#endif
     }
 
     bool keyPressed(const juce::KeyPress& key) override
@@ -146,6 +153,26 @@ public:
         if (editMode_ && wantsUndo) {
             undoLastEdit();
             return true;
+        }
+        if (editMode_ && selectedElement_ >= 0) {
+            const auto amount = key.getModifiers().isShiftDown() ? 10.0F : 1.0F;
+            const auto resize = key.getModifiers().isAltDown();
+            if (keyCode == juce::KeyPress::leftKey) {
+                nudgeSelected(-amount, 0.0F, resize);
+                return true;
+            }
+            if (keyCode == juce::KeyPress::rightKey) {
+                nudgeSelected(amount, 0.0F, resize);
+                return true;
+            }
+            if (keyCode == juce::KeyPress::upKey) {
+                nudgeSelected(0.0F, -amount, resize);
+                return true;
+            }
+            if (keyCode == juce::KeyPress::downKey) {
+                nudgeSelected(0.0F, amount, resize);
+                return true;
+            }
         }
         if (editMode_ && (key.getTextCharacter() == 's' || key.getTextCharacter() == 'S')) {
             saveLayout();
@@ -179,6 +206,7 @@ public:
             editStartMouse_ = event.position;
             editStartBounds_ = layout_->elements[static_cast<size_t>(selectedElement_)].bounds;
         }
+        updateEditToolbar();
         repaint();
 #else
         juce::ignoreUnused(event);
@@ -202,8 +230,9 @@ public:
             bounds.x = editStartBounds_.x + delta.x;
             bounds.y = editStartBounds_.y + delta.y;
         }
-        element.bounds = clampBounds(bounds);
+        element.bounds = clampBounds(snapBounds(bounds, event.mods.isShiftDown()));
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+        updateEditToolbar();
         repaint();
 #else
         juce::ignoreUnused(event);
@@ -413,6 +442,24 @@ private:
         return bounds;
     }
 
+    SurfaceBounds snapBounds(SurfaceBounds bounds, bool bypassSnap) const
+    {
+        if (!snapToGrid_ || bypassSnap) {
+            return bounds;
+        }
+
+        bounds.x = snapValue(bounds.x);
+        bounds.y = snapValue(bounds.y);
+        bounds.width = snapValue(bounds.width);
+        bounds.height = snapValue(bounds.height);
+        return bounds;
+    }
+
+    static float snapValue(float value)
+    {
+        return std::round(value / kEditSnapStep) * kEditSnapStep;
+    }
+
     juce::Rectangle<int> resizeHandle(juce::Rectangle<int> bounds) const
     {
         return {bounds.getRight() - 10, bounds.getBottom() - 10, 14, 14};
@@ -488,10 +535,10 @@ private:
         }
 
         graphics.setColour(juce::Colour(0xcc182126));
-        graphics.fillRoundedRectangle(getLocalBounds().withSizeKeepingCentre(360, 30).withY(8).toFloat(), 5.0F);
+        graphics.fillRoundedRectangle(getLocalBounds().withSizeKeepingCentre(360, 30).withY(44).toFloat(), 5.0F);
         graphics.setColour(juce::Colours::white);
         graphics.setFont(juce::Font(juce::FontOptions(13.0F).withStyle("Bold")));
-        graphics.drawText("EDIT MODE: drag move, bottom-right resize, Ctrl+Z undo, E toggle, S save", getLocalBounds().withSizeKeepingCentre(430, 30).withY(8), juce::Justification::centred);
+        graphics.drawText(selectedElementSummary(), getLocalBounds().withSizeKeepingCentre(430, 30).withY(44), juce::Justification::centred);
 
         for (int index = 0; index < static_cast<int>(layout_->elements.size()); ++index) {
             const auto& element = layout_->elements[static_cast<size_t>(index)];
@@ -1144,17 +1191,140 @@ private:
     }
 
 #if LIVELOOPING_HAS_PROFILE_IO
+    void setupEditToolbar()
+    {
+        editModeButton_ = makeToolbarButton("Edit");
+        editModeButton_->onClick = [this] {
+            setEditMode(!editMode_);
+        };
+
+        saveLayoutButton_ = makeToolbarButton("Save");
+        saveLayoutButton_->onClick = [this] {
+            saveLayout();
+        };
+
+        undoButton_ = makeToolbarButton("Undo");
+        undoButton_->onClick = [this] {
+            undoLastEdit();
+        };
+
+        snapButton_ = makeToolbarButton("Snap 4");
+        snapButton_->setClickingTogglesState(true);
+        snapButton_->setToggleState(snapToGrid_, juce::dontSendNotification);
+        snapButton_->onClick = [this] {
+            snapToGrid_ = snapButton_ != nullptr && snapButton_->getToggleState();
+            editorStatus_ = snapToGrid_ ? "Snap: 4 px" : "Snap: off";
+            updateEditToolbar();
+            repaint();
+        };
+
+        editorStatusLabel_ = std::make_unique<juce::Label>();
+        editorStatusLabel_->setJustificationType(juce::Justification::centredLeft);
+        editorStatusLabel_->setColour(juce::Label::textColourId, juce::Colours::white);
+        editorStatusLabel_->setColour(juce::Label::backgroundColourId, juce::Colour(0xcc182126));
+        editorStatusLabel_->setFont(juce::Font(juce::FontOptions(13.0F)));
+        addAndMakeVisible(*editorStatusLabel_);
+
+        updateEditToolbar();
+    }
+
+    std::unique_ptr<juce::TextButton> makeToolbarButton(const juce::String& text)
+    {
+        auto button = std::make_unique<juce::TextButton>(text);
+        button->setWantsKeyboardFocus(false);
+        button->setColour(juce::TextButton::buttonColourId, juce::Colour(0xee20272d));
+        button->setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xffd00010));
+        button->setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+        button->setColour(juce::TextButton::textColourOnId, juce::Colours::white);
+        addAndMakeVisible(*button);
+        return button;
+    }
+
+    void layoutEditToolbar()
+    {
+        if (editModeButton_ == nullptr) {
+            return;
+        }
+
+        auto toolbar = getLocalBounds().reduced(10).withHeight(28);
+        editModeButton_->setBounds(toolbar.removeFromLeft(64));
+        toolbar.removeFromLeft(8);
+        saveLayoutButton_->setBounds(toolbar.removeFromLeft(64));
+        toolbar.removeFromLeft(8);
+        undoButton_->setBounds(toolbar.removeFromLeft(64));
+        toolbar.removeFromLeft(8);
+        snapButton_->setBounds(toolbar.removeFromLeft(72));
+        toolbar.removeFromLeft(10);
+        editorStatusLabel_->setBounds(toolbar.removeFromLeft(420));
+    }
+
+    void updateEditToolbar()
+    {
+        if (editModeButton_ == nullptr) {
+            return;
+        }
+
+        editModeButton_->setToggleState(editMode_, juce::dontSendNotification);
+        saveLayoutButton_->setEnabled(editMode_ && !layoutPath_.empty());
+        undoButton_->setEnabled(editMode_ && !undoStack_.empty());
+        snapButton_->setEnabled(editMode_);
+        snapButton_->setToggleState(snapToGrid_, juce::dontSendNotification);
+        editorStatusLabel_->setText(editorStatus_.isNotEmpty() ? editorStatus_ : selectedElementSummary(), juce::dontSendNotification);
+    }
+
+    juce::String selectedElementSummary() const
+    {
+        if (!editMode_) {
+            return "Edit mode off";
+        }
+        if (!layout_.has_value() || selectedElement_ < 0) {
+            return "No selection";
+        }
+
+        const auto& element = layout_->elements[static_cast<size_t>(selectedElement_)];
+        return juce::String(element.id)
+            + "  x=" + juce::String(element.bounds.x, 1)
+            + " y=" + juce::String(element.bounds.y, 1)
+            + " w=" + juce::String(element.bounds.width, 1)
+            + " h=" + juce::String(element.bounds.height, 1);
+    }
+
+    void nudgeSelected(float primaryDelta, float secondaryDelta, bool resize)
+    {
+        if (!layout_.has_value() || selectedElement_ < 0) {
+            return;
+        }
+
+        pushUndoSnapshot();
+        auto& element = layout_->elements[static_cast<size_t>(selectedElement_)];
+        auto bounds = element.bounds;
+        if (resize) {
+            bounds.width += primaryDelta;
+            bounds.height += secondaryDelta;
+        } else {
+            bounds.x += primaryDelta;
+            bounds.y += secondaryDelta;
+        }
+        element.bounds = clampBounds(snapBounds(bounds, !snapToGrid_));
+        editorStatus_.clear();
+        layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+        updateEditToolbar();
+        repaint();
+    }
+
     void setEditMode(bool enabled)
     {
         editMode_ = enabled;
         selectedElement_ = -1;
         editDragMode_ = EditDragMode::None;
+        editorStatus_ = editMode_ ? "Edit mode on" : "Edit mode off";
         for (auto& control : controls_) {
             if (control.component != nullptr) {
                 control.component->setInterceptsMouseClicks(!editMode_, !editMode_);
             }
         }
         grabKeyboardFocus();
+        updateEditToolbar();
         repaint();
     }
 
@@ -1229,11 +1399,15 @@ private:
     void saveLayout()
     {
         if (!layout_.has_value() || layoutPath_.empty()) {
+            editorStatus_ = "No layout path";
+            updateEditToolbar();
             return;
         }
 
         std::ofstream out(layoutPath_);
         if (!out) {
+            editorStatus_ = "Save failed";
+            updateEditToolbar();
             return;
         }
 
@@ -1269,6 +1443,8 @@ private:
         }
         out << "  ]\n";
         out << "}\n";
+        editorStatus_ = "Saved " + juce::Time::getCurrentTime().formatted("%H:%M:%S");
+        updateEditToolbar();
     }
 
     void pushUndoSnapshot()
@@ -1301,7 +1477,9 @@ private:
         for (size_t index = 0; index < count; ++index) {
             layout_->elements[index].bounds = snapshot[index];
         }
+        editorStatus_ = "Undo";
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+        updateEditToolbar();
         repaint();
     }
 #endif
@@ -1318,6 +1496,13 @@ private:
     juce::Point<float> editStartMouse_;
     SurfaceBounds editStartBounds_;
     std::vector<std::vector<SurfaceBounds>> undoStack_;
+    bool snapToGrid_ = true;
+    juce::String editorStatus_;
+    std::unique_ptr<juce::TextButton> editModeButton_;
+    std::unique_ptr<juce::TextButton> saveLayoutButton_;
+    std::unique_ptr<juce::TextButton> undoButton_;
+    std::unique_ptr<juce::TextButton> snapButton_;
+    std::unique_ptr<juce::Label> editorStatusLabel_;
 #endif
     std::vector<Group> groups_;
     std::vector<Control> controls_;
