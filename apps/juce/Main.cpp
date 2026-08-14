@@ -9,8 +9,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <memory>
 #include <optional>
+#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -30,6 +32,7 @@ using loop_rigger::profile_io::SurfaceBounds;
 using loop_rigger::profile_io::SurfaceElement;
 using loop_rigger::profile_io::SurfaceElementShape;
 using loop_rigger::profile_io::SurfaceElementRole;
+using loop_rigger::profile_io::loadControllerProfileFromFile;
 using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
 #endif
 
@@ -43,6 +46,15 @@ juce::String displayGroupName(juce::String group)
 }
 
 #if LIVELOOPING_HAS_PROFILE_IO
+ControllerProfile loadProfileOrFallback(const char* fileName, ControllerProfile fallback)
+{
+    try {
+        return loadControllerProfileFromFile(std::string(LIVELOOPING_PROFILE_DIR) + "/" + fileName);
+    } catch (const std::exception&) {
+        return fallback;
+    }
+}
+
 std::optional<ControlSurfaceLayout> loadOptionalLayout(const char* fileName)
 {
     try {
@@ -53,14 +65,17 @@ std::optional<ControlSurfaceLayout> loadOptionalLayout(const char* fileName)
 }
 #endif
 
-class ProfileSurfaceComponent final : public juce::Component {
+class ProfileSurfaceComponent final : public juce::Component,
+                                      private juce::Timer,
+                                      private juce::KeyListener {
 public:
     ProfileSurfaceComponent(
         LiveLoopingEngine& engine,
         ControllerProfile profile
 #if LIVELOOPING_HAS_PROFILE_IO
         ,
-        std::optional<ControlSurfaceLayout> layout = std::nullopt
+        std::optional<ControlSurfaceLayout> layout = std::nullopt,
+        std::string layoutPath = {}
 #endif
         )
         : engine_(engine),
@@ -68,12 +83,19 @@ public:
           kind_(mapper_.profile().id.find("yaeltex") != std::string::npos ? SurfaceKind::Yaeltex : SurfaceKind::Kaoss)
 #if LIVELOOPING_HAS_PROFILE_IO
           ,
-          layout_(std::move(layout))
+          layout_(std::move(layout)),
+          layoutPath_(std::move(layoutPath))
 #endif
     {
+        setWantsKeyboardFocus(true);
         for (const auto& widget : mapper_.profile().widgets) {
             addWidget(widget);
         }
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value()) {
+            startTimerHz(30);
+        }
+#endif
     }
 
     void paint(juce::Graphics& graphics) override
@@ -94,6 +116,117 @@ public:
     void resized() override
     {
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+    }
+
+    bool keyPressed(const juce::KeyPress& key) override
+    {
+        return handleKeyPress(key);
+    }
+
+    bool keyPressed(const juce::KeyPress& key, juce::Component*) override
+    {
+        return handleKeyPress(key);
+    }
+
+    bool handleKeyPress(const juce::KeyPress& key)
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (!layout_.has_value()) {
+            return false;
+        }
+
+        if (key.getTextCharacter() == 'e' || key.getTextCharacter() == 'E') {
+            setEditMode(!editMode_);
+            return true;
+        }
+        const auto character = key.getTextCharacter();
+        const auto keyCode = key.getKeyCode();
+        const auto wantsUndo = (character == 'z' || character == 'Z' || character == 26 || keyCode == 'z' || keyCode == 'Z')
+            && (key.getModifiers().isCtrlDown() || key.getModifiers().isCommandDown());
+        if (editMode_ && wantsUndo) {
+            undoLastEdit();
+            return true;
+        }
+        if (editMode_ && (key.getTextCharacter() == 's' || key.getTextCharacter() == 'S')) {
+            saveLayout();
+            return true;
+        }
+        if (editMode_ && key.getKeyCode() == juce::KeyPress::deleteKey) {
+            selectedElement_ = -1;
+            repaint();
+            return true;
+        }
+#else
+        juce::ignoreUnused(key);
+#endif
+        return false;
+    }
+
+    void mouseDown(const juce::MouseEvent& event) override
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (!editMode_ || !layout_.has_value()) {
+            return;
+        }
+
+        grabKeyboardFocus();
+        selectedElement_ = findElementAt(event.position);
+        editDragMode_ = EditDragMode::None;
+        if (selectedElement_ >= 0) {
+            pushUndoSnapshot();
+            const auto bounds = scaledBounds(layout_->elements[static_cast<size_t>(selectedElement_)].bounds);
+            editDragMode_ = resizeHandle(bounds).contains(event.position.roundToInt()) ? EditDragMode::Resize : EditDragMode::Move;
+            editStartMouse_ = event.position;
+            editStartBounds_ = layout_->elements[static_cast<size_t>(selectedElement_)].bounds;
+        }
+        repaint();
+#else
+        juce::ignoreUnused(event);
+#endif
+    }
+
+    void mouseDrag(const juce::MouseEvent& event) override
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (!editMode_ || !layout_.has_value() || selectedElement_ < 0 || editDragMode_ == EditDragMode::None) {
+            return;
+        }
+
+        auto& element = layout_->elements[static_cast<size_t>(selectedElement_)];
+        const auto delta = toLayoutDelta(event.position - editStartMouse_);
+        auto bounds = editStartBounds_;
+        if (editDragMode_ == EditDragMode::Resize) {
+            bounds.width = juce::jmax(4.0F, editStartBounds_.width + delta.x);
+            bounds.height = juce::jmax(4.0F, editStartBounds_.height + delta.y);
+        } else {
+            bounds.x = editStartBounds_.x + delta.x;
+            bounds.y = editStartBounds_.y + delta.y;
+        }
+        element.bounds = clampBounds(bounds);
+        layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+        repaint();
+#else
+        juce::ignoreUnused(event);
+#endif
+    }
+
+    void mouseUp(const juce::MouseEvent& event) override
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        juce::ignoreUnused(event);
+        editDragMode_ = EditDragMode::None;
+#else
+        juce::ignoreUnused(event);
+#endif
+    }
+
+    void timerCallback() override
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value()) {
+            repaint();
+        }
+#endif
     }
 
 private:
@@ -118,6 +251,26 @@ private:
         int width = 1;
         int height = 1;
     };
+
+    struct WidgetVisualState {
+        WidgetVisualState(bool isHover = false, bool isDown = false, bool hasControlValue = false, float controlValue = 0.0F)
+            : hover(isHover), down(isDown), hasValue(hasControlValue), value(controlValue)
+        {
+        }
+
+        bool hover;
+        bool down;
+        bool hasValue;
+        float value;
+    };
+
+#if LIVELOOPING_HAS_PROFILE_IO
+    enum class EditDragMode {
+        None,
+        Move,
+        Resize
+    };
+#endif
 
     Group& ensureGroup(const ControllerWidget& widget)
     {
@@ -148,6 +301,8 @@ private:
 
         if (widget.type == WidgetType::Button) {
             auto button = std::make_unique<juce::TextButton>(widget.label);
+            button->setWantsKeyboardFocus(false);
+            button->addKeyListener(this);
             const auto isYaeltex = kind_ == SurfaceKind::Yaeltex;
             button->setColour(juce::TextButton::buttonColourId, isYaeltex ? juce::Colour(0xffeceff0) : juce::Colour(0xff151a1f));
             button->setColour(juce::TextButton::buttonOnColourId, isYaeltex ? juce::Colour(0xffd00010) : juce::Colour(0xff4c1018));
@@ -155,7 +310,16 @@ private:
             button->setColour(juce::TextButton::textColourOnId, juce::Colours::white);
             button->onClick = [this, id = widget.id] {
                 dispatch({id, WidgetEventType::Press, 1.0F});
+                repaint();
             };
+            button->onStateChange = [this] {
+                repaint();
+            };
+#if LIVELOOPING_HAS_PROFILE_IO
+            if (layout_.has_value()) {
+                button->setAlpha(0.0F);
+            }
+#endif
             addAndMakeVisible(*button);
             controls_.push_back(makeControl(*button, widget));
             buttons_.push_back(std::move(button));
@@ -163,6 +327,8 @@ private:
         }
 
         auto slider = std::make_unique<juce::Slider>();
+        slider->setWantsKeyboardFocus(false);
+        slider->addKeyListener(this);
         slider->setRange(0.0, 1.0, 0.001);
         slider->setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         slider->setName(widget.label);
@@ -179,7 +345,19 @@ private:
         }
         slider->onValueChange = [this, id = widget.id, slider = slider.get()] {
             dispatch({id, WidgetEventType::Change, static_cast<float>(slider->getValue())});
+            repaint();
         };
+        slider->onDragStart = [this] {
+            repaint();
+        };
+        slider->onDragEnd = [this] {
+            repaint();
+        };
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value()) {
+            slider->setAlpha(0.0F);
+        }
+#endif
         addAndMakeVisible(*slider);
         controls_.push_back(makeControl(*slider, widget));
         sliders_.push_back(std::move(slider));
@@ -189,19 +367,65 @@ private:
     juce::Rectangle<int> scaledBounds(const SurfaceBounds& bounds) const
     {
         const auto area = getLocalBounds();
+        const auto transform = layoutTransform();
+        return {
+            static_cast<int>(std::round(transform.offsetX + bounds.x * transform.scale)),
+            static_cast<int>(std::round(transform.offsetY + bounds.y * transform.scale)),
+            static_cast<int>(std::round(bounds.width * transform.scale)),
+            static_cast<int>(std::round(bounds.height * transform.scale)),
+        };
+    }
+
+    struct LayoutTransform {
+        float scale = 1.0F;
+        float offsetX = 0.0F;
+        float offsetY = 0.0F;
+    };
+
+    LayoutTransform layoutTransform() const
+    {
+        const auto area = getLocalBounds();
         const auto scaleX = layout_->baseWidth > 0 ? static_cast<float>(area.getWidth()) / static_cast<float>(layout_->baseWidth) : 1.0F;
         const auto scaleY = layout_->baseHeight > 0 ? static_cast<float>(area.getHeight()) / static_cast<float>(layout_->baseHeight) : 1.0F;
         const auto scale = juce::jmin(scaleX, scaleY);
         const auto canvasWidth = static_cast<float>(layout_->baseWidth) * scale;
         const auto canvasHeight = static_cast<float>(layout_->baseHeight) * scale;
-        const auto offsetX = static_cast<float>(area.getX()) + (static_cast<float>(area.getWidth()) - canvasWidth) * 0.5F;
-        const auto offsetY = static_cast<float>(area.getY()) + (static_cast<float>(area.getHeight()) - canvasHeight) * 0.5F;
         return {
-            static_cast<int>(std::round(offsetX + bounds.x * scale)),
-            static_cast<int>(std::round(offsetY + bounds.y * scale)),
-            static_cast<int>(std::round(bounds.width * scale)),
-            static_cast<int>(std::round(bounds.height * scale)),
+            scale,
+            static_cast<float>(area.getX()) + (static_cast<float>(area.getWidth()) - canvasWidth) * 0.5F,
+            static_cast<float>(area.getY()) + (static_cast<float>(area.getHeight()) - canvasHeight) * 0.5F,
         };
+    }
+
+    juce::Point<float> toLayoutDelta(juce::Point<float> screenDelta) const
+    {
+        const auto transform = layoutTransform();
+        const auto scale = transform.scale > 0.0F ? transform.scale : 1.0F;
+        return {screenDelta.x / scale, screenDelta.y / scale};
+    }
+
+    SurfaceBounds clampBounds(SurfaceBounds bounds) const
+    {
+        bounds.width = juce::jmax(4.0F, bounds.width);
+        bounds.height = juce::jmax(4.0F, bounds.height);
+        bounds.x = juce::jlimit(0.0F, static_cast<float>(layout_->baseWidth) - bounds.width, bounds.x);
+        bounds.y = juce::jlimit(0.0F, static_cast<float>(layout_->baseHeight) - bounds.height, bounds.y);
+        return bounds;
+    }
+
+    juce::Rectangle<int> resizeHandle(juce::Rectangle<int> bounds) const
+    {
+        return {bounds.getRight() - 10, bounds.getBottom() - 10, 14, 14};
+    }
+
+    int findElementAt(juce::Point<float> position) const
+    {
+        for (int index = static_cast<int>(layout_->elements.size()) - 1; index >= 0; --index) {
+            if (scaledBounds(layout_->elements[static_cast<size_t>(index)].bounds).contains(position.roundToInt())) {
+                return index;
+            }
+        }
+        return -1;
     }
 
     const SurfaceElement* findLayoutWidget(const juce::String& widgetId) const
@@ -218,15 +442,76 @@ private:
         return nullptr;
     }
 
+    const Control* findControl(const std::string& widgetId) const
+    {
+        const auto id = juce::String(widgetId);
+        for (const auto& control : controls_) {
+            if (control.id == id) {
+                return &control;
+            }
+        }
+        return nullptr;
+    }
+
+    WidgetVisualState visualStateFor(const SurfaceElement& element) const
+    {
+        WidgetVisualState state;
+        if (element.role != SurfaceElementRole::Widget) {
+            return state;
+        }
+
+        if (const auto* control = findControl(element.widgetId)) {
+            state.hover = control->component != nullptr && control->component->isMouseOver();
+            state.down = control->component != nullptr && control->component->isMouseButtonDown();
+            if (const auto* slider = dynamic_cast<const juce::Slider*>(control->component)) {
+                state.hasValue = true;
+                state.value = static_cast<float>(juce::jlimit(0.0, 1.0, slider->getValue()));
+            }
+        }
+        return state;
+    }
+
     void paintLayoutSurface(juce::Graphics& graphics)
     {
         graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
 
         for (const auto& element : layout_->elements) {
-            if (element.role == SurfaceElementRole::Widget) {
-                continue;
-            }
             paintLayoutDecoration(graphics, element);
+        }
+        paintEditOverlay(graphics);
+    }
+
+    void paintEditOverlay(juce::Graphics& graphics)
+    {
+        if (!editMode_) {
+            return;
+        }
+
+        graphics.setColour(juce::Colour(0xcc182126));
+        graphics.fillRoundedRectangle(getLocalBounds().withSizeKeepingCentre(360, 30).withY(8).toFloat(), 5.0F);
+        graphics.setColour(juce::Colours::white);
+        graphics.setFont(juce::Font(juce::FontOptions(13.0F).withStyle("Bold")));
+        graphics.drawText("EDIT MODE: drag move, bottom-right resize, Ctrl+Z undo, E toggle, S save", getLocalBounds().withSizeKeepingCentre(430, 30).withY(8), juce::Justification::centred);
+
+        for (int index = 0; index < static_cast<int>(layout_->elements.size()); ++index) {
+            const auto& element = layout_->elements[static_cast<size_t>(index)];
+            const auto bounds = scaledBounds(element.bounds);
+            const auto selected = index == selectedElement_;
+            graphics.setColour(selected ? juce::Colour(0xffffd21f) : juce::Colour(0x6631b8d8));
+            graphics.drawRect(bounds, selected ? 2 : 1);
+            if (selected) {
+                graphics.fillRect(resizeHandle(bounds));
+                graphics.setColour(juce::Colour(0xdd000000));
+                auto labelBounds = bounds.withHeight(20).translated(0, -22);
+                labelBounds.setWidth(juce::jmax(labelBounds.getWidth(), 260));
+                graphics.fillRect(labelBounds);
+                graphics.setColour(juce::Colours::white);
+                const auto text = juce::String(element.id) + "  x=" + juce::String(element.bounds.x, 1)
+                    + " y=" + juce::String(element.bounds.y, 1)
+                    + " w=" + juce::String(element.bounds.width, 1)
+                    + " h=" + juce::String(element.bounds.height, 1);
+                graphics.drawText(text, labelBounds.reduced(4, 0), juce::Justification::centredLeft);
+            }
         }
     }
 
@@ -237,6 +522,7 @@ private:
         const auto darkPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colours::black : juce::Colour(0xff1d2023);
         const auto softPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff101010) : juce::Colour(0xff252b30);
         const auto border = kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xffd00010) : juce::Colour(0xff454b4f);
+        const auto state = visualStateFor(element);
 
         switch (element.shape) {
         case SurfaceElementShape::RoundRect:
@@ -245,8 +531,8 @@ private:
                 graphics.fillRoundedRectangle(bounds.toFloat(), 18.0F);
                 graphics.setColour(juce::Colour(0xff7a4b21));
                 graphics.drawRoundedRectangle(bounds.toFloat(), 18.0F, 4.0F);
-            } else if (variant == "hardware_button") {
-                drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xffe9edee), juce::Colours::black, 5.0F);
+            } else if (variant == "hardware_button" || variant == "interactive_button") {
+                drawHardwareButton(graphics, bounds, element.label, buttonFill(juce::Colour(0xffe9edee), state), juce::Colours::black, 5.0F, state);
             } else if (variant == "kaoss_button") {
                 drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xff8090a0), juce::Colours::black, 6.0F);
             } else if (variant == "kaoss_light_button") {
@@ -254,7 +540,7 @@ private:
             } else if (variant == "kaoss_red_button") {
                 drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xffd35a70), juce::Colours::black, 30.0F);
             } else if (variant.startsWith("arcade_")) {
-                drawYaeltexArcadeButton(graphics, bounds.getX(), bounds.getY(), arcadeColour(variant), element.label);
+                drawYaeltexArcadeButton(graphics, bounds.getX(), bounds.getY(), buttonFill(arcadeColour(variant), state), element.label, state);
             } else {
                 graphics.setColour(variant == "display" ? juce::Colours::black : (variant == "top_deck" ? softPanel : darkPanel));
                 graphics.fillRoundedRectangle(bounds.toFloat(), variant == "top_deck" ? 6.0F : 14.0F);
@@ -303,14 +589,14 @@ private:
             if (variant == "metal_knob") {
                 drawKaossMetalKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), bounds.getWidth() / 2, element.label);
             } else {
-                drawKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2, element.label);
+                drawKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2, element.label, state);
             }
             break;
         case SurfaceElementShape::Fader:
-            drawFader(graphics, bounds);
+            drawFader(graphics, bounds, state);
             break;
         case SurfaceElementShape::Joystick:
-            drawJoystick(graphics, bounds, element.label, variant == "joystick_value_2" ? "Value 2" : "Value 1");
+            drawJoystick(graphics, bounds, element.label, variant == "joystick_value_2" ? "Value 2" : "Value 1", state);
             break;
         }
     }
@@ -347,13 +633,32 @@ private:
         return juce::Colour(0xff24d947);
     }
 
-    void drawFader(juce::Graphics& graphics, juce::Rectangle<int> area)
+    juce::Colour buttonFill(juce::Colour base, const WidgetVisualState& state) const
+    {
+        if (state.down) {
+            return base.interpolatedWith(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xffd00010) : juce::Colour(0xffff3155), 0.45F);
+        }
+        if (state.hover) {
+            return base.brighter(0.22F);
+        }
+        return base;
+    }
+
+    void drawFader(juce::Graphics& graphics, juce::Rectangle<int> area, WidgetVisualState state = WidgetVisualState())
     {
         const auto rail = area.withSizeKeepingCentre(18, area.getHeight());
         graphics.setColour(juce::Colour(0xff050505));
         graphics.fillRoundedRectangle(rail.toFloat(), 5.0F);
+        if (state.hasValue) {
+            const auto fillTop = rail.getBottom() - static_cast<int>(std::round(static_cast<float>(rail.getHeight()) * state.value));
+            graphics.setColour(juce::Colour(0xff31b8d8));
+            graphics.fillRoundedRectangle(rail.withTop(fillTop).toFloat(), 5.0F);
+        }
         graphics.setColour(juce::Colour(0xffd8d0c6));
-        graphics.fillRoundedRectangle(area.withHeight(18).translated(0, area.getHeight() / 2 - 9).toFloat(), 3.0F);
+        const auto thumbY = state.hasValue
+            ? area.getBottom() - static_cast<int>(std::round(static_cast<float>(area.getHeight()) * state.value)) - 9
+            : area.getY() + area.getHeight() / 2 - 9;
+        graphics.fillRoundedRectangle(area.withHeight(18).withY(thumbY).toFloat(), 3.0F);
     }
 
     void drawKaossPad(juce::Graphics& graphics, juce::Rectangle<int> pad)
@@ -406,8 +711,12 @@ private:
         const juce::String& text,
         juce::Colour fill,
         juce::Colour textColour,
-        float corner = 4.0F)
+        float corner = 4.0F,
+        WidgetVisualState state = WidgetVisualState())
     {
+        if (state.down) {
+            area.translate(1, 1);
+        }
         graphics.setColour(juce::Colour(0x77000000));
         graphics.fillRoundedRectangle(area.translated(2, 2).toFloat(), corner);
         graphics.setColour(fill);
@@ -419,9 +728,13 @@ private:
             graphics.setFont(juce::Font(juce::FontOptions(12.0F).withStyle("Bold")));
             graphics.drawText(text, area.reduced(3), juce::Justification::centred);
         }
+        if (state.hover || state.down) {
+            graphics.setColour(state.down ? juce::Colour(0x99ffffff) : juce::Colour(0x55ffffff));
+            graphics.drawRoundedRectangle(area.reduced(1).toFloat(), corner, state.down ? 2.0F : 1.2F);
+        }
     }
 
-    void drawKnob(juce::Graphics& graphics, int centreX, int centreY, int radius, const juce::String& label)
+    void drawKnob(juce::Graphics& graphics, int centreX, int centreY, int radius, const juce::String& label, WidgetVisualState state = WidgetVisualState())
     {
         graphics.setColour(juce::Colour(0xffd8d8d8));
         for (int tick = 0; tick < 19; ++tick) {
@@ -437,14 +750,27 @@ private:
 
         graphics.setColour(juce::Colour(0xff070707));
         graphics.fillEllipse(static_cast<float>(centreX - radius), static_cast<float>(centreY - radius), static_cast<float>(radius * 2), static_cast<float>(radius * 2));
+        if (state.hover || state.down) {
+            graphics.setColour(state.down ? juce::Colour(0x7731b8d8) : juce::Colour(0x4425a9c8));
+            graphics.fillEllipse(static_cast<float>(centreX - radius), static_cast<float>(centreY - radius), static_cast<float>(radius * 2), static_cast<float>(radius * 2));
+        }
         graphics.setColour(juce::Colour(0xff303030));
         graphics.drawEllipse(static_cast<float>(centreX - radius), static_cast<float>(centreY - radius), static_cast<float>(radius * 2), static_cast<float>(radius * 2), 2.0F);
         graphics.setColour(juce::Colour(0xfff2f2f2));
-        graphics.fillRect(centreX + radius / 3, centreY - 3, radius, 6);
+        const auto value = state.hasValue ? state.value : 0.68F;
+        const auto angle = juce::MathConstants<float>::pi * (0.72F + value * 1.56F);
+        const auto pointerInner = static_cast<float>(radius * 0.15F);
+        const auto pointerOuter = static_cast<float>(radius * 0.9F);
+        graphics.drawLine(
+            static_cast<float>(centreX) + std::cos(angle) * pointerInner,
+            static_cast<float>(centreY) + std::sin(angle) * pointerInner,
+            static_cast<float>(centreX) + std::cos(angle) * pointerOuter,
+            static_cast<float>(centreY) + std::sin(angle) * pointerOuter,
+            5.0F);
         drawPanelLabel(graphics, label, {centreX - 52, centreY + radius + 15, 104, 16}, 9.5F);
     }
 
-    void drawJoystick(juce::Graphics& graphics, juce::Rectangle<int> area, const juce::String& rangeLabel, const juce::String& valueLabel)
+    void drawJoystick(juce::Graphics& graphics, juce::Rectangle<int> area, const juce::String& rangeLabel, const juce::String& valueLabel, WidgetVisualState state = WidgetVisualState())
     {
         graphics.setColour(juce::Colour(0xff111111));
         graphics.fillRoundedRectangle(area.toFloat(), 12.0F);
@@ -456,9 +782,10 @@ private:
         graphics.setColour(juce::Colour(0xff1f1f1f));
         graphics.drawRoundedRectangle(well.toFloat(), 7.0F, 2.0F);
         graphics.setColour(juce::Colour(0xff202020));
-        graphics.fillEllipse(static_cast<float>(well.getCentreX() - 14), static_cast<float>(well.getCentreY() - 14), 28.0F, 28.0F);
+        const auto offset = state.hasValue ? static_cast<int>(std::round((state.value - 0.5F) * 22.0F)) : 0;
+        graphics.fillEllipse(static_cast<float>(well.getCentreX() - 14 + offset), static_cast<float>(well.getCentreY() - 14), 28.0F, 28.0F);
         graphics.setColour(juce::Colour(0xff565656));
-        graphics.drawLine(static_cast<float>(well.getCentreX() - 12), static_cast<float>(well.getCentreY() - 12), static_cast<float>(well.getCentreX() + 12), static_cast<float>(well.getCentreY() + 12), 3.0F);
+        graphics.drawLine(static_cast<float>(well.getCentreX() - 12 + offset), static_cast<float>(well.getCentreY() - 12), static_cast<float>(well.getCentreX() + 12 + offset), static_cast<float>(well.getCentreY() + 12), 3.0F);
         drawPanelLabel(graphics, valueLabel, {area.getRight() - 22, area.getY() + 8, 18, area.getHeight() - 16}, 12.0F);
         drawPanelLabel(graphics, rangeLabel, {area.getX(), area.getBottom() + 8, area.getWidth(), 18}, 13.0F);
     }
@@ -475,8 +802,12 @@ private:
         }
     }
 
-    void drawYaeltexArcadeButton(juce::Graphics& graphics, int x, int y, juce::Colour colour, const juce::String& label)
+    void drawYaeltexArcadeButton(juce::Graphics& graphics, int x, int y, juce::Colour colour, const juce::String& label, WidgetVisualState state = WidgetVisualState())
     {
+        if (state.down) {
+            x += 2;
+            y += 2;
+        }
         graphics.setColour(juce::Colour(0xaa000000));
         graphics.fillEllipse(static_cast<float>(x + 5), static_cast<float>(y + 5), 68.0F, 68.0F);
         graphics.setColour(colour);
@@ -485,6 +816,10 @@ private:
         graphics.fillEllipse(static_cast<float>(x + 8), static_cast<float>(y + 7), 30.0F, 18.0F);
         graphics.setColour(juce::Colour(0xff101010));
         graphics.drawEllipse(static_cast<float>(x), static_cast<float>(y), 68.0F, 68.0F, 2.0F);
+        if (state.hover || state.down) {
+            graphics.setColour(state.down ? juce::Colour(0xaaffffff) : juce::Colour(0x66ffffff));
+            graphics.drawEllipse(static_cast<float>(x + 2), static_cast<float>(y + 2), 64.0F, 64.0F, state.down ? 3.0F : 2.0F);
+        }
         drawPanelLabel(graphics, label, {x + 48, y + 48, 24, 18}, 13.0F);
     }
 
@@ -808,11 +1143,181 @@ private:
         }
     }
 
+#if LIVELOOPING_HAS_PROFILE_IO
+    void setEditMode(bool enabled)
+    {
+        editMode_ = enabled;
+        selectedElement_ = -1;
+        editDragMode_ = EditDragMode::None;
+        for (auto& control : controls_) {
+            if (control.component != nullptr) {
+                control.component->setInterceptsMouseClicks(!editMode_, !editMode_);
+            }
+        }
+        grabKeyboardFocus();
+        repaint();
+    }
+
+    static const char* roleName(SurfaceElementRole role)
+    {
+        return role == SurfaceElementRole::Widget ? "widget" : "decoration";
+    }
+
+    static const char* shapeName(SurfaceElementShape shape)
+    {
+        switch (shape) {
+        case SurfaceElementShape::Rect:
+            return "rect";
+        case SurfaceElementShape::RoundRect:
+            return "round_rect";
+        case SurfaceElementShape::Circle:
+            return "circle";
+        case SurfaceElementShape::Text:
+            return "text";
+        case SurfaceElementShape::Line:
+            return "line";
+        case SurfaceElementShape::Knob:
+            return "knob";
+        case SurfaceElementShape::Fader:
+            return "fader";
+        case SurfaceElementShape::Joystick:
+            return "joystick";
+        }
+        return "rect";
+    }
+
+    static std::string jsonEscape(const std::string& value)
+    {
+        std::ostringstream out;
+        for (const auto ch : value) {
+            switch (ch) {
+            case '\\':
+                out << "\\\\";
+                break;
+            case '"':
+                out << "\\\"";
+                break;
+            case '\n':
+                out << "\\n";
+                break;
+            default:
+                out << ch;
+                break;
+            }
+        }
+        return out.str();
+    }
+
+    static void writeJsonString(std::ostream& out, const char* key, const std::string& value, int indent, bool comma = true)
+    {
+        out << std::string(static_cast<size_t>(indent), ' ') << "\"" << key << "\": \"" << jsonEscape(value) << "\"";
+        if (comma) {
+            out << ",";
+        }
+        out << "\n";
+    }
+
+    static void writeJsonNumber(std::ostream& out, const char* key, float value, int indent, bool comma = true)
+    {
+        out << std::string(static_cast<size_t>(indent), ' ') << "\"" << key << "\": " << value;
+        if (comma) {
+            out << ",";
+        }
+        out << "\n";
+    }
+
+    void saveLayout()
+    {
+        if (!layout_.has_value() || layoutPath_.empty()) {
+            return;
+        }
+
+        std::ofstream out(layoutPath_);
+        if (!out) {
+            return;
+        }
+
+        out << "{\n";
+        writeJsonString(out, "id", layout_->id, 2);
+        writeJsonString(out, "profileId", layout_->profileId, 2);
+        out << "  \"baseWidth\": " << layout_->baseWidth << ",\n";
+        out << "  \"baseHeight\": " << layout_->baseHeight << ",\n";
+        out << "  \"elements\": [\n";
+        for (size_t index = 0; index < layout_->elements.size(); ++index) {
+            const auto& element = layout_->elements[index];
+            out << "    {\n";
+            writeJsonString(out, "id", element.id, 6);
+            writeJsonString(out, "role", roleName(element.role), 6);
+            writeJsonString(out, "shape", shapeName(element.shape), 6);
+            writeJsonString(out, "variant", element.variant, 6);
+            if (!element.label.empty()) {
+                writeJsonString(out, "label", element.label, 6);
+            }
+            if (!element.widgetId.empty()) {
+                writeJsonString(out, "widgetId", element.widgetId, 6);
+            }
+            if (!element.group.empty()) {
+                writeJsonString(out, "group", element.group, 6);
+            }
+            out << "      \"bounds\": {\n";
+            writeJsonNumber(out, "x", element.bounds.x, 8);
+            writeJsonNumber(out, "y", element.bounds.y, 8);
+            writeJsonNumber(out, "width", element.bounds.width, 8);
+            writeJsonNumber(out, "height", element.bounds.height, 8, false);
+            out << "      }\n";
+            out << "    }" << (index + 1 == layout_->elements.size() ? "\n" : ",\n");
+        }
+        out << "  ]\n";
+        out << "}\n";
+    }
+
+    void pushUndoSnapshot()
+    {
+        if (!layout_.has_value()) {
+            return;
+        }
+
+        std::vector<SurfaceBounds> snapshot;
+        snapshot.reserve(layout_->elements.size());
+        for (const auto& element : layout_->elements) {
+            snapshot.push_back(element.bounds);
+        }
+        undoStack_.push_back(std::move(snapshot));
+        constexpr size_t kMaxUndoSteps = 128;
+        if (undoStack_.size() > kMaxUndoSteps) {
+            undoStack_.erase(undoStack_.begin());
+        }
+    }
+
+    void undoLastEdit()
+    {
+        if (!layout_.has_value() || undoStack_.empty()) {
+            return;
+        }
+
+        const auto snapshot = std::move(undoStack_.back());
+        undoStack_.pop_back();
+        const auto count = juce::jmin(snapshot.size(), layout_->elements.size());
+        for (size_t index = 0; index < count; ++index) {
+            layout_->elements[index].bounds = snapshot[index];
+        }
+        layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
+        repaint();
+    }
+#endif
+
     LiveLoopingEngine& engine_;
     MidiMapper mapper_;
     SurfaceKind kind_ = SurfaceKind::Kaoss;
 #if LIVELOOPING_HAS_PROFILE_IO
     std::optional<ControlSurfaceLayout> layout_;
+    std::string layoutPath_;
+    bool editMode_ = false;
+    int selectedElement_ = -1;
+    EditDragMode editDragMode_ = EditDragMode::None;
+    juce::Point<float> editStartMouse_;
+    SurfaceBounds editStartBounds_;
+    std::vector<std::vector<SurfaceBounds>> undoStack_;
 #endif
     std::vector<Group> groups_;
     std::vector<Control> controls_;
@@ -851,11 +1356,15 @@ private:
 std::unique_ptr<ProfileSurfaceComponent> makeProfileSurface(
     LiveLoopingEngine& engine,
     ControllerProfile profile,
+    const char* profileFileName,
     const char* layoutFileName)
 {
 #if LIVELOOPING_HAS_PROFILE_IO
-    return std::make_unique<ProfileSurfaceComponent>(engine, std::move(profile), loadOptionalLayout(layoutFileName));
+    profile = loadProfileOrFallback(profileFileName, std::move(profile));
+    const auto layoutPath = std::string(LIVELOOPING_LAYOUT_DIR) + "/" + layoutFileName;
+    return std::make_unique<ProfileSurfaceComponent>(engine, std::move(profile), loadOptionalLayout(layoutFileName), layoutPath);
 #else
+    juce::ignoreUnused(profileFileName);
     juce::ignoreUnused(layoutFileName);
     return std::make_unique<ProfileSurfaceComponent>(engine, std::move(profile));
 #endif
@@ -867,13 +1376,13 @@ public:
     {
         tabs_.setTabBarDepth(28);
         tabs_.addTab("Mic Kaoss", juce::Colours::darkslategrey,
-            makeProfileSurface(engine, makeMicKaossPadProfile(), "kaoss_pad.json").release(),
+            makeProfileSurface(engine, makeMicKaossPadProfile(), "kaoss_mic.json", "kaoss_pad.json").release(),
             true);
         tabs_.addTab("Synth Kaoss", juce::Colours::darkslategrey,
-            makeProfileSurface(engine, makeSynthKaossPadProfile(), "kaoss_pad.json").release(),
+            makeProfileSurface(engine, makeSynthKaossPadProfile(), "kaoss_synth.json", "kaoss_pad.json").release(),
             true);
         tabs_.addTab("Yaeltex", juce::Colours::darkslategrey,
-            makeProfileSurface(engine, makeYaeltexLiveLoopingProfile(), "yaeltex_livelooping.json").release(),
+            makeProfileSurface(engine, makeYaeltexLiveLoopingProfile(), "yaeltex_livelooping.json", "yaeltex_livelooping.json").release(),
             true);
         addAndMakeVisible(tabs_);
     }

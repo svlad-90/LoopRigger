@@ -121,6 +121,69 @@ void LiveLoopingEngine::handle(const ControllerCommand& command)
         appendEvent("track selection toggled");
         break;
     }
+    case CommandType::StartTransport:
+        state_.transport.playing = true;
+        appendEvent("transport started");
+        break;
+    case CommandType::StopTransport:
+        state_.transport.playing = false;
+        appendEvent("transport stopped");
+        break;
+    case CommandType::RestartAllLoopers:
+        state_.transport.playing = true;
+        ++state_.transport.restartGeneration;
+        appendEvent("all loopers restart queued");
+        break;
+    case CommandType::SelectRoutingSource:
+        state_.routing.source = static_cast<RoutingSource>(clampIndex(command.index, 9));
+        appendEvent("routing source: " + toString(state_.routing.source));
+        break;
+    case CommandType::SelectRoutingTarget:
+        state_.routing.target = static_cast<RoutingTarget>(clampIndex(command.index, 4));
+        appendEvent("routing target: " + toString(state_.routing.target));
+        break;
+    case CommandType::SelectCenterFxSlot:
+        state_.centerFx.selectedSlot = clampIndex(command.index, kCenterFxSlots);
+        appendEvent("center FX slot: " + std::to_string(state_.centerFx.selectedSlot + 1));
+        break;
+    case CommandType::SelectCenterFxBank:
+        state_.centerFx.selectedBank = clampIndex(command.index, kCenterFxBanks);
+        appendEvent("center FX bank: " + std::to_string(state_.centerFx.selectedBank + 1));
+        break;
+    case CommandType::SetCenterFxParameter: {
+        const auto parameter = clampIndex(command.index, kCenterFxParameters);
+        state_.centerFx.parameters[parameter] = clampLevel(command.value);
+        appendEvent("center FX parameter " + std::to_string(parameter + 1) + ": " + std::to_string(state_.centerFx.parameters[parameter]));
+        break;
+    }
+    case CommandType::SetCenterFxJoystick: {
+        const auto joystick = clampIndex(command.index, kCenterFxJoysticks);
+        state_.centerFx.joysticks[joystick] = clampLevel(command.value);
+        appendEvent("center FX joystick " + std::to_string(joystick + 1) + ": " + std::to_string(state_.centerFx.joysticks[joystick]));
+        break;
+    }
+    case CommandType::TriggerRemixerMacro:
+        appendEvent("remixer macro: " + std::to_string(command.index + 1));
+        break;
+    case CommandType::SetMasterParameter: {
+        const auto parameter = clampIndex(command.index, kMasterParameters);
+        state_.master.parameters[parameter] = clampLevel(command.value);
+        appendEvent("master parameter " + std::to_string(parameter + 1) + ": " + std::to_string(state_.master.parameters[parameter]));
+        break;
+    }
+    case CommandType::TriggerSamplerSlot: {
+        const auto slot = clampIndex(command.index, kSamplerSlots);
+        state_.sampler.slots[slot].loaded = true;
+        state_.sampler.slots[slot].playing = true;
+        appendEvent("sampler slot triggered: " + std::to_string(slot + 1));
+        break;
+    }
+    case CommandType::ClearSamplerSlot: {
+        const auto slot = clampIndex(command.index, kSamplerSlots);
+        state_.sampler.slots[slot] = SamplerSlotState{};
+        appendEvent("sampler slot cleared: " + std::to_string(slot + 1));
+        break;
+    }
     case CommandType::StartResampleSelectedLooper:
         state_.resampleMode = ResampleMode::SelectedLooper;
         appendEvent("resample mode: selected looper");
@@ -155,6 +218,12 @@ std::string LiveLoopingEngine::renderTextSnapshot() const
     out << "Selected looper=" << state_.selectedLooper + 1
         << " sampleLength=" << state_.selectedSampleLengthBeats
         << " resample=" << toString(state_.resampleMode) << "\n";
+    out << "Transport playing=" << (state_.transport.playing ? "yes" : "no")
+        << " restartGeneration=" << state_.transport.restartGeneration << "\n";
+    out << "Routing source=" << toString(state_.routing.source)
+        << " target=" << toString(state_.routing.target)
+        << " centerFx=slot " << state_.centerFx.selectedSlot + 1
+        << "/bank " << state_.centerFx.selectedBank + 1 << "\n";
 
     for (int looper = 0; looper < kLoopers; ++looper) {
         out << "L" << looper + 1 << " vol=" << state_.loopers[looper].volume << ": ";
@@ -272,5 +341,44 @@ std::string toString(ResampleMode mode)
     return "unknown";
 }
 
-} // namespace loop_rigger::core
+std::string toString(RoutingSource source)
+{
+    switch (source) {
+    case RoutingSource::Mic:
+        return "mic";
+    case RoutingSource::Synth:
+        return "synth";
+    case RoutingSource::SelectedLooper:
+        return "selected-looper";
+    case RoutingSource::Looper1:
+        return "looper-1";
+    case RoutingSource::Looper2:
+        return "looper-2";
+    case RoutingSource::Looper3:
+        return "looper-3";
+    case RoutingSource::Looper4:
+        return "looper-4";
+    case RoutingSource::AllLoopers:
+        return "all-loopers";
+    case RoutingSource::RecordingBus:
+        return "recording-bus";
+    }
+    return "unknown";
+}
 
+std::string toString(RoutingTarget target)
+{
+    switch (target) {
+    case RoutingTarget::SelectedTrack:
+        return "selected-track";
+    case RoutingTarget::SelectedLooper:
+        return "selected-looper";
+    case RoutingTarget::Sampler:
+        return "sampler";
+    case RoutingTarget::Master:
+        return "master";
+    }
+    return "unknown";
+}
+
+} // namespace loop_rigger::core

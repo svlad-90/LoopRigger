@@ -114,6 +114,35 @@ void testYaeltexLooperCommands()
     expect(state.loopers[1].tracks[1].state == TrackState::Empty, "reset looper clears L2 T2");
 }
 
+void testYaeltexPerformanceCommands()
+{
+    LiveLoopingEngine engine;
+
+    engine.handle(yaeltexCommand(CommandType::StartTransport));
+    engine.handle(yaeltexCommand(CommandType::RestartAllLoopers));
+    engine.handle(yaeltexCommand(CommandType::SelectRoutingSource, 0));
+    engine.handle(yaeltexCommand(CommandType::SelectRoutingTarget, 2));
+    engine.handle(yaeltexCommand(CommandType::SelectCenterFxSlot, 4));
+    engine.handle(yaeltexCommand(CommandType::SelectCenterFxBank, 2));
+    engine.handle(yaeltexCommand(CommandType::SetCenterFxParameter, 0, 0.75F));
+    engine.handle(yaeltexCommand(CommandType::SetCenterFxJoystick, 1, 0.25F));
+    engine.handle(yaeltexCommand(CommandType::SetMasterParameter, 4, 0.5F));
+    engine.handle(yaeltexCommand(CommandType::TriggerSamplerSlot, 6));
+
+    const auto& state = engine.state();
+    expect(state.transport.playing, "transport should be playing");
+    expect(state.transport.restartGeneration == 1, "restart all should increment restart generation");
+    expect(state.routing.source == loop_rigger::core::RoutingSource::Mic, "routing source should select mic");
+    expect(state.routing.target == loop_rigger::core::RoutingTarget::Sampler, "routing target should select sampler");
+    expect(state.centerFx.selectedSlot == 4, "center FX should select zero-based slot 5");
+    expect(state.centerFx.selectedBank == 2, "center FX should select zero-based bank 3");
+    expect(state.centerFx.parameters[0] == 0.75F, "center FX parameter should store value");
+    expect(state.centerFx.joysticks[1] == 0.25F, "center FX joystick should store value");
+    expect(state.master.parameters[4] == 0.5F, "master parameter should store value");
+    expect(state.sampler.slots[6].loaded, "sampler slot should become loaded");
+    expect(state.sampler.slots[6].playing, "sampler slot should become playing");
+}
+
 void testKaossPadMapping()
 {
     const MidiMapper micMapper(makeMicKaossPadProfile());
@@ -168,6 +197,21 @@ void testYaeltexMapping()
     expect(mappedPseudoKnob->type == CommandType::SetTrackVolume, "Vol/Pan T3 should set track volume initially");
     expect(mappedPseudoKnob->index == 2, "Vol/Pan T3 should target zero-based track 3");
     expect(mappedPseudoKnob->value == 0.25F, "pseudo knob value should pass through");
+
+    const auto mappedRoutingSource = mapper.mapWidget({"routing_mic", WidgetEventType::Press, 1.0F});
+    expect(mappedRoutingSource.has_value(), "Yaeltex routing widget should map to a command");
+    expect(mappedRoutingSource->type == CommandType::SelectRoutingSource, "MIC should select routing source");
+    expect(mappedRoutingSource->index == 0, "MIC should map to routing source index 0");
+
+    const auto mappedFxSlot = mapper.mapWidget({"center_fx_slot_5", WidgetEventType::Press, 1.0F});
+    expect(mappedFxSlot.has_value(), "Yaeltex FX slot widget should map to a command");
+    expect(mappedFxSlot->type == CommandType::SelectCenterFxSlot, "FX slot should select center FX slot");
+    expect(mappedFxSlot->index == 4, "FX5 should map to zero-based slot 5");
+
+    const auto mappedSamplerSlot = mapper.mapWidget({"sampler_slot_7", WidgetEventType::Press, 1.0F});
+    expect(mappedSamplerSlot.has_value(), "Yaeltex sampler widget should map to a command");
+    expect(mappedSamplerSlot->type == CommandType::TriggerSamplerSlot, "sampler button should trigger sampler slot");
+    expect(mappedSamplerSlot->index == 6, "sampler button 7 should map to zero-based slot 7");
 
     expect(normalizeMidiValue(-10) == 0.0F, "negative MIDI values should clamp to zero");
     expect(normalizeMidiValue(200) == 1.0F, "large MIDI values should clamp to one");
@@ -259,6 +303,17 @@ void testJsonProfileLoading()
     expect(mappedKnob->type == CommandType::SetTrackVolume, "JSON Vol/Pan T3 should set track volume");
     expect(mappedKnob->index == 2, "JSON Vol/Pan T3 should target zero-based track 3");
     expect(mappedKnob->value == 0.42F, "JSON pseudo knob value should pass through");
+
+    const auto mappedFxBank = yaeltexMapper.mapWidget({"center_fx_bank_3", WidgetEventType::Press, 1.0F});
+    expect(mappedFxBank.has_value(), "JSON Yaeltex profile should map center FX bank");
+    expect(mappedFxBank->type == CommandType::SelectCenterFxBank, "JSON B3 should select center FX bank");
+    expect(mappedFxBank->index == 2, "JSON B3 should map to zero-based bank 3");
+
+    const auto mappedMaster = yaeltexMapper.mapWidget({"master_output_volume", WidgetEventType::Change, 0.66F});
+    expect(mappedMaster.has_value(), "JSON Yaeltex profile should map master output volume");
+    expect(mappedMaster->type == CommandType::SetMasterParameter, "JSON master output should set master parameter");
+    expect(mappedMaster->index == 4, "JSON output volume should map to master parameter 5");
+    expect(mappedMaster->value == 0.66F, "JSON master value should pass through");
 }
 
 void testJsonSurfaceLayoutLoading()
@@ -313,6 +368,7 @@ int main()
 {
     testInputControllerCommands();
     testYaeltexLooperCommands();
+    testYaeltexPerformanceCommands();
     testKaossPadMapping();
     testYaeltexMapping();
 #if LIVELOOPING_HAS_PROFILE_IO

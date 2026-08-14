@@ -429,6 +429,7 @@ if(LIVELOOPING_BUILD_JUCE_APP)
         target_compile_definitions(livelooping_product
             PRIVATE
                 LIVELOOPING_HAS_PROFILE_IO=1
+                LIVELOOPING_PROFILE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/controller_profiles"
                 LIVELOOPING_LAYOUT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/control_surfaces"
         )
     endif()

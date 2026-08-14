@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="1200" height="820">
+<rect width="100%" height="100%" fill="#f3f3f3"/>
+<rect x="24" y="24" width="1152" height="772" rx="8" fill="#111820" stroke="#454b4f" stroke-width="2"/>
+<rect x="236" y="118" width="728" height="585" fill="#111820" stroke="#454b4f" stroke-width="2"/>
+<rect x="202" y="58" width="796" height="190" rx="8" fill="#111820" stroke="#454b4f" stroke-width="2"/>
+<text x="252" y="121.0" fill="#fff" font-size="34" font-family="Arial" font-weight="700">KORG</text>
+<text x="446" y="121.5" fill="#fff" font-size="34" font-family="Arial" font-weight="700">KAOSS PAD</text>
+<text x="840" y="119.5" fill="#fff" font-size="34" font-family="Arial" font-weight="700">KP3+</text>
+<rect x="432" y="126" width="160" height="54" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="454" y="163.0" fill="#fff" font-size="34" font-family="Arial" font-weight="700">FLT.1</text>
+<rect x="614" y="126" width="72" height="24" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="650.0" y="142.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">PROG</text>
+<rect x="696" y="126" width="80" height="24" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="736.0" y="142.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">WRITE</text>
+<rect x="696" y="161" width="80" height="24" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="736.0" y="177.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">SHIFT</text>
+<line x1="322" y1="218" x2="1150" y2="218" stroke="#eee" stroke-width="2"/>
+<text x="510" y="209.5" fill="#fff" font-size="18" font-family="Arial" font-weight="700">PROGRAM MEMORY</text>
+<rect x="292" y="342" width="560" height="300" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="52" y="83.0" fill="#fff" font-size="20" font-family="Arial" font-weight="700">INPUT VOLUME</text>
+<ellipse cx="110.0" cy="134.0" rx="34.0" ry="34.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="52" y="219.0" fill="#fff" font-size="20" font-family="Arial" font-weight="700">FX DEPTH</text>
+<ellipse cx="110.0" cy="270.0" rx="34.0" ry="34.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<rect x="64" y="662" width="94" height="46" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="111.0" y="689.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">HOLD</text>
+<ellipse cx="1080.0" cy="136.0" rx="34.0" ry="34.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<rect x="1026" y="236" width="78" height="62" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1065.0" y="271.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">TAP/
+RANGE</text>
+<rect x="1034" y="376" width="78" height="44" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1073.0" y="402.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">AUTO BPM</text>
+<rect x="1034" y="458" width="78" height="44" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1073.0" y="484.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">PAD
+MOTION</text>
+<rect x="1034" y="536" width="78" height="44" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1073.0" y="562.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">MUTE</text>
+<rect x="1024" y="640" width="92" height="50" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1070.0" y="669.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">SAMPLING</text>
+<text x="390" y="673.5" fill="#fff" font-size="18" font-family="Arial" font-weight="700">SAMPLE BANK</text>
+<rect x="322" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="356.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1</text>
+<rect x="402" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="436.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">2</text>
+<rect x="482" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="516.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">3</text>
+<rect x="562" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="596.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">4</text>
+<rect x="642" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="676.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">5</text>
+<rect x="722" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="756.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">6</text>
+<rect x="802" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="836.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">7</text>
+<rect x="882" y="247" width="68" height="44" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="916.0" y="273.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">8</text>
+<rect x="342" y="712" width="92" height="46" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="388.0" y="739.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">A</text>
+<rect x="492" y="712" width="92" height="46" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="538.0" y="739.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">B</text>
+<rect x="642" y="712" width="92" height="46" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="688.0" y="739.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">C</text>
+<rect x="792" y="712" width="92" height="46" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="838.0" y="739.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">D</text>
+<rect x="94" y="410" width="24" height="168" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<rect x="136" y="410" width="24" height="168" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+</svg>

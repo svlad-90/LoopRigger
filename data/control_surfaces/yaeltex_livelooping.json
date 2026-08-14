@@ -4,115 +4,2031 @@
   "baseWidth": 1520,
   "baseHeight": 900,
   "elements": [
-    {"id": "wood_frame", "role": "decoration", "shape": "round_rect", "variant": "wood_frame", "bounds": {"x": 18, "y": 18, "width": 1484, "height": 864}},
-    {"id": "faceplate", "role": "decoration", "shape": "rect", "variant": "faceplate", "bounds": {"x": 44, "y": 44, "width": 1432, "height": 812}},
-    {"id": "brand_main", "role": "decoration", "shape": "text", "variant": "brand", "label": "LIVELOOPING", "bounds": {"x": 102, "y": 68, "width": 300, "height": 42}},
-    {"id": "brand_sub", "role": "decoration", "shape": "text", "variant": "brand_sub", "label": "YAELTEX", "bounds": {"x": 106, "y": 108, "width": 150, "height": 24}},
-    {"id": "screw_tl", "role": "decoration", "shape": "circle", "variant": "screw", "bounds": {"x": 54, "y": 54, "width": 16, "height": 16}},
-    {"id": "screw_tr", "role": "decoration", "shape": "circle", "variant": "screw", "bounds": {"x": 1450, "y": 54, "width": 16, "height": 16}},
-    {"id": "screw_bl", "role": "decoration", "shape": "circle", "variant": "screw", "bounds": {"x": 54, "y": 830, "width": 16, "height": 16}},
-    {"id": "screw_br", "role": "decoration", "shape": "circle", "variant": "screw", "bounds": {"x": 1450, "y": 830, "width": 16, "height": 16}},
-    {"id": "line_top", "role": "decoration", "shape": "line", "variant": "panel_line", "bounds": {"x": 78, "y": 158, "width": 1364, "height": 0}},
-    {"id": "line_middle_1", "role": "decoration", "shape": "line", "variant": "panel_line", "bounds": {"x": 78, "y": 318, "width": 1364, "height": 0}},
-    {"id": "line_middle_2", "role": "decoration", "shape": "line", "variant": "panel_line", "bounds": {"x": 78, "y": 468, "width": 1364, "height": 0}},
-    {"id": "line_left_split", "role": "decoration", "shape": "line", "variant": "panel_line", "bounds": {"x": 604, "y": 158, "width": 0, "height": 670}},
-    {"id": "line_right_split", "role": "decoration", "shape": "line", "variant": "panel_line", "bounds": {"x": 1039, "y": 62, "width": 0, "height": 766}},
-    {"id": "top_grid_1", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "4", "bounds": {"x": 764, "y": 68, "width": 54, "height": 30}},
-    {"id": "top_grid_2", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "2", "bounds": {"x": 834, "y": 68, "width": 54, "height": 30}},
-    {"id": "top_grid_3", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "1", "bounds": {"x": 904, "y": 68, "width": 54, "height": 30}},
-    {"id": "top_grid_4", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "1/2", "bounds": {"x": 974, "y": 68, "width": 54, "height": 30}},
-    {"id": "top_grid_5", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "1/4", "bounds": {"x": 764, "y": 118, "width": 54, "height": 30}},
-    {"id": "top_grid_6", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "1/8", "bounds": {"x": 834, "y": 118, "width": 54, "height": 30}},
-    {"id": "top_grid_7", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "1/16", "bounds": {"x": 904, "y": 118, "width": 54, "height": 30}},
-    {"id": "top_grid_8", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "1/32", "bounds": {"x": 974, "y": 118, "width": 54, "height": 30}},
-    {"id": "mute_1", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute T1", "bounds": {"x": 162, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_2", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute T2", "bounds": {"x": 232, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_3", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute T3", "bounds": {"x": 302, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_4", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute T4", "bounds": {"x": 372, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_5", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute L1", "bounds": {"x": 442, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_6", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute L2", "bounds": {"x": 512, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_7", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute L3", "bounds": {"x": 582, "y": 202, "width": 54, "height": 30}},
-    {"id": "mute_8", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Mute L4", "bounds": {"x": 652, "y": 202, "width": 54, "height": 30}},
-    {"id": "inv_1", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv T1", "bounds": {"x": 162, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_2", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv T2", "bounds": {"x": 232, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_3", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv T3", "bounds": {"x": 302, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_4", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv T4", "bounds": {"x": 372, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_5", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv L1", "bounds": {"x": 442, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_6", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv L2", "bounds": {"x": 512, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_7", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv L3", "bounds": {"x": 582, "y": 252, "width": 54, "height": 30}},
-    {"id": "inv_8", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Inv L4", "bounds": {"x": 652, "y": 252, "width": 54, "height": 30}},
-    {"id": "dry_wet", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Dry/Wet", "bounds": {"x": 632, "y": 238, "width": 48, "height": 48}},
-    {"id": "lfo1", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "LFO1 Speed", "bounds": {"x": 752, "y": 238, "width": 48, "height": 48}},
-    {"id": "lfo2", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "LFO2 Speed", "bounds": {"x": 872, "y": 238, "width": 48, "height": 48}},
-    {"id": "drop_fx", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Drop FX", "bounds": {"x": 992, "y": 238, "width": 48, "height": 48}},
-    {"id": "vol_drop", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Vol/Drop", "bounds": {"x": 1064, "y": 172, "width": 48, "height": 48}},
-    {"id": "reverb_top", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Reverb", "bounds": {"x": 1184, "y": 172, "width": 48, "height": 48}},
-    {"id": "transpose", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Transpose", "bounds": {"x": 1304, "y": 172, "width": 48, "height": 48}},
-    {"id": "phaser_top", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Phaser", "bounds": {"x": 1400, "y": 172, "width": 48, "height": 48}},
-    {"id": "fx_grid_1", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX1", "bounds": {"x": 622, "y": 350, "width": 54, "height": 30}},
-    {"id": "fx_grid_2", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX2", "bounds": {"x": 692, "y": 350, "width": 54, "height": 30}},
-    {"id": "fx_grid_3", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX3", "bounds": {"x": 762, "y": 350, "width": 54, "height": 30}},
-    {"id": "fx_grid_4", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX4", "bounds": {"x": 832, "y": 350, "width": 54, "height": 30}},
-    {"id": "fx_grid_5", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX5", "bounds": {"x": 902, "y": 350, "width": 54, "height": 30}},
-    {"id": "fx_grid_6", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "B1", "bounds": {"x": 972, "y": 350, "width": 54, "height": 30}},
-    {"id": "fx_grid_7", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX6", "bounds": {"x": 622, "y": 400, "width": 54, "height": 30}},
-    {"id": "fx_grid_8", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX7", "bounds": {"x": 692, "y": 400, "width": 54, "height": 30}},
-    {"id": "fx_grid_9", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX8", "bounds": {"x": 762, "y": 400, "width": 54, "height": 30}},
-    {"id": "fx_grid_10", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX9", "bounds": {"x": 832, "y": 400, "width": 54, "height": 30}},
-    {"id": "fx_grid_11", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FX10", "bounds": {"x": 902, "y": 400, "width": 54, "height": 30}},
-    {"id": "fx_grid_12", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "B4", "bounds": {"x": 972, "y": 400, "width": 54, "height": 30}},
-    {"id": "joystick_1", "role": "decoration", "shape": "joystick", "variant": "joystick_value_1", "label": "Range 1", "bounds": {"x": 610, "y": 492, "width": 96, "height": 96}},
-    {"id": "joystick_2", "role": "decoration", "shape": "joystick", "variant": "joystick_value_2", "label": "Range 2", "bounds": {"x": 820, "y": 492, "width": 96, "height": 96}},
-    {"id": "right_btn_1", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "FRZ", "bounds": {"x": 1060, "y": 340, "width": 46, "height": 30}},
-    {"id": "right_btn_2", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Drop", "bounds": {"x": 1118, "y": 340, "width": 46, "height": 30}},
-    {"id": "right_btn_3", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Extra", "bounds": {"x": 1176, "y": 340, "width": 46, "height": 30}},
-    {"id": "right_btn_4", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "REC", "bounds": {"x": 1234, "y": 340, "width": 46, "height": 30}},
-    {"id": "right_btn_5", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "RST", "bounds": {"x": 1060, "y": 390, "width": 46, "height": 30}},
-    {"id": "right_btn_6", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "RST all", "bounds": {"x": 1118, "y": 390, "width": 46, "height": 30}},
-    {"id": "right_btn_7", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "Extra 2", "bounds": {"x": 1176, "y": 390, "width": 46, "height": 30}},
-    {"id": "right_btn_8", "role": "decoration", "shape": "round_rect", "variant": "hardware_button", "label": "STOP", "bounds": {"x": 1234, "y": 390, "width": 46, "height": 30}},
-    {"id": "master_tempo", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Master tempo", "bounds": {"x": 1316, "y": 300, "width": 54, "height": 54}},
-    {"id": "pitch_shift", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Pitch shift", "bounds": {"x": 1392, "y": 300, "width": 54, "height": 54}},
-    {"id": "master_vol", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Master vol.", "bounds": {"x": 1316, "y": 435, "width": 54, "height": 54}},
-    {"id": "pitch_dry_wet", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Pitch dry/wet", "bounds": {"x": 1392, "y": 435, "width": 54, "height": 54}},
-    {"id": "volume", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "VOLUME", "bounds": {"x": 1316, "y": 570, "width": 54, "height": 54}},
-    {"id": "distortion", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Distortion", "bounds": {"x": 1392, "y": 570, "width": 54, "height": 54}},
-    {"id": "pan", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Pan", "bounds": {"x": 1316, "y": 705, "width": 54, "height": 54}},
-    {"id": "dist_dry_wet", "role": "decoration", "shape": "knob", "variant": "panel_knob", "label": "Dist dry/wet", "bounds": {"x": 1392, "y": 705, "width": 54, "height": 54}},
-    {"id": "arcade_1", "role": "decoration", "shape": "round_rect", "variant": "arcade_green", "label": "1", "bounds": {"x": 1130, "y": 648, "width": 68, "height": 68}},
-    {"id": "arcade_2", "role": "decoration", "shape": "round_rect", "variant": "arcade_red", "label": "2", "bounds": {"x": 1212, "y": 648, "width": 68, "height": 68}},
-    {"id": "arcade_3", "role": "decoration", "shape": "round_rect", "variant": "arcade_blue", "label": "3", "bounds": {"x": 1294, "y": 648, "width": 68, "height": 68}},
-    {"id": "arcade_4", "role": "decoration", "shape": "round_rect", "variant": "arcade_yellow", "label": "4", "bounds": {"x": 1376, "y": 648, "width": 68, "height": 68}},
-    {"id": "arcade_5", "role": "decoration", "shape": "round_rect", "variant": "arcade_green", "label": "5", "bounds": {"x": 1130, "y": 735, "width": 68, "height": 68}},
-    {"id": "arcade_6", "role": "decoration", "shape": "round_rect", "variant": "arcade_red", "label": "6", "bounds": {"x": 1212, "y": 735, "width": 68, "height": 68}},
-    {"id": "arcade_7", "role": "decoration", "shape": "round_rect", "variant": "arcade_blue", "label": "7", "bounds": {"x": 1294, "y": 735, "width": 68, "height": 68}},
-    {"id": "arcade_8", "role": "decoration", "shape": "round_rect", "variant": "arcade_yellow", "label": "8", "bounds": {"x": 1376, "y": 735, "width": 68, "height": 68}},
-    {"id": "looper_1", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "looper_1", "group": "looper_select", "bounds": {"x": 102, "y": 352, "width": 76, "height": 64}},
-    {"id": "looper_2", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "looper_2", "group": "looper_select", "bounds": {"x": 192, "y": 352, "width": 76, "height": 64}},
-    {"id": "looper_3", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "looper_3", "group": "looper_select", "bounds": {"x": 282, "y": 352, "width": 76, "height": 64}},
-    {"id": "looper_4", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "looper_4", "group": "looper_select", "bounds": {"x": 372, "y": 352, "width": 76, "height": 64}},
-    {"id": "length_1", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_1", "group": "sample_length", "bounds": {"x": 102, "y": 450, "width": 52, "height": 40}},
-    {"id": "length_2", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_2", "group": "sample_length", "bounds": {"x": 166, "y": 450, "width": 52, "height": 40}},
-    {"id": "length_4", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_4", "group": "sample_length", "bounds": {"x": 230, "y": 450, "width": 52, "height": 40}},
-    {"id": "length_8", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_8", "group": "sample_length", "bounds": {"x": 294, "y": 450, "width": 52, "height": 40}},
-    {"id": "length_16", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_16", "group": "sample_length", "bounds": {"x": 102, "y": 502, "width": 52, "height": 40}},
-    {"id": "length_32", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_32", "group": "sample_length", "bounds": {"x": 166, "y": 502, "width": 52, "height": 40}},
-    {"id": "length_64", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_64", "group": "sample_length", "bounds": {"x": 230, "y": 502, "width": 52, "height": 40}},
-    {"id": "length_128", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "sample_length_128", "group": "sample_length", "bounds": {"x": 294, "y": 502, "width": 52, "height": 40}},
-    {"id": "record_t1", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "record_t1", "group": "track_record", "bounds": {"x": 102, "y": 556, "width": 76, "height": 56}},
-    {"id": "record_t2", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "record_t2", "group": "track_record", "bounds": {"x": 192, "y": 556, "width": 76, "height": 56}},
-    {"id": "record_t3", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "record_t3", "group": "track_record", "bounds": {"x": 282, "y": 556, "width": 76, "height": 56}},
-    {"id": "record_t4", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "record_t4", "group": "track_record", "bounds": {"x": 372, "y": 556, "width": 76, "height": 56}},
-    {"id": "clear_t1", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "clear_t1", "group": "track_clear", "bounds": {"x": 102, "y": 648, "width": 76, "height": 48}},
-    {"id": "clear_t2", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "clear_t2", "group": "track_clear", "bounds": {"x": 192, "y": 648, "width": 76, "height": 48}},
-    {"id": "clear_t3", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "clear_t3", "group": "track_clear", "bounds": {"x": 282, "y": 648, "width": 76, "height": 48}},
-    {"id": "clear_t4", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "clear_t4", "group": "track_clear", "bounds": {"x": 372, "y": 648, "width": 76, "height": 48}},
-    {"id": "vol_pan_t1", "role": "widget", "shape": "knob", "variant": "interactive_knob", "widgetId": "vol_pan_t1", "group": "track_volume_pan", "bounds": {"x": 110, "y": 710, "width": 78, "height": 78}},
-    {"id": "vol_pan_t2", "role": "widget", "shape": "knob", "variant": "interactive_knob", "widgetId": "vol_pan_t2", "group": "track_volume_pan", "bounds": {"x": 255, "y": 710, "width": 78, "height": 78}},
-    {"id": "vol_pan_t3", "role": "widget", "shape": "knob", "variant": "interactive_knob", "widgetId": "vol_pan_t3", "group": "track_volume_pan", "bounds": {"x": 400, "y": 710, "width": 78, "height": 78}},
-    {"id": "vol_pan_t4", "role": "widget", "shape": "knob", "variant": "interactive_knob", "widgetId": "vol_pan_t4", "group": "track_volume_pan", "bounds": {"x": 545, "y": 710, "width": 78, "height": 78}},
-    {"id": "resample_selected", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "resample_selected", "group": "resampling", "bounds": {"x": 404, "y": 838, "width": 104, "height": 54}},
-    {"id": "resample_all", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "resample_all", "group": "resampling", "bounds": {"x": 526, "y": 838, "width": 104, "height": 54}},
-    {"id": "reset_all", "role": "widget", "shape": "round_rect", "variant": "interactive_button", "widgetId": "reset_all", "group": "session", "bounds": {"x": 448, "y": 98, "width": 76, "height": 54}}
+    {
+      "id": "wood_frame",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "wood_frame",
+      "bounds": {
+        "x": 18,
+        "y": 18,
+        "width": 1484,
+        "height": 864
+      }
+    },
+    {
+      "id": "faceplate",
+      "role": "decoration",
+      "shape": "rect",
+      "variant": "faceplate",
+      "bounds": {
+        "x": 50,
+        "y": 50,
+        "width": 1420,
+        "height": 820
+      }
+    },
+    {
+      "id": "brand_main",
+      "role": "decoration",
+      "shape": "text",
+      "variant": "brand",
+      "label": "LIVELOOPING",
+      "bounds": {
+        "x": 105,
+        "y": 82,
+        "width": 310,
+        "height": 42
+      }
+    },
+    {
+      "id": "brand_sub",
+      "role": "decoration",
+      "shape": "text",
+      "variant": "brand_sub",
+      "label": "YAELTEX",
+      "bounds": {
+        "x": 108,
+        "y": 122,
+        "width": 150,
+        "height": 24
+      }
+    },
+    {
+      "id": "screw_tl",
+      "role": "decoration",
+      "shape": "circle",
+      "variant": "screw",
+      "bounds": {
+        "x": 58,
+        "y": 58,
+        "width": 16,
+        "height": 16
+      }
+    },
+    {
+      "id": "screw_tr",
+      "role": "decoration",
+      "shape": "circle",
+      "variant": "screw",
+      "bounds": {
+        "x": 1446,
+        "y": 58,
+        "width": 16,
+        "height": 16
+      }
+    },
+    {
+      "id": "screw_bl",
+      "role": "decoration",
+      "shape": "circle",
+      "variant": "screw",
+      "bounds": {
+        "x": 58,
+        "y": 842,
+        "width": 16,
+        "height": 16
+      }
+    },
+    {
+      "id": "screw_br",
+      "role": "decoration",
+      "shape": "circle",
+      "variant": "screw",
+      "bounds": {
+        "x": 1446,
+        "y": 842,
+        "width": 16,
+        "height": 16
+      }
+    },
+    {
+      "id": "line_top",
+      "role": "decoration",
+      "shape": "line",
+      "variant": "panel_line",
+      "bounds": {
+        "x": 82,
+        "y": 178,
+        "width": 1356,
+        "height": 0
+      }
+    },
+    {
+      "id": "line_middle_1",
+      "role": "decoration",
+      "shape": "line",
+      "variant": "panel_line",
+      "bounds": {
+        "x": 82,
+        "y": 330,
+        "width": 1356,
+        "height": 0
+      }
+    },
+    {
+      "id": "line_middle_2",
+      "role": "decoration",
+      "shape": "line",
+      "variant": "panel_line",
+      "bounds": {
+        "x": 82,
+        "y": 470,
+        "width": 1356,
+        "height": 0
+      }
+    },
+    {
+      "id": "line_left_split",
+      "role": "decoration",
+      "shape": "line",
+      "variant": "panel_line",
+      "bounds": {
+        "x": 610,
+        "y": 178,
+        "width": 0,
+        "height": 650
+      }
+    },
+    {
+      "id": "line_right_split",
+      "role": "decoration",
+      "shape": "line",
+      "variant": "panel_line",
+      "bounds": {
+        "x": 1044,
+        "y": 70,
+        "width": 0,
+        "height": 758
+      }
+    },
+    {
+      "id": "top_grid_1",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "4",
+      "bounds": {
+        "x": 760,
+        "y": 86,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_2",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "2",
+      "bounds": {
+        "x": 832,
+        "y": 86,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_3",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "1",
+      "bounds": {
+        "x": 904,
+        "y": 86,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_4",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "1/2",
+      "bounds": {
+        "x": 976,
+        "y": 86,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_5",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "1/4",
+      "bounds": {
+        "x": 760,
+        "y": 136,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_6",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "1/8",
+      "bounds": {
+        "x": 832,
+        "y": 136,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_7",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "1/16",
+      "bounds": {
+        "x": 904,
+        "y": 136,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_grid_8",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "1/32",
+      "bounds": {
+        "x": 976,
+        "y": 136,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "restart_all_loopers",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Restart",
+      "widgetId": "restart_all_loopers",
+      "group": "session",
+      "bounds": {
+        "x": 330,
+        "y": 112,
+        "width": 88,
+        "height": 52
+      }
+    },
+    {
+      "id": "reset_all",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Clear",
+      "widgetId": "reset_all",
+      "group": "session",
+      "bounds": {
+        "x": 450,
+        "y": 112,
+        "width": 76,
+        "height": 52
+      }
+    },
+    {
+      "id": "transport_start",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Start",
+      "widgetId": "transport_start",
+      "group": "session",
+      "bounds": {
+        "x": 550,
+        "y": 112,
+        "width": 76,
+        "height": 52
+      }
+    },
+    {
+      "id": "transport_stop",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Stop",
+      "widgetId": "transport_stop",
+      "group": "session",
+      "bounds": {
+        "x": 650,
+        "y": 112,
+        "width": 76,
+        "height": 52
+      }
+    },
+    {
+      "id": "mute_1",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute T1",
+      "bounds": {
+        "x": 158,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_2",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute T2",
+      "bounds": {
+        "x": 230,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_3",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute T3",
+      "bounds": {
+        "x": 302,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_4",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute T4",
+      "bounds": {
+        "x": 374,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_5",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute L1",
+      "bounds": {
+        "x": 446,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_6",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute L2",
+      "bounds": {
+        "x": 518,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_7",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute L3",
+      "bounds": {
+        "x": 590,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_8",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Mute L4",
+      "bounds": {
+        "x": 662,
+        "y": 220,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_9",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv T1",
+      "bounds": {
+        "x": 158,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_10",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv T2",
+      "bounds": {
+        "x": 230,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_11",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv T3",
+      "bounds": {
+        "x": 302,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_12",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv T4",
+      "bounds": {
+        "x": 374,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_13",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv L1",
+      "bounds": {
+        "x": 446,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_14",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv L2",
+      "bounds": {
+        "x": 518,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_15",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv L3",
+      "bounds": {
+        "x": 590,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "mute_16",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Inv L4",
+      "bounds": {
+        "x": 662,
+        "y": 272,
+        "width": 54,
+        "height": 30
+      }
+    },
+    {
+      "id": "top_vol_drop",
+      "role": "decoration",
+      "shape": "knob",
+      "variant": "panel_knob",
+      "label": "Vol/Drop",
+      "bounds": {
+        "x": 1066,
+        "y": 102,
+        "width": 58,
+        "height": 58
+      }
+    },
+    {
+      "id": "top_reverb",
+      "role": "decoration",
+      "shape": "knob",
+      "variant": "panel_knob",
+      "label": "Reverb",
+      "bounds": {
+        "x": 1172,
+        "y": 102,
+        "width": 58,
+        "height": 58
+      }
+    },
+    {
+      "id": "top_transpose",
+      "role": "decoration",
+      "shape": "knob",
+      "variant": "panel_knob",
+      "label": "Transpose",
+      "bounds": {
+        "x": 1278,
+        "y": 102,
+        "width": 58,
+        "height": 58
+      }
+    },
+    {
+      "id": "top_phaser",
+      "role": "decoration",
+      "shape": "knob",
+      "variant": "panel_knob",
+      "label": "Phaser",
+      "bounds": {
+        "x": 1384,
+        "y": 102,
+        "width": 58,
+        "height": 58
+      }
+    },
+    {
+      "id": "center_fx_dry_wet",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Dry/Wet",
+      "widgetId": "center_fx_dry_wet",
+      "group": "center_fx_parameter",
+      "bounds": {
+        "x": 654,
+        "y": 260,
+        "width": 50,
+        "height": 50
+      }
+    },
+    {
+      "id": "center_fx_lfo1_speed",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "LFO1 Speed",
+      "widgetId": "center_fx_lfo1_speed",
+      "group": "center_fx_parameter",
+      "bounds": {
+        "x": 754,
+        "y": 260,
+        "width": 50,
+        "height": 50
+      }
+    },
+    {
+      "id": "center_fx_lfo2_speed",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "LFO2 Speed",
+      "widgetId": "center_fx_lfo2_speed",
+      "group": "center_fx_parameter",
+      "bounds": {
+        "x": 854,
+        "y": 260,
+        "width": 50,
+        "height": 50
+      }
+    },
+    {
+      "id": "center_fx_drop",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Drop FX",
+      "widgetId": "center_fx_drop",
+      "group": "center_fx_parameter",
+      "bounds": {
+        "x": 954,
+        "y": 260,
+        "width": 50,
+        "height": 50
+      }
+    },
+    {
+      "id": "routing_mic",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "MIC",
+      "widgetId": "routing_mic",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1062,
+        "y": 222,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_synth",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "SYNTH",
+      "widgetId": "routing_synth",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1152,
+        "y": 222,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_looper_all",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "LOOPER ALL",
+      "widgetId": "routing_looper_all",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1242,
+        "y": 222,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_recording_bus",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "RECORD",
+      "widgetId": "routing_recording_bus",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1332,
+        "y": 222,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_looper",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "LOOPER",
+      "widgetId": "routing_looper",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1062,
+        "y": 274,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_looper_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "LOOPER 2",
+      "widgetId": "routing_looper_2",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1152,
+        "y": 274,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_looper_3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "LOOPER 3",
+      "widgetId": "routing_looper_3",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1242,
+        "y": 274,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "routing_looper_4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "LOOPER 4",
+      "widgetId": "routing_looper_4",
+      "group": "routing_source",
+      "bounds": {
+        "x": 1332,
+        "y": 274,
+        "width": 80,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX1",
+      "widgetId": "center_fx_slot_1",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 620,
+        "y": 356,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX2",
+      "widgetId": "center_fx_slot_2",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 692,
+        "y": 356,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX3",
+      "widgetId": "center_fx_slot_3",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 764,
+        "y": 356,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX4",
+      "widgetId": "center_fx_slot_4",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 836,
+        "y": 356,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_5",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX5",
+      "widgetId": "center_fx_slot_5",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 908,
+        "y": 356,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_6",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "B1",
+      "widgetId": "center_fx_bank_1",
+      "group": "center_fx_bank",
+      "bounds": {
+        "x": 980,
+        "y": 356,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_7",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX6",
+      "widgetId": "center_fx_slot_6",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 620,
+        "y": 408,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_8",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX7",
+      "widgetId": "center_fx_slot_7",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 692,
+        "y": 408,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_9",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX8",
+      "widgetId": "center_fx_slot_8",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 764,
+        "y": 408,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_10",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX9",
+      "widgetId": "center_fx_slot_9",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 836,
+        "y": 408,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_11",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FX10",
+      "widgetId": "center_fx_slot_10",
+      "group": "center_fx_slot",
+      "bounds": {
+        "x": 908,
+        "y": 408,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_grid_12",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "B4",
+      "widgetId": "center_fx_bank_4",
+      "group": "center_fx_bank",
+      "bounds": {
+        "x": 980,
+        "y": 408,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_bank_extra_1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "B2",
+      "widgetId": "center_fx_bank_2",
+      "group": "center_fx_bank",
+      "bounds": {
+        "x": 620,
+        "y": 448,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_bank_extra_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "B3",
+      "widgetId": "center_fx_bank_3",
+      "group": "center_fx_bank",
+      "bounds": {
+        "x": 692,
+        "y": 448,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "fx_bank_extra_3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "B5",
+      "widgetId": "center_fx_bank_5",
+      "group": "center_fx_bank",
+      "bounds": {
+        "x": 764,
+        "y": 448,
+        "width": 58,
+        "height": 30
+      }
+    },
+    {
+      "id": "center_fx_joystick_1",
+      "role": "widget",
+      "shape": "joystick",
+      "variant": "joystick_value_1",
+      "label": "Range 1",
+      "widgetId": "center_fx_joystick_1",
+      "group": "center_fx_joystick",
+      "bounds": {
+        "x": 638,
+        "y": 522,
+        "width": 96,
+        "height": 96
+      }
+    },
+    {
+      "id": "center_fx_joystick_2",
+      "role": "widget",
+      "shape": "joystick",
+      "variant": "joystick_value_2",
+      "label": "Range 2",
+      "widgetId": "center_fx_joystick_2",
+      "group": "center_fx_joystick",
+      "bounds": {
+        "x": 838,
+        "y": 522,
+        "width": 96,
+        "height": 96
+      }
+    },
+    {
+      "id": "looper_1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Looper 1",
+      "widgetId": "looper_1",
+      "group": "looper_select",
+      "bounds": {
+        "x": 112,
+        "y": 360,
+        "width": 76,
+        "height": 64
+      }
+    },
+    {
+      "id": "looper_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Looper 2",
+      "widgetId": "looper_2",
+      "group": "looper_select",
+      "bounds": {
+        "x": 212,
+        "y": 360,
+        "width": 76,
+        "height": 64
+      }
+    },
+    {
+      "id": "looper_3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Looper 3",
+      "widgetId": "looper_3",
+      "group": "looper_select",
+      "bounds": {
+        "x": 312,
+        "y": 360,
+        "width": 76,
+        "height": 64
+      }
+    },
+    {
+      "id": "looper_4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Looper 4",
+      "widgetId": "looper_4",
+      "group": "looper_select",
+      "bounds": {
+        "x": 412,
+        "y": 360,
+        "width": 76,
+        "height": 64
+      }
+    },
+    {
+      "id": "length_1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "1",
+      "widgetId": "sample_length_1",
+      "group": "sample_length",
+      "bounds": {
+        "x": 112,
+        "y": 462,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "2",
+      "widgetId": "sample_length_2",
+      "group": "sample_length",
+      "bounds": {
+        "x": 180,
+        "y": 462,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "4",
+      "widgetId": "sample_length_4",
+      "group": "sample_length",
+      "bounds": {
+        "x": 248,
+        "y": 462,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_8",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "8",
+      "widgetId": "sample_length_8",
+      "group": "sample_length",
+      "bounds": {
+        "x": 316,
+        "y": 462,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_16",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "16",
+      "widgetId": "sample_length_16",
+      "group": "sample_length",
+      "bounds": {
+        "x": 112,
+        "y": 516,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_32",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "32",
+      "widgetId": "sample_length_32",
+      "group": "sample_length",
+      "bounds": {
+        "x": 180,
+        "y": 516,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_64",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "64",
+      "widgetId": "sample_length_64",
+      "group": "sample_length",
+      "bounds": {
+        "x": 248,
+        "y": 516,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "length_128",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "128",
+      "widgetId": "sample_length_128",
+      "group": "sample_length",
+      "bounds": {
+        "x": 316,
+        "y": 516,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": "record_t1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Record T1",
+      "widgetId": "record_t1",
+      "group": "track_record",
+      "bounds": {
+        "x": 112,
+        "y": 560,
+        "width": 76,
+        "height": 54
+      }
+    },
+    {
+      "id": "record_t2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Record T2",
+      "widgetId": "record_t2",
+      "group": "track_record",
+      "bounds": {
+        "x": 212,
+        "y": 560,
+        "width": 76,
+        "height": 54
+      }
+    },
+    {
+      "id": "record_t3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Record T3",
+      "widgetId": "record_t3",
+      "group": "track_record",
+      "bounds": {
+        "x": 312,
+        "y": 560,
+        "width": 76,
+        "height": 54
+      }
+    },
+    {
+      "id": "record_t4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Record T4",
+      "widgetId": "record_t4",
+      "group": "track_record",
+      "bounds": {
+        "x": 412,
+        "y": 560,
+        "width": 76,
+        "height": 54
+      }
+    },
+    {
+      "id": "clear_t1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Clear T1",
+      "widgetId": "clear_t1",
+      "group": "track_clear",
+      "bounds": {
+        "x": 112,
+        "y": 642,
+        "width": 76,
+        "height": 48
+      }
+    },
+    {
+      "id": "clear_t2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Clear T2",
+      "widgetId": "clear_t2",
+      "group": "track_clear",
+      "bounds": {
+        "x": 212,
+        "y": 642,
+        "width": 76,
+        "height": 48
+      }
+    },
+    {
+      "id": "clear_t3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Clear T3",
+      "widgetId": "clear_t3",
+      "group": "track_clear",
+      "bounds": {
+        "x": 312,
+        "y": 642,
+        "width": 76,
+        "height": 48
+      }
+    },
+    {
+      "id": "clear_t4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Clear T4",
+      "widgetId": "clear_t4",
+      "group": "track_clear",
+      "bounds": {
+        "x": 412,
+        "y": 642,
+        "width": 76,
+        "height": 48
+      }
+    },
+    {
+      "id": "vol_pan_t1",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Vol/Pan T1",
+      "widgetId": "vol_pan_t1",
+      "group": "track_volume_pan",
+      "bounds": {
+        "x": 120,
+        "y": 732,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "id": "vol_pan_t2",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Vol/Pan T2",
+      "widgetId": "vol_pan_t2",
+      "group": "track_volume_pan",
+      "bounds": {
+        "x": 268,
+        "y": 732,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "id": "vol_pan_t3",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Vol/Pan T3",
+      "widgetId": "vol_pan_t3",
+      "group": "track_volume_pan",
+      "bounds": {
+        "x": 416,
+        "y": 732,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "id": "vol_pan_t4",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Vol/Pan T4",
+      "widgetId": "vol_pan_t4",
+      "group": "track_volume_pan",
+      "bounds": {
+        "x": 564,
+        "y": 732,
+        "width": 56,
+        "height": 56
+      }
+    },
+    {
+      "id": "resample_selected",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Resample L",
+      "widgetId": "resample_selected",
+      "group": "resampling",
+      "bounds": {
+        "x": 430,
+        "y": 858,
+        "width": 104,
+        "height": 30
+      }
+    },
+    {
+      "id": "resample_all",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Resample all",
+      "widgetId": "resample_all",
+      "group": "resampling",
+      "bounds": {
+        "x": 552,
+        "y": 858,
+        "width": 104,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_freeze",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "FRZ",
+      "widgetId": "remixer_freeze",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1062,
+        "y": 362,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_drop",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Drop",
+      "widgetId": "remixer_drop",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1122,
+        "y": 362,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_extra_1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Extra",
+      "widgetId": "remixer_extra_1",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1182,
+        "y": 362,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_record",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "REC",
+      "widgetId": "remixer_record",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1242,
+        "y": 362,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_reset_current",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "RST",
+      "widgetId": "remixer_reset_current",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1062,
+        "y": 414,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_reset_all",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "RST all",
+      "widgetId": "remixer_reset_all",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1122,
+        "y": 414,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_extra_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "Extra 2",
+      "widgetId": "remixer_extra_2",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1182,
+        "y": 414,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_stop",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "interactive_button",
+      "label": "STOP",
+      "widgetId": "remixer_stop",
+      "group": "remixer_macro",
+      "bounds": {
+        "x": 1242,
+        "y": 414,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_1",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Gate",
+      "bounds": {
+        "x": 1062,
+        "y": 466,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_2",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Gate all",
+      "bounds": {
+        "x": 1122,
+        "y": 466,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_3",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Extra 3",
+      "bounds": {
+        "x": 1182,
+        "y": 466,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_4",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "REV",
+      "bounds": {
+        "x": 1242,
+        "y": 466,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_5",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "CTRL",
+      "bounds": {
+        "x": 1062,
+        "y": 514,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_6",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "min/max",
+      "bounds": {
+        "x": 1122,
+        "y": 514,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_7",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Nat.",
+      "bounds": {
+        "x": 1182,
+        "y": 514,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_8",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Reverb",
+      "bounds": {
+        "x": 1242,
+        "y": 514,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_9",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "I",
+      "bounds": {
+        "x": 1062,
+        "y": 562,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_10",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "V",
+      "bounds": {
+        "x": 1122,
+        "y": 562,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_11",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Harm.",
+      "bounds": {
+        "x": 1182,
+        "y": 562,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_12",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Delay",
+      "bounds": {
+        "x": 1242,
+        "y": 562,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_13",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "II",
+      "bounds": {
+        "x": 1062,
+        "y": 610,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_14",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "VI",
+      "bounds": {
+        "x": 1122,
+        "y": 610,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_15",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Melod.",
+      "bounds": {
+        "x": 1182,
+        "y": 610,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_16",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "Phaser",
+      "bounds": {
+        "x": 1242,
+        "y": 610,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_17",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "III",
+      "bounds": {
+        "x": 1062,
+        "y": 658,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_18",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "VII",
+      "bounds": {
+        "x": 1122,
+        "y": 658,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_19",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "label": "CLEAR",
+      "bounds": {
+        "x": 1182,
+        "y": 658,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "remixer_mode_20",
+      "role": "decoration",
+      "shape": "round_rect",
+      "variant": "hardware_button",
+      "bounds": {
+        "x": 1242,
+        "y": 658,
+        "width": 48,
+        "height": 30
+      }
+    },
+    {
+      "id": "master_tempo",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Master tempo",
+      "widgetId": "master_tempo",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1342,
+        "y": 330,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_pitch_shift",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Pitch shift",
+      "widgetId": "master_pitch_shift",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1428,
+        "y": 330,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_volume",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Master vol.",
+      "widgetId": "master_volume",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1342,
+        "y": 424,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_pitch_dry_wet",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Pitch dry/wet",
+      "widgetId": "master_pitch_dry_wet",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1428,
+        "y": 424,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_output_volume",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "VOLUME",
+      "widgetId": "master_output_volume",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1342,
+        "y": 518,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_distortion",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Distortion",
+      "widgetId": "master_distortion",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1428,
+        "y": 518,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_pan",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Pan",
+      "widgetId": "master_pan",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1342,
+        "y": 612,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "master_distortion_dry_wet",
+      "role": "widget",
+      "shape": "knob",
+      "variant": "interactive_knob",
+      "label": "Dist dry/wet",
+      "widgetId": "master_distortion_dry_wet",
+      "group": "master_parameter",
+      "bounds": {
+        "x": 1428,
+        "y": 612,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "id": "sampler_slot_1",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_green",
+      "label": "1",
+      "widgetId": "sampler_slot_1",
+      "group": "sampler",
+      "bounds": {
+        "x": 1078,
+        "y": 728,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_2",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_red",
+      "label": "2",
+      "widgetId": "sampler_slot_2",
+      "group": "sampler",
+      "bounds": {
+        "x": 1158,
+        "y": 728,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_3",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_blue",
+      "label": "3",
+      "widgetId": "sampler_slot_3",
+      "group": "sampler",
+      "bounds": {
+        "x": 1238,
+        "y": 728,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_4",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_yellow",
+      "label": "4",
+      "widgetId": "sampler_slot_4",
+      "group": "sampler",
+      "bounds": {
+        "x": 1318,
+        "y": 728,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_5",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_green",
+      "label": "5",
+      "widgetId": "sampler_slot_5",
+      "group": "sampler",
+      "bounds": {
+        "x": 1078,
+        "y": 808,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_6",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_red",
+      "label": "6",
+      "widgetId": "sampler_slot_6",
+      "group": "sampler",
+      "bounds": {
+        "x": 1158,
+        "y": 808,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_7",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_blue",
+      "label": "7",
+      "widgetId": "sampler_slot_7",
+      "group": "sampler",
+      "bounds": {
+        "x": 1238,
+        "y": 808,
+        "width": 68,
+        "height": 68
+      }
+    },
+    {
+      "id": "sampler_slot_8",
+      "role": "widget",
+      "shape": "round_rect",
+      "variant": "arcade_yellow",
+      "label": "8",
+      "widgetId": "sampler_slot_8",
+      "group": "sampler",
+      "bounds": {
+        "x": 1318,
+        "y": 808,
+        "width": 68,
+        "height": 68
+      }
+    }
   ]
 }

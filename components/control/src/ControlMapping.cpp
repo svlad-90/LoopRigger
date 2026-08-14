@@ -305,6 +305,109 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         92,
         CommandType::ResetAll));
 
+    profile.widgets.push_back(button("transport_start", "Start", "session", 0, 0));
+    profile.bindings.push_back(widgetBinding("transport_start", CommandType::StartTransport));
+
+    profile.widgets.push_back(button("transport_stop", "Stop", "session", 0, 2));
+    profile.bindings.push_back(widgetBinding("transport_stop", CommandType::StopTransport));
+
+    profile.widgets.push_back(button("restart_all_loopers", "Restart all", "session", 0, 3));
+    profile.bindings.push_back(widgetBinding("restart_all_loopers", CommandType::RestartAllLoopers));
+
+    const char* routingSourceIds[] = {
+        "routing_mic",
+        "routing_synth",
+        "routing_looper",
+        "routing_looper_2",
+        "routing_looper_3",
+        "routing_looper_4",
+        "routing_looper_all",
+        "routing_recording_bus",
+    };
+    const char* routingSourceLabels[] = {
+        "MIC",
+        "SYNTH",
+        "LOOPER",
+        "LOOPER 2",
+        "LOOPER 3",
+        "LOOPER 4",
+        "LOOPER ALL",
+        "RECORD",
+    };
+    const int routingSourceIndexes[] = {0, 1, 3, 4, 5, 6, 7, 8};
+    for (int i = 0; i < 8; ++i) {
+        profile.widgets.push_back(button(routingSourceIds[i], routingSourceLabels[i], "routing_source", i / 4, i % 4));
+        profile.bindings.push_back(widgetBinding(routingSourceIds[i], CommandType::SelectRoutingSource, routingSourceIndexes[i]));
+    }
+
+    for (int slot = 0; slot < 10; ++slot) {
+        profile.widgets.push_back(button("center_fx_slot_" + std::to_string(slot + 1), "FX" + std::to_string(slot + 1), "center_fx_slot", slot / 5, slot % 5));
+        profile.bindings.push_back(widgetBinding("center_fx_slot_" + std::to_string(slot + 1), CommandType::SelectCenterFxSlot, slot));
+    }
+
+    for (int bank = 0; bank < 5; ++bank) {
+        profile.widgets.push_back(button("center_fx_bank_" + std::to_string(bank + 1), "B" + std::to_string(bank + 1), "center_fx_bank", bank / 3, bank % 3));
+        profile.bindings.push_back(widgetBinding("center_fx_bank_" + std::to_string(bank + 1), CommandType::SelectCenterFxBank, bank));
+    }
+
+    const char* centerFxParameterIds[] = {"center_fx_dry_wet", "center_fx_lfo1_speed", "center_fx_lfo2_speed", "center_fx_drop"};
+    const char* centerFxParameterLabels[] = {"Dry/Wet", "LFO1 Speed", "LFO2 Speed", "Drop FX"};
+    for (int parameter = 0; parameter < 4; ++parameter) {
+        profile.widgets.push_back(knob(centerFxParameterIds[parameter], centerFxParameterLabels[parameter], "center_fx_parameter", 0, parameter));
+        profile.bindings.push_back(widgetBinding(centerFxParameterIds[parameter], CommandType::SetCenterFxParameter, parameter, 0.0F, InputTarget::Mic, true));
+    }
+
+    for (int joystick = 0; joystick < 2; ++joystick) {
+        profile.widgets.push_back(widget("center_fx_joystick_" + std::to_string(joystick + 1), "Value " + std::to_string(joystick + 1), WidgetType::Joystick, "center_fx_joystick", 0, joystick, 2, 2));
+        profile.bindings.push_back(widgetBinding("center_fx_joystick_" + std::to_string(joystick + 1), CommandType::SetCenterFxJoystick, joystick, 0.0F, InputTarget::Mic, true));
+    }
+
+    const char* remixerMacroIds[] = {
+        "remixer_freeze",
+        "remixer_drop",
+        "remixer_extra_1",
+        "remixer_record",
+        "remixer_reset_current",
+        "remixer_reset_all",
+        "remixer_extra_2",
+        "remixer_stop",
+    };
+    const char* remixerMacroLabels[] = {"FRZ", "Drop", "Extra", "REC", "RST", "RST all", "Extra 2", "STOP"};
+    for (int macro = 0; macro < 8; ++macro) {
+        profile.widgets.push_back(button(remixerMacroIds[macro], remixerMacroLabels[macro], "remixer_macro", macro / 4, macro % 4));
+        profile.bindings.push_back(widgetBinding(remixerMacroIds[macro], CommandType::TriggerRemixerMacro, macro));
+    }
+
+    const char* masterParameterIds[] = {
+        "master_tempo",
+        "master_pitch_shift",
+        "master_volume",
+        "master_pitch_dry_wet",
+        "master_output_volume",
+        "master_distortion",
+        "master_pan",
+        "master_distortion_dry_wet",
+    };
+    const char* masterParameterLabels[] = {
+        "Master tempo",
+        "Pitch shift",
+        "Master vol.",
+        "Pitch dry/wet",
+        "VOLUME",
+        "Distortion",
+        "Pan",
+        "Dist dry/wet",
+    };
+    for (int parameter = 0; parameter < 8; ++parameter) {
+        profile.widgets.push_back(knob(masterParameterIds[parameter], masterParameterLabels[parameter], "master_parameter", parameter / 2, parameter % 2));
+        profile.bindings.push_back(widgetBinding(masterParameterIds[parameter], CommandType::SetMasterParameter, parameter, 0.0F, InputTarget::Mic, true));
+    }
+
+    for (int slot = 0; slot < 8; ++slot) {
+        profile.widgets.push_back(button("sampler_slot_" + std::to_string(slot + 1), std::to_string(slot + 1), "sampler", slot / 4, slot % 4));
+        profile.bindings.push_back(widgetBinding("sampler_slot_" + std::to_string(slot + 1), CommandType::TriggerSamplerSlot, slot));
+    }
+
     assignController(profile);
     return profile;
 }

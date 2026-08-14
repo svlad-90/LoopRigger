@@ -1,0 +1,255 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 900" width="1520" height="900">
+<rect width="100%" height="100%" fill="#f3f3f3"/>
+<rect x="18" y="18" width="1484" height="864" rx="8" fill="#c6904d" stroke="#454b4f" stroke-width="2"/>
+<rect x="50" y="50" width="1420" height="820" fill="#050505" stroke="#d00010" stroke-width="2"/>
+<text x="105" y="113.5" fill="#fff" font-size="34" font-family="Arial" font-weight="700">LIVELOOPING</text>
+<text x="108" y="140.0" fill="#fff" font-size="24" font-family="Arial" font-weight="700">YAELTEX</text>
+<ellipse cx="66.0" cy="66.0" rx="8.0" ry="8.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="1454.0" cy="66.0" rx="8.0" ry="8.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="66.0" cy="850.0" rx="8.0" ry="8.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="1454.0" cy="850.0" rx="8.0" ry="8.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<line x1="82" y1="178" x2="1438" y2="178" stroke="#eee" stroke-width="2"/>
+<line x1="82" y1="330" x2="1438" y2="330" stroke="#eee" stroke-width="2"/>
+<line x1="82" y1="470" x2="1438" y2="470" stroke="#eee" stroke-width="2"/>
+<line x1="610" y1="178" x2="610" y2="828" stroke="#eee" stroke-width="2"/>
+<line x1="1044" y1="70" x2="1044" y2="828" stroke="#eee" stroke-width="2"/>
+<rect x="760" y="86" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="787.0" y="105.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">4</text>
+<rect x="832" y="86" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="859.0" y="105.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">2</text>
+<rect x="904" y="86" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="931.0" y="105.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1</text>
+<rect x="976" y="86" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1003.0" y="105.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1/2</text>
+<rect x="760" y="136" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="787.0" y="155.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1/4</text>
+<rect x="832" y="136" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="859.0" y="155.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1/8</text>
+<rect x="904" y="136" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="931.0" y="155.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1/16</text>
+<rect x="976" y="136" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1003.0" y="155.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1/32</text>
+<rect x="330" y="112" width="88" height="52" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="374.0" y="142.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Restart</text>
+<rect x="450" y="112" width="76" height="52" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="488.0" y="142.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Clear</text>
+<rect x="550" y="112" width="76" height="52" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="588.0" y="142.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Start</text>
+<rect x="650" y="112" width="76" height="52" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="688.0" y="142.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Stop</text>
+<rect x="158" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="185.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute T1</text>
+<rect x="230" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="257.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute T2</text>
+<rect x="302" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="329.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute T3</text>
+<rect x="374" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="401.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute T4</text>
+<rect x="446" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="473.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute L1</text>
+<rect x="518" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="545.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute L2</text>
+<rect x="590" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="617.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute L3</text>
+<rect x="662" y="220" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="689.0" y="239.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Mute L4</text>
+<rect x="158" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="185.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv T1</text>
+<rect x="230" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="257.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv T2</text>
+<rect x="302" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="329.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv T3</text>
+<rect x="374" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="401.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv T4</text>
+<rect x="446" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="473.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv L1</text>
+<rect x="518" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="545.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv L2</text>
+<rect x="590" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="617.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv L3</text>
+<rect x="662" y="272" width="54" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="689.0" y="291.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Inv L4</text>
+<ellipse cx="1095.0" cy="131.0" rx="29.0" ry="29.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="1201.0" cy="131.0" rx="29.0" ry="29.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="1307.0" cy="131.0" rx="29.0" ry="29.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="1413.0" cy="131.0" rx="29.0" ry="29.0" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="679.0" cy="285.0" rx="25.0" ry="25.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="779.0" cy="285.0" rx="25.0" ry="25.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="879.0" cy="285.0" rx="25.0" ry="25.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="979.0" cy="285.0" rx="25.0" ry="25.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<rect x="1062" y="222" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1102.0" y="241.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">MIC</text>
+<rect x="1152" y="222" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1192.0" y="241.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">SYNTH</text>
+<rect x="1242" y="222" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1282.0" y="241.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">LOOPER ALL</text>
+<rect x="1332" y="222" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1372.0" y="241.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">RECORD</text>
+<rect x="1062" y="274" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1102.0" y="293.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">LOOPER</text>
+<rect x="1152" y="274" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1192.0" y="293.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">LOOPER 2</text>
+<rect x="1242" y="274" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1282.0" y="293.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">LOOPER 3</text>
+<rect x="1332" y="274" width="80" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1372.0" y="293.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">LOOPER 4</text>
+<rect x="620" y="356" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="649.0" y="375.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX1</text>
+<rect x="692" y="356" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="721.0" y="375.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX2</text>
+<rect x="764" y="356" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="793.0" y="375.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX3</text>
+<rect x="836" y="356" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="865.0" y="375.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX4</text>
+<rect x="908" y="356" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="937.0" y="375.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX5</text>
+<rect x="980" y="356" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1009.0" y="375.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">B1</text>
+<rect x="620" y="408" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="649.0" y="427.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX6</text>
+<rect x="692" y="408" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="721.0" y="427.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX7</text>
+<rect x="764" y="408" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="793.0" y="427.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX8</text>
+<rect x="836" y="408" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="865.0" y="427.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX9</text>
+<rect x="908" y="408" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="937.0" y="427.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FX10</text>
+<rect x="980" y="408" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1009.0" y="427.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">B4</text>
+<rect x="620" y="448" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="649.0" y="467.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">B2</text>
+<rect x="692" y="448" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="721.0" y="467.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">B3</text>
+<rect x="764" y="448" width="58" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="793.0" y="467.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">B5</text>
+<rect x="638" y="522" width="96" height="96" rx="12" fill="#111" stroke="#333" stroke-width="4"/>
+<rect x="838" y="522" width="96" height="96" rx="12" fill="#111" stroke="#333" stroke-width="4"/>
+<rect x="112" y="360" width="76" height="64" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="150.0" y="396.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Looper 1</text>
+<rect x="212" y="360" width="76" height="64" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="250.0" y="396.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Looper 2</text>
+<rect x="312" y="360" width="76" height="64" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="350.0" y="396.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Looper 3</text>
+<rect x="412" y="360" width="76" height="64" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="450.0" y="396.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Looper 4</text>
+<rect x="112" y="462" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="138.0" y="486.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1</text>
+<rect x="180" y="462" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="206.0" y="486.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">2</text>
+<rect x="248" y="462" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="274.0" y="486.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">4</text>
+<rect x="316" y="462" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="342.0" y="486.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">8</text>
+<rect x="112" y="516" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="138.0" y="540.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">16</text>
+<rect x="180" y="516" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="206.0" y="540.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">32</text>
+<rect x="248" y="516" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="274.0" y="540.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">64</text>
+<rect x="316" y="516" width="52" height="40" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="342.0" y="540.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">128</text>
+<rect x="112" y="560" width="76" height="54" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="150.0" y="591.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Record T1</text>
+<rect x="212" y="560" width="76" height="54" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="250.0" y="591.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Record T2</text>
+<rect x="312" y="560" width="76" height="54" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="350.0" y="591.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Record T3</text>
+<rect x="412" y="560" width="76" height="54" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="450.0" y="591.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Record T4</text>
+<rect x="112" y="642" width="76" height="48" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="150.0" y="670.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Clear T1</text>
+<rect x="212" y="642" width="76" height="48" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="250.0" y="670.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Clear T2</text>
+<rect x="312" y="642" width="76" height="48" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="350.0" y="670.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Clear T3</text>
+<rect x="412" y="642" width="76" height="48" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="450.0" y="670.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Clear T4</text>
+<ellipse cx="148.0" cy="760.0" rx="28.0" ry="28.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="296.0" cy="760.0" rx="28.0" ry="28.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="444.0" cy="760.0" rx="28.0" ry="28.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="592.0" cy="760.0" rx="28.0" ry="28.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<rect x="430" y="858" width="104" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="482.0" y="877.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Resample L</text>
+<rect x="552" y="858" width="104" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="604.0" y="877.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Resample all</text>
+<rect x="1062" y="362" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1086.0" y="381.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">FRZ</text>
+<rect x="1122" y="362" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1146.0" y="381.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Drop</text>
+<rect x="1182" y="362" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1206.0" y="381.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Extra</text>
+<rect x="1242" y="362" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1266.0" y="381.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">REC</text>
+<rect x="1062" y="414" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1086.0" y="433.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">RST</text>
+<rect x="1122" y="414" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1146.0" y="433.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">RST all</text>
+<rect x="1182" y="414" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1206.0" y="433.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Extra 2</text>
+<rect x="1242" y="414" width="48" height="30" rx="8" fill="#e9edee" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1266.0" y="433.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">STOP</text>
+<rect x="1062" y="466" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1086.0" y="485.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Gate</text>
+<rect x="1122" y="466" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1146.0" y="485.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Gate all</text>
+<rect x="1182" y="466" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1206.0" y="485.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Extra 3</text>
+<rect x="1242" y="466" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1266.0" y="485.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">REV</text>
+<rect x="1062" y="514" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1086.0" y="533.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">CTRL</text>
+<rect x="1122" y="514" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1146.0" y="533.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">min/max</text>
+<rect x="1182" y="514" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1206.0" y="533.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Nat.</text>
+<rect x="1242" y="514" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1266.0" y="533.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Reverb</text>
+<rect x="1062" y="562" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1086.0" y="581.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">I</text>
+<rect x="1122" y="562" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1146.0" y="581.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">V</text>
+<rect x="1182" y="562" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1206.0" y="581.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Harm.</text>
+<rect x="1242" y="562" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1266.0" y="581.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Delay</text>
+<rect x="1062" y="610" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1086.0" y="629.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">II</text>
+<rect x="1122" y="610" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1146.0" y="629.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">VI</text>
+<rect x="1182" y="610" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1206.0" y="629.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Melod.</text>
+<rect x="1242" y="610" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1266.0" y="629.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">Phaser</text>
+<rect x="1062" y="658" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1086.0" y="677.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">III</text>
+<rect x="1122" y="658" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1146.0" y="677.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">VII</text>
+<rect x="1182" y="658" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<text x="1206.0" y="677.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">CLEAR</text>
+<rect x="1242" y="658" width="48" height="30" rx="8" fill="#22282d" stroke="#454b4f" stroke-width="2"/>
+<ellipse cx="1364.0" cy="352.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1450.0" cy="352.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1364.0" cy="446.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1450.0" cy="446.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1364.0" cy="540.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1450.0" cy="540.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1364.0" cy="634.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<ellipse cx="1450.0" cy="634.0" rx="22.0" ry="22.0" fill="#20262c" stroke="#9ca4a8" stroke-width="2"/>
+<rect x="1078" y="728" width="68" height="68" rx="8" fill="#24d947" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1112.0" y="766.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">1</text>
+<rect x="1158" y="728" width="68" height="68" rx="8" fill="#e32626" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1192.0" y="766.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">2</text>
+<rect x="1238" y="728" width="68" height="68" rx="8" fill="#20aeea" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1272.0" y="766.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">3</text>
+<rect x="1318" y="728" width="68" height="68" rx="8" fill="#ffd21f" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1352.0" y="766.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">4</text>
+<rect x="1078" y="808" width="68" height="68" rx="8" fill="#24d947" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1112.0" y="846.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">5</text>
+<rect x="1158" y="808" width="68" height="68" rx="8" fill="#e32626" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1192.0" y="846.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">6</text>
+<rect x="1238" y="808" width="68" height="68" rx="8" fill="#20aeea" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1272.0" y="846.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">7</text>
+<rect x="1318" y="808" width="68" height="68" rx="8" fill="#ffd21f" stroke="#9ca4a8" stroke-width="2"/>
+<text x="1352.0" y="846.0" text-anchor="middle" fill="#111" font-size="12" font-family="Arial" font-weight="700">8</text>
+</svg>

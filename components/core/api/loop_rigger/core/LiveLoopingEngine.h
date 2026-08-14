@@ -29,6 +29,7 @@ std::string toString(ControllerId controller);
 std::string toString(InputTarget target);
 std::string toString(TrackState state);
 std::string toString(ResampleMode mode);
+std::string toString(RoutingSource source);
+std::string toString(RoutingTarget target);
 
 } // namespace loop_rigger::core
-

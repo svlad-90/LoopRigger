@@ -30,6 +30,19 @@ enum class CommandType {
     SetTrackPan,
     SetLooperVolume,
     ToggleTrackSelection,
+    StartTransport,
+    StopTransport,
+    RestartAllLoopers,
+    SelectRoutingSource,
+    SelectRoutingTarget,
+    SelectCenterFxSlot,
+    SelectCenterFxBank,
+    SetCenterFxParameter,
+    SetCenterFxJoystick,
+    TriggerRemixerMacro,
+    SetMasterParameter,
+    TriggerSamplerSlot,
+    ClearSamplerSlot,
     StartResampleSelectedLooper,
     StartResampleAllLoopers,
     StopResampling,
@@ -47,4 +60,3 @@ struct ControllerCommand {
 };
 
 } // namespace loop_rigger::core
-

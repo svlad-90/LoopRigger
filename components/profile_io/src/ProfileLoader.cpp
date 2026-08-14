@@ -177,6 +177,48 @@ core::CommandType parseCommandType(const std::string& value)
     if (value == "set_looper_volume") {
         return core::CommandType::SetLooperVolume;
     }
+    if (value == "toggle_track_selection") {
+        return core::CommandType::ToggleTrackSelection;
+    }
+    if (value == "start_transport") {
+        return core::CommandType::StartTransport;
+    }
+    if (value == "stop_transport") {
+        return core::CommandType::StopTransport;
+    }
+    if (value == "restart_all_loopers") {
+        return core::CommandType::RestartAllLoopers;
+    }
+    if (value == "select_routing_source") {
+        return core::CommandType::SelectRoutingSource;
+    }
+    if (value == "select_routing_target") {
+        return core::CommandType::SelectRoutingTarget;
+    }
+    if (value == "select_center_fx_slot") {
+        return core::CommandType::SelectCenterFxSlot;
+    }
+    if (value == "select_center_fx_bank") {
+        return core::CommandType::SelectCenterFxBank;
+    }
+    if (value == "set_center_fx_parameter") {
+        return core::CommandType::SetCenterFxParameter;
+    }
+    if (value == "set_center_fx_joystick") {
+        return core::CommandType::SetCenterFxJoystick;
+    }
+    if (value == "trigger_remixer_macro") {
+        return core::CommandType::TriggerRemixerMacro;
+    }
+    if (value == "set_master_parameter") {
+        return core::CommandType::SetMasterParameter;
+    }
+    if (value == "trigger_sampler_slot") {
+        return core::CommandType::TriggerSamplerSlot;
+    }
+    if (value == "clear_sampler_slot") {
+        return core::CommandType::ClearSamplerSlot;
+    }
     throw std::runtime_error("unknown command type: " + value);
 }
 
@@ -210,6 +252,7 @@ core::ControllerCommand parseCommand(const json& value, core::ControllerId contr
     command.type = parseCommandType(value.at("type").get<std::string>());
     command.inputTarget = parseInputTarget(value.value("inputTarget", "mic"));
     command.index = value.value("index", 0);
+    command.secondaryIndex = value.value("secondaryIndex", 0);
     command.value = value.value("value", 0.0F);
     return command;
 }
