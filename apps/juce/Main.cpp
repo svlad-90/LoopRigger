@@ -192,25 +192,11 @@ public:
     void mouseDown(const juce::MouseEvent& event) override
     {
 #if LIVELOOPING_HAS_PROFILE_IO
-        if (!layout_.has_value()) {
+        if (!editMode_ || !layout_.has_value()) {
             return;
         }
 
         grabKeyboardFocus();
-        if (event.mods.isPopupMenu()) {
-            if (editMode_) {
-                selectedElement_ = findElementAt(event.position);
-            }
-            updateEditToolbar();
-            repaint();
-            showEditContextMenu();
-            return;
-        }
-
-        if (!editMode_) {
-            return;
-        }
-
         selectedElement_ = findElementAt(event.position);
         editDragMode_ = EditDragMode::None;
         if (selectedElement_ >= 0) {
@@ -409,6 +395,7 @@ private:
 #if LIVELOOPING_HAS_PROFILE_IO
     juce::Rectangle<int> scaledBounds(const SurfaceBounds& bounds) const
     {
+        const auto area = getLocalBounds();
         const auto transform = layoutTransform();
         return {
             static_cast<int>(std::round(transform.offsetX + bounds.x * transform.scale)),
@@ -426,8 +413,7 @@ private:
 
     LayoutTransform layoutTransform() const
     {
-        auto area = getLocalBounds();
-        area.removeFromTop(editToolbarHeight());
+        const auto area = getLocalBounds();
         const auto scaleX = layout_->baseWidth > 0 ? static_cast<float>(area.getWidth()) / static_cast<float>(layout_->baseWidth) : 1.0F;
         const auto scaleY = layout_->baseHeight > 0 ? static_cast<float>(area.getHeight()) / static_cast<float>(layout_->baseHeight) : 1.0F;
         const auto scale = juce::jmin(scaleX, scaleY);
@@ -536,9 +522,9 @@ private:
     {
         graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
 
-        if (editModeButton_ != nullptr) {
+        if (editMode_) {
             graphics.setColour(juce::Colour(0xee151b20));
-            graphics.fillRect(getLocalBounds().withHeight(editToolbarHeight()));
+            graphics.fillRect(getLocalBounds().withHeight(48));
         }
 
         for (const auto& element : layout_->elements) {
@@ -568,8 +554,8 @@ private:
                 graphics.setColour(juce::Colours::white);
                 const auto text = juce::String(element.id) + "  x=" + juce::String(element.bounds.x, 1)
                     + " y=" + juce::String(element.bounds.y, 1)
-                    + " шир=" + juce::String(element.bounds.width, 1)
-                    + " выс=" + juce::String(element.bounds.height, 1);
+                    + " w=" + juce::String(element.bounds.width, 1)
+                    + " h=" + juce::String(element.bounds.height, 1);
                 graphics.drawText(text, labelBounds.reduced(4, 0), juce::Justification::centredLeft);
             }
         }
@@ -1204,129 +1190,29 @@ private:
     }
 
 #if LIVELOOPING_HAS_PROFILE_IO
-    int editToolbarHeight() const
-    {
-        if (!layout_.has_value()) {
-            return 0;
-        }
-        return getWidth() < 620 ? 78 : 48;
-    }
-
-    enum EditMenuItem {
-        ToggleEditMode = 1,
-        SaveLayout,
-        UndoEdit,
-        ToggleSnap,
-        CopyElementId,
-        ClearSelection,
-    };
-
-    juce::String editButtonText() const
-    {
-        if (compactToolbar_) {
-            return editMode_ ? "Выкл." : "Ред.";
-        }
-        return editMode_ ? "Выключить" : "Правка";
-    }
-
-    juce::String saveButtonText() const
-    {
-        return compactToolbar_ ? "Сохр." : "Сохранить";
-    }
-
-    juce::String undoButtonText() const
-    {
-        return compactToolbar_ ? "Отм." : "Отменить";
-    }
-
-    juce::String snapButtonText() const
-    {
-        return compactToolbar_ ? "Сетка" : "Сетка 4";
-    }
-
-    void showEditContextMenu()
-    {
-        juce::PopupMenu menu;
-        menu.addItem(ToggleEditMode, editMode_ ? "Выключить правку" : "Включить правку", true, editMode_);
-        menu.addSeparator();
-        menu.addItem(SaveLayout, "Сохранить layout", editMode_ && !layoutPath_.empty());
-        menu.addItem(UndoEdit, "Отменить", editMode_ && !undoStack_.empty());
-        menu.addItem(ToggleSnap, "Сетка 4 px", editMode_, snapToGrid_);
-
-        if (editMode_ && selectedElement_ >= 0) {
-            menu.addSeparator();
-            menu.addItem(CopyElementId, "Скопировать ID", true);
-            menu.addItem(ClearSelection, "Снять выделение", true);
-        }
-
-        const juce::Component::SafePointer<ProfileSurfaceComponent> safeThis(this);
-        menu.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(this), [safeThis](int result) mutable {
-            if (safeThis != nullptr) {
-                safeThis->handleEditContextMenu(result);
-            }
-        });
-    }
-
-    void handleEditContextMenu(int result)
-    {
-        switch (result) {
-        case ToggleEditMode:
-            setEditMode(!editMode_);
-            break;
-        case SaveLayout:
-            saveLayout();
-            break;
-        case UndoEdit:
-            undoLastEdit();
-            break;
-        case ToggleSnap:
-            snapToGrid_ = !snapToGrid_;
-            editorStatus_ = snapToGrid_ ? "Сетка: 4 px" : "Сетка: выкл.";
-            updateEditToolbar();
-            repaint();
-            break;
-        case CopyElementId:
-            if (layout_.has_value() && selectedElement_ >= 0) {
-                juce::SystemClipboard::copyTextToClipboard(
-                    juce::String(layout_->elements[static_cast<size_t>(selectedElement_)].id));
-                editorStatus_ = "ID скопирован";
-                updateEditToolbar();
-            }
-            break;
-        case ClearSelection:
-            selectedElement_ = -1;
-            editorStatus_.clear();
-            updateEditToolbar();
-            repaint();
-            break;
-        default:
-            break;
-        }
-    }
-
     void setupEditToolbar()
     {
-        editModeButton_ = makeToolbarButton(editButtonText());
+        editModeButton_ = makeToolbarButton("Edit");
         editModeButton_->onClick = [this] {
             setEditMode(!editMode_);
         };
 
-        saveLayoutButton_ = makeToolbarButton(saveButtonText());
+        saveLayoutButton_ = makeToolbarButton("Save");
         saveLayoutButton_->onClick = [this] {
             saveLayout();
         };
 
-        undoButton_ = makeToolbarButton(undoButtonText());
+        undoButton_ = makeToolbarButton("Undo");
         undoButton_->onClick = [this] {
             undoLastEdit();
         };
 
-        snapButton_ = makeToolbarButton(snapButtonText());
+        snapButton_ = makeToolbarButton("Snap 4");
         snapButton_->setClickingTogglesState(true);
         snapButton_->setToggleState(snapToGrid_, juce::dontSendNotification);
         snapButton_->onClick = [this] {
             snapToGrid_ = snapButton_ != nullptr && snapButton_->getToggleState();
-            editorStatus_ = snapToGrid_ ? "Сетка: 4 px" : "Сетка: выкл.";
+            editorStatus_ = snapToGrid_ ? "Snap: 4 px" : "Snap: off";
             updateEditToolbar();
             repaint();
         };
@@ -1359,39 +1245,16 @@ private:
             return;
         }
 
-        const auto wasCompact = compactToolbar_;
-        compactToolbar_ = getWidth() < 520;
-
-        auto toolbar = getLocalBounds().reduced(10);
-        toolbar.setHeight(editToolbarHeight() - 12);
-        toolbar.translate(0, 6);
-
-        auto buttonRow = toolbar.withHeight(30);
-        const auto gap = compactToolbar_ ? 6 : 8;
-        const auto compactWidth = juce::jmax(42, (buttonRow.getWidth() - gap * 3) / 4);
-        const auto editWidth = compactToolbar_ ? compactWidth : 96;
-        const auto saveWidth = compactToolbar_ ? compactWidth : 104;
-        const auto undoWidth = compactToolbar_ ? compactWidth : 92;
-        const auto snapWidth = compactToolbar_ ? compactWidth : 92;
-
-        editModeButton_->setBounds(buttonRow.removeFromLeft(editWidth));
-        buttonRow.removeFromLeft(gap);
-        saveLayoutButton_->setBounds(buttonRow.removeFromLeft(saveWidth));
-        buttonRow.removeFromLeft(gap);
-        undoButton_->setBounds(buttonRow.removeFromLeft(undoWidth));
-        buttonRow.removeFromLeft(gap);
-        snapButton_->setBounds(buttonRow.removeFromLeft(snapWidth));
-
-        if (getWidth() < 620) {
-            editorStatusLabel_->setBounds(toolbar.withTrimmedTop(36).withHeight(30));
-        } else {
-            buttonRow.removeFromLeft(10);
-            editorStatusLabel_->setBounds(buttonRow);
-        }
-
-        if (compactToolbar_ != wasCompact) {
-            updateEditToolbar();
-        }
+        auto toolbar = getLocalBounds().reduced(10).withHeight(30).translated(0, 6);
+        editModeButton_->setBounds(toolbar.removeFromLeft(58));
+        toolbar.removeFromLeft(8);
+        saveLayoutButton_->setBounds(toolbar.removeFromLeft(58));
+        toolbar.removeFromLeft(8);
+        undoButton_->setBounds(toolbar.removeFromLeft(58));
+        toolbar.removeFromLeft(8);
+        snapButton_->setBounds(toolbar.removeFromLeft(72));
+        toolbar.removeFromLeft(10);
+        editorStatusLabel_->setBounds(toolbar);
     }
 
     void updateEditToolbar()
@@ -1400,35 +1263,30 @@ private:
             return;
         }
 
-        editModeButton_->setButtonText(editButtonText());
-        saveLayoutButton_->setButtonText(saveButtonText());
-        undoButton_->setButtonText(undoButtonText());
-        snapButton_->setButtonText(snapButtonText());
         editModeButton_->setToggleState(editMode_, juce::dontSendNotification);
         saveLayoutButton_->setEnabled(editMode_ && !layoutPath_.empty());
         undoButton_->setEnabled(editMode_ && !undoStack_.empty());
         snapButton_->setEnabled(editMode_);
         snapButton_->setToggleState(snapToGrid_, juce::dontSendNotification);
         editorStatusLabel_->setText(editorStatus_.isNotEmpty() ? editorStatus_ : selectedElementSummary(), juce::dontSendNotification);
-        editorStatusLabel_->setTooltip(
-            "E — правка, S — сохранить, Ctrl+Z — отменить, стрелки — сдвиг, Shift — шаг 10, Alt — размер, Shift+drag — без сетки");
+        editorStatusLabel_->setTooltip("E edit, S save, Ctrl+Z undo, arrows move, Shift changes step, Alt resizes, Shift-drag bypasses snap");
     }
 
     juce::String selectedElementSummary() const
     {
         if (!editMode_) {
-            return "Режим правки выключен";
+            return "Edit mode off";
         }
         if (!layout_.has_value() || selectedElement_ < 0) {
-            return "Ничего не выбрано";
+            return "No selection";
         }
 
         const auto& element = layout_->elements[static_cast<size_t>(selectedElement_)];
         return juce::String(element.id)
             + "  x=" + juce::String(element.bounds.x, 1)
             + " y=" + juce::String(element.bounds.y, 1)
-            + " шир=" + juce::String(element.bounds.width, 1)
-            + " выс=" + juce::String(element.bounds.height, 1);
+            + " w=" + juce::String(element.bounds.width, 1)
+            + " h=" + juce::String(element.bounds.height, 1);
     }
 
     void nudgeSelected(float primaryDelta, float secondaryDelta, bool resize)
@@ -1460,8 +1318,8 @@ private:
         selectedElement_ = -1;
         editDragMode_ = EditDragMode::None;
         editorStatus_ = editMode_
-            ? "Правка: стрелки двигают, Alt меняет размер, Shift меняет шаг"
-            : "Режим правки выключен";
+            ? "Edit mode: arrows move, Alt resizes, Shift changes step"
+            : "Edit mode off";
         for (auto& control : controls_) {
             if (control.component != nullptr) {
                 control.component->setInterceptsMouseClicks(!editMode_, !editMode_);
@@ -1543,14 +1401,14 @@ private:
     void saveLayout()
     {
         if (!layout_.has_value() || layoutPath_.empty()) {
-            editorStatus_ = "Нет пути layout";
+            editorStatus_ = "No layout path";
             updateEditToolbar();
             return;
         }
 
         std::ofstream out(layoutPath_);
         if (!out) {
-            editorStatus_ = "Не удалось сохранить";
+            editorStatus_ = "Save failed";
             updateEditToolbar();
             return;
         }
@@ -1587,7 +1445,7 @@ private:
         }
         out << "  ]\n";
         out << "}\n";
-        editorStatus_ = "Сохранено " + juce::Time::getCurrentTime().formatted("%H:%M:%S");
+        editorStatus_ = "Saved " + juce::Time::getCurrentTime().formatted("%H:%M:%S");
         updateEditToolbar();
     }
 
@@ -1621,7 +1479,7 @@ private:
         for (size_t index = 0; index < count; ++index) {
             layout_->elements[index].bounds = snapshot[index];
         }
-        editorStatus_ = "Отменено";
+        editorStatus_ = "Undo";
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
         updateEditToolbar();
         repaint();
@@ -1641,7 +1499,6 @@ private:
     SurfaceBounds editStartBounds_;
     std::vector<std::vector<SurfaceBounds>> undoStack_;
     bool snapToGrid_ = true;
-    bool compactToolbar_ = false;
     juce::String editorStatus_;
     std::unique_ptr<juce::TextButton> editModeButton_;
     std::unique_ptr<juce::TextButton> saveLayoutButton_;
