@@ -185,6 +185,22 @@ ControllerProfile makeKaossPadInputProfile(
         0,
         target,
         true));
+    profile.widgets.push_back(knob("input_volume_knob", "Input volume", "levels", 0, 0));
+    profile.bindings.push_back(widgetBinding(
+        "input_volume_knob",
+        CommandType::SetInputVolume,
+        0,
+        0.0F,
+        target,
+        true));
+    profile.widgets.push_back(widget("input_volume_fader", "Input volume", WidgetType::Fader, "levels", 1, 0));
+    profile.bindings.push_back(widgetBinding(
+        "input_volume_fader",
+        CommandType::SetInputVolume,
+        0,
+        0.0F,
+        target,
+        true));
 
     profile.widgets.push_back(knob("fx_level", "FX level", "levels", 0, 1));
     profile.bindings.push_back(widgetBinding(
@@ -194,6 +210,30 @@ ControllerProfile makeKaossPadInputProfile(
         0.0F,
         target,
         true));
+    profile.widgets.push_back(knob("fx_level_knob", "FX level", "levels", 0, 1));
+    profile.bindings.push_back(widgetBinding(
+        "fx_level_knob",
+        CommandType::SetInputFxLevel,
+        0,
+        0.0F,
+        target,
+        true));
+    profile.widgets.push_back(widget("fx_level_fader", "FX level", WidgetType::Fader, "levels", 1, 1));
+    profile.bindings.push_back(widgetBinding(
+        "fx_level_fader",
+        CommandType::SetInputFxLevel,
+        0,
+        0.0F,
+        target,
+        true));
+
+    profile.widgets.push_back(button("hold", "HOLD", "hold", 0, 0));
+    profile.bindings.push_back(widgetBinding(
+        "hold",
+        CommandType::ToggleInputFxHold,
+        0,
+        0.0F,
+        target));
 
     for (int parameter = 0; parameter < 8; ++parameter) {
         profile.widgets.push_back(knob("fx_parameter_" + std::to_string(parameter + 1), "FX " + std::to_string(parameter + 1), "fx_parameters", 0, parameter));
@@ -252,6 +292,26 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
             lengths[i]));
     }
 
+    const char* clockDivisionLabels[] = {"4", "2", "1", "1/2", "1/4", "1/8", "1/16", "1/32"};
+    for (int i = 0; i < 8; ++i) {
+        profile.widgets.push_back(button("top_grid_" + std::to_string(i + 1), clockDivisionLabels[i], "clock_division", i / 4, i % 4));
+        profile.bindings.push_back(widgetBinding("top_grid_" + std::to_string(i + 1), CommandType::SelectClockDivision, i));
+    }
+
+    for (int i = 0; i < 16; ++i) {
+        const auto isInvert = i >= 8;
+        const auto local = i % 8;
+        const auto isLooperTarget = local >= 4;
+        const auto index = local % 4;
+        const auto widgetId = "mute_" + std::to_string(i + 1);
+        const auto label = std::string(isInvert ? "Inv " : "Mute ") + (isLooperTarget ? "L" : "T") + std::to_string(index + 1);
+        const auto commandType = isInvert
+            ? (isLooperTarget ? CommandType::ToggleLooperInvert : CommandType::ToggleTrackInvert)
+            : (isLooperTarget ? CommandType::ToggleLooperMute : CommandType::ToggleTrackMute);
+        profile.widgets.push_back(button(widgetId, label, "mute_invert", i / 8, local));
+        profile.bindings.push_back(widgetBinding(widgetId, commandType, index));
+    }
+
     for (int track = 0; track < 4; ++track) {
         profile.widgets.push_back(button("record_t" + std::to_string(track + 1), "Record T" + std::to_string(track + 1), "track_record", 0, track));
         profile.bindings.push_back(midiBinding(
@@ -276,6 +336,23 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
             "vol_pan_t" + std::to_string(track + 1),
             CommandType::SetTrackVolume,
             track,
+            0.0F,
+            InputTarget::Mic,
+            true));
+
+        profile.widgets.push_back(button("select_t" + std::to_string(track + 1), "Select T" + std::to_string(track + 1), "track_select", 0, track));
+        profile.bindings.push_back(widgetBinding(
+            "select_t" + std::to_string(track + 1),
+            CommandType::ToggleTrackSelection,
+            track));
+    }
+
+    for (int looper = 0; looper < 4; ++looper) {
+        profile.widgets.push_back(knob("vol_pan_l" + std::to_string(looper + 1), "Vol/Pan L" + std::to_string(looper + 1), "looper_volume_pan", 0, looper));
+        profile.bindings.push_back(widgetBinding(
+            "vol_pan_l" + std::to_string(looper + 1),
+            CommandType::SetLooperVolume,
+            looper,
             0.0F,
             InputTarget::Mic,
             true));
@@ -357,6 +434,13 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         profile.bindings.push_back(widgetBinding(centerFxParameterIds[parameter], CommandType::SetCenterFxParameter, parameter, 0.0F, InputTarget::Mic, true));
     }
 
+    const char* topFxParameterIds[] = {"top_vol_drop", "top_reverb", "top_transpose", "top_phaser"};
+    const char* topFxParameterLabels[] = {"Vol/Drop", "Reverb", "Transpose", "Phaser"};
+    for (int parameter = 0; parameter < 4; ++parameter) {
+        profile.widgets.push_back(knob(topFxParameterIds[parameter], topFxParameterLabels[parameter], "top_fx_parameter", 0, parameter));
+        profile.bindings.push_back(widgetBinding(topFxParameterIds[parameter], CommandType::SetTopFxParameter, parameter, 0.0F, InputTarget::Mic, true));
+    }
+
     for (int joystick = 0; joystick < 2; ++joystick) {
         profile.widgets.push_back(widget("center_fx_joystick_" + std::to_string(joystick + 1), "Value " + std::to_string(joystick + 1), WidgetType::Joystick, "center_fx_joystick", 0, joystick, 2, 2));
         profile.bindings.push_back(widgetBinding("center_fx_joystick_" + std::to_string(joystick + 1), CommandType::SetCenterFxJoystick, joystick, 0.0F, InputTarget::Mic, true));
@@ -377,6 +461,71 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         profile.widgets.push_back(button(remixerMacroIds[macro], remixerMacroLabels[macro], "remixer_macro", macro / 4, macro % 4));
         profile.bindings.push_back(widgetBinding(remixerMacroIds[macro], CommandType::TriggerRemixerMacro, macro));
     }
+
+    const char* remixerModeLabels[] = {
+        "Gate",
+        "Gate all",
+        "Extra 3",
+        "REV",
+        "CTRL all",
+        "min/max",
+        "Nat.",
+        "Reverb",
+        "I",
+        "V",
+        "Harm.",
+        "Delay",
+        "II",
+        "VI",
+        "Melod.",
+        "Phaser",
+        "III",
+        "VII",
+        "CLEAR",
+        "",
+    };
+    for (int mode = 0; mode < 20; ++mode) {
+        profile.widgets.push_back(button("remixer_mode_" + std::to_string(mode + 1), remixerModeLabels[mode], "remixer_mode", mode / 4, mode % 4));
+        profile.bindings.push_back(widgetBinding("remixer_mode_" + std::to_string(mode + 1), CommandType::TriggerRemixerMode, mode));
+    }
+
+    for (int slot = 0; slot < 8; ++slot) {
+        profile.widgets.push_back(button("animation_" + std::to_string(slot + 1), "Ani. " + std::to_string(slot + 1), "animation_slot", 0, slot));
+        profile.bindings.push_back(widgetBinding("animation_" + std::to_string(slot + 1), CommandType::TriggerAnimationSlot, slot));
+    }
+
+    const char* presetSlotIds[] = {"preset_on_off", "preset_default", "preset_pr1", "preset_pr2", "preset_pr3", "preset_pr4", "preset_pr5", "preset_pr6"};
+    const char* presetSlotLabels[] = {"On/Off", "Default", "Pr.1", "Pr.2", "Pr.3", "Pr.4", "Pr.5", "Pr.6"};
+    for (int slot = 0; slot < 8; ++slot) {
+        profile.widgets.push_back(button(presetSlotIds[slot], presetSlotLabels[slot], "preset_slot", 0, slot));
+        profile.bindings.push_back(widgetBinding(presetSlotIds[slot], CommandType::TriggerPresetSlot, slot));
+    }
+
+    for (int track = 0; track < 4; ++track) {
+        profile.widgets.push_back(knob("sidechain_stash_t" + std::to_string(track + 1), "Sidechain Vol/Stash T" + std::to_string(track + 1), "sidechain_parameter", 0, track));
+        profile.bindings.push_back(widgetBinding(
+            "sidechain_stash_t" + std::to_string(track + 1),
+            CommandType::SetSidechainParameter,
+            track,
+            0.0F,
+            InputTarget::Mic,
+            true));
+
+        profile.widgets.push_back(knob("sidechain_decay_t" + std::to_string(track + 1), "Sidechain Dec/Ten T" + std::to_string(track + 1), "sidechain_parameter", 1, track));
+        profile.bindings.push_back(widgetBinding(
+            "sidechain_decay_t" + std::to_string(track + 1),
+            CommandType::SetSidechainParameter,
+            4 + track,
+            0.0F,
+            InputTarget::Mic,
+            true));
+    }
+
+    profile.widgets.push_back(button("bottom_record", "Record", "bottom_record", 0, 0));
+    profile.bindings.push_back(widgetBinding("bottom_record", CommandType::ToggleTrackRecording, 0));
+
+    profile.widgets.push_back(button("bottom_extra_clear_l", "Extra/Clear L", "bottom_extra_clear", 0, 0));
+    profile.bindings.push_back(widgetBinding("bottom_extra_clear_l", CommandType::ResetLooper));
 
     const char* masterParameterIds[] = {
         "master_tempo",

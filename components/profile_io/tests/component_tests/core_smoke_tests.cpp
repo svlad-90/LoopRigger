@@ -3,6 +3,7 @@
 
 #if LIVELOOPING_HAS_PROFILE_IO
 #include "loop_rigger/profile_io/ProfileLoader.h"
+#include "loop_rigger/profile_io/SurfaceLayoutGeometry.h"
 #endif
 
 #include <cstdlib>
@@ -31,6 +32,11 @@ using loop_rigger::profile_io::loadControllerProfileFromFile;
 using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
 using loop_rigger::profile_io::loadDevicePackageFromDirectory;
 using loop_rigger::profile_io::hasScript;
+using loop_rigger::profile_io::containsSurfaceBounds;
+using loop_rigger::profile_io::findSurfaceGroupGeometry;
+using loop_rigger::profile_io::profileSurfaceLayout;
+using loop_rigger::profile_io::summarizeSurfaceGroups;
+using loop_rigger::profile_io::surfaceBoundsOverlap;
 #endif
 
 namespace {
@@ -73,6 +79,7 @@ void testInputControllerCommands()
     engine.handle(inputCommand(InputTarget::Mic, CommandType::SelectInputPresetPage, 2));
     engine.handle(inputCommand(InputTarget::Mic, CommandType::SelectInputPreset, 5));
     engine.handle(inputCommand(InputTarget::Mic, CommandType::SetInputVolume, 0, 1.25F));
+    engine.handle(inputCommand(InputTarget::Mic, CommandType::ToggleInputFxHold));
     engine.handle(inputCommand(InputTarget::Synth, CommandType::SelectInputPreset, 3));
     engine.handle(inputCommand(InputTarget::Synth, CommandType::SetInputFxParameter, 4, 0.42F));
 
@@ -80,6 +87,7 @@ void testInputControllerCommands()
     expect(state.mic.selectedPage == 2, "mic page should be zero-based page 3");
     expect(state.mic.selectedPreset == 5, "mic preset should be zero-based preset 6");
     expect(state.mic.volume == 1.0F, "mic volume should clamp to 1.0");
+    expect(state.mic.fxHold, "mic FX hold should toggle on");
     expect(state.synth.selectedPreset == 3, "synth preset should be zero-based preset 4");
     expect(state.synth.fxParameters[4] == 0.42F, "synth FX parameter should be stored");
 }
@@ -128,6 +136,18 @@ void testYaeltexPerformanceCommands()
     engine.handle(yaeltexCommand(CommandType::SetCenterFxJoystick, 1, 0.25F));
     engine.handle(yaeltexCommand(CommandType::SetMasterParameter, 4, 0.5F));
     engine.handle(yaeltexCommand(CommandType::TriggerSamplerSlot, 6));
+    engine.handle(yaeltexCommand(CommandType::SetLooperVolume, 3, 0.35F));
+    engine.handle(yaeltexCommand(CommandType::ToggleTrackSelection, 2));
+    engine.handle(yaeltexCommand(CommandType::ToggleTrackMute, 1));
+    engine.handle(yaeltexCommand(CommandType::ToggleLooperMute, 2));
+    engine.handle(yaeltexCommand(CommandType::ToggleTrackInvert, 3));
+    engine.handle(yaeltexCommand(CommandType::ToggleLooperInvert, 1));
+    engine.handle(yaeltexCommand(CommandType::SelectClockDivision, 5));
+    engine.handle(yaeltexCommand(CommandType::SetTopFxParameter, 1, 0.45F));
+    engine.handle(yaeltexCommand(CommandType::TriggerRemixerMode, 18));
+    engine.handle(yaeltexCommand(CommandType::TriggerAnimationSlot, 3));
+    engine.handle(yaeltexCommand(CommandType::TriggerPresetSlot, 6));
+    engine.handle(yaeltexCommand(CommandType::SetSidechainParameter, 7, 0.25F));
 
     const auto& state = engine.state();
     expect(state.transport.playing, "transport should be playing");
@@ -141,6 +161,18 @@ void testYaeltexPerformanceCommands()
     expect(state.master.parameters[4] == 0.5F, "master parameter should store value");
     expect(state.sampler.slots[6].loaded, "sampler slot should become loaded");
     expect(state.sampler.slots[6].playing, "sampler slot should become playing");
+    expect(state.loopers[3].volume == 0.35F, "looper volume command should target its indexed looper");
+    expect(state.loopers[state.selectedLooper].tracks[2].selected, "track selection command should toggle track selection on the selected looper");
+    expect(state.loopers[state.selectedLooper].tracks[1].muted, "track mute command should toggle selected looper track mute");
+    expect(state.loopers[2].muted, "looper mute command should toggle indexed looper mute");
+    expect(state.loopers[state.selectedLooper].tracks[3].inverted, "track invert command should toggle selected looper track invert");
+    expect(state.loopers[1].inverted, "looper invert command should toggle indexed looper invert");
+    expect(state.yaeltex.selectedClockDivision == 5, "clock division command should store selected division");
+    expect(state.yaeltex.topFxParameters[1] == 0.45F, "top FX parameter should store value");
+    expect(state.yaeltex.selectedRemixerMode == 18, "remixer mode command should store selected mode");
+    expect(state.yaeltex.selectedAnimationSlot == 3, "animation command should store selected slot");
+    expect(state.yaeltex.selectedPresetSlot == 6, "preset command should store selected slot");
+    expect(state.yaeltex.sidechainParameters[7] == 0.25F, "sidechain parameter should store value");
 }
 
 void testKaossPadMapping()
@@ -161,6 +193,31 @@ void testKaossPadMapping()
     expect(mappedVolume->type == CommandType::SetInputVolume, "mic volume CC should set input volume");
     expect(mappedVolume->value > 0.50F && mappedVolume->value < 0.51F, "MIDI 64 should normalize close to 0.5");
 
+    const auto mappedVolumeKnob = micMapper.mapWidget({"input_volume_knob", WidgetEventType::Change, 0.25F});
+    expect(mappedVolumeKnob.has_value(), "mic input volume knob widget should map to a command");
+    expect(mappedVolumeKnob->type == CommandType::SetInputVolume, "mic input volume knob should set input volume");
+    expect(mappedVolumeKnob->value == 0.25F, "mic input volume knob should use event value");
+
+    const auto mappedVolumeFader = micMapper.mapWidget({"input_volume_fader", WidgetEventType::Change, 0.75F});
+    expect(mappedVolumeFader.has_value(), "mic input volume fader widget should map to a command");
+    expect(mappedVolumeFader->type == CommandType::SetInputVolume, "mic input volume fader should set input volume");
+    expect(mappedVolumeFader->value == 0.75F, "mic input volume fader should use event value");
+
+    const auto mappedFxKnob = micMapper.mapWidget({"fx_level_knob", WidgetEventType::Change, 0.35F});
+    expect(mappedFxKnob.has_value(), "mic FX level knob widget should map to a command");
+    expect(mappedFxKnob->type == CommandType::SetInputFxLevel, "mic FX level knob should set input FX level");
+    expect(mappedFxKnob->value == 0.35F, "mic FX level knob should use event value");
+
+    const auto mappedFxFader = micMapper.mapWidget({"fx_level_fader", WidgetEventType::Change, 0.65F});
+    expect(mappedFxFader.has_value(), "mic FX level fader widget should map to a command");
+    expect(mappedFxFader->type == CommandType::SetInputFxLevel, "mic FX level fader should set input FX level");
+    expect(mappedFxFader->value == 0.65F, "mic FX level fader should use event value");
+
+    const auto mappedHold = micMapper.mapWidget({"hold", WidgetEventType::Press, 1.0F});
+    expect(mappedHold.has_value(), "mic hold widget should map to a command");
+    expect(mappedHold->type == CommandType::ToggleInputFxHold, "mic hold widget should toggle FX hold");
+    expect(mappedHold->inputTarget == InputTarget::Mic, "mic hold widget should target mic input");
+
     const MidiMapper synthMapper(makeSynthKaossPadProfile());
     const auto mappedWidget = synthMapper.mapWidget({"page_2", WidgetEventType::Press, 1.0F});
     expect(mappedWidget.has_value(), "synth page widget should map to a command");
@@ -168,6 +225,11 @@ void testKaossPadMapping()
     expect(mappedWidget->inputTarget == InputTarget::Synth, "synth page widget should target synth input");
     expect(mappedWidget->type == CommandType::SelectInputPresetPage, "synth page widget should select page");
     expect(mappedWidget->index == 1, "page_2 should map to zero-based page 2");
+
+    const auto mappedSynthHold = synthMapper.mapWidget({"hold", WidgetEventType::Press, 1.0F});
+    expect(mappedSynthHold.has_value(), "synth hold widget should map to a command");
+    expect(mappedSynthHold->type == CommandType::ToggleInputFxHold, "synth hold widget should toggle FX hold");
+    expect(mappedSynthHold->inputTarget == InputTarget::Synth, "synth hold widget should target synth input");
 }
 
 void testYaeltexMapping()
@@ -212,6 +274,77 @@ void testYaeltexMapping()
     expect(mappedSamplerSlot.has_value(), "Yaeltex sampler widget should map to a command");
     expect(mappedSamplerSlot->type == CommandType::TriggerSamplerSlot, "sampler button should trigger sampler slot");
     expect(mappedSamplerSlot->index == 6, "sampler button 7 should map to zero-based slot 7");
+
+    const auto mappedTrackSelect = mapper.mapWidget({"select_t3", WidgetEventType::Press, 1.0F});
+    expect(mappedTrackSelect.has_value(), "Yaeltex track select widget should map to a command");
+    expect(mappedTrackSelect->type == CommandType::ToggleTrackSelection, "Select T3 should toggle track selection");
+    expect(mappedTrackSelect->index == 2, "Select T3 should map to zero-based track 3");
+
+    const auto mappedLooperVolume = mapper.mapWidget({"vol_pan_l4", WidgetEventType::Change, 0.4F});
+    expect(mappedLooperVolume.has_value(), "Yaeltex looper volume widget should map to a command");
+    expect(mappedLooperVolume->type == CommandType::SetLooperVolume, "Vol/Pan L4 should set looper volume");
+    expect(mappedLooperVolume->index == 3, "Vol/Pan L4 should map to zero-based looper 4");
+    expect(mappedLooperVolume->value == 0.4F, "looper volume value should pass through");
+
+    const auto mappedClockDivision = mapper.mapWidget({"top_grid_6", WidgetEventType::Press, 1.0F});
+    expect(mappedClockDivision.has_value(), "Yaeltex clock division widget should map to a command");
+    expect(mappedClockDivision->type == CommandType::SelectClockDivision, "top grid should select clock division");
+    expect(mappedClockDivision->index == 5, "top_grid_6 should map to zero-based clock division 6");
+
+    const auto mappedMuteTrack = mapper.mapWidget({"mute_2", WidgetEventType::Press, 1.0F});
+    expect(mappedMuteTrack.has_value(), "Yaeltex Mute T2 widget should map to a command");
+    expect(mappedMuteTrack->type == CommandType::ToggleTrackMute, "Mute T2 should toggle track mute");
+    expect(mappedMuteTrack->index == 1, "Mute T2 should map to zero-based track 2");
+
+    const auto mappedMuteLooper = mapper.mapWidget({"mute_8", WidgetEventType::Press, 1.0F});
+    expect(mappedMuteLooper.has_value(), "Yaeltex Mute L4 widget should map to a command");
+    expect(mappedMuteLooper->type == CommandType::ToggleLooperMute, "Mute L4 should toggle looper mute");
+    expect(mappedMuteLooper->index == 3, "Mute L4 should map to zero-based looper 4");
+
+    const auto mappedInvertTrack = mapper.mapWidget({"mute_11", WidgetEventType::Press, 1.0F});
+    expect(mappedInvertTrack.has_value(), "Yaeltex Inv T3 widget should map to a command");
+    expect(mappedInvertTrack->type == CommandType::ToggleTrackInvert, "Inv T3 should toggle track invert");
+    expect(mappedInvertTrack->index == 2, "Inv T3 should map to zero-based track 3");
+
+    const auto mappedInvertLooper = mapper.mapWidget({"mute_14", WidgetEventType::Press, 1.0F});
+    expect(mappedInvertLooper.has_value(), "Yaeltex Inv L2 widget should map to a command");
+    expect(mappedInvertLooper->type == CommandType::ToggleLooperInvert, "Inv L2 should toggle looper invert");
+    expect(mappedInvertLooper->index == 1, "Inv L2 should map to zero-based looper 2");
+
+    const auto mappedTopFx = mapper.mapWidget({"top_reverb", WidgetEventType::Change, 0.7F});
+    expect(mappedTopFx.has_value(), "Yaeltex top FX knob should map to a command");
+    expect(mappedTopFx->type == CommandType::SetTopFxParameter, "top Reverb should set top FX parameter");
+    expect(mappedTopFx->index == 1, "top Reverb should map to zero-based top FX parameter 2");
+    expect(mappedTopFx->value == 0.7F, "top FX value should pass through");
+
+    const auto mappedRemixerMode = mapper.mapWidget({"remixer_mode_19", WidgetEventType::Press, 1.0F});
+    expect(mappedRemixerMode.has_value(), "Yaeltex remixer mode widget should map to a command");
+    expect(mappedRemixerMode->type == CommandType::TriggerRemixerMode, "remixer mode button should trigger remixer mode");
+    expect(mappedRemixerMode->index == 18, "remixer_mode_19 should map to zero-based mode 19");
+
+    const auto mappedAnimation = mapper.mapWidget({"animation_4", WidgetEventType::Press, 1.0F});
+    expect(mappedAnimation.has_value(), "Yaeltex animation widget should map to a command");
+    expect(mappedAnimation->type == CommandType::TriggerAnimationSlot, "animation button should trigger animation slot");
+    expect(mappedAnimation->index == 3, "animation_4 should map to zero-based animation slot 4");
+
+    const auto mappedPresetSlot = mapper.mapWidget({"preset_pr5", WidgetEventType::Press, 1.0F});
+    expect(mappedPresetSlot.has_value(), "Yaeltex preset slot widget should map to a command");
+    expect(mappedPresetSlot->type == CommandType::TriggerPresetSlot, "preset button should trigger preset slot");
+    expect(mappedPresetSlot->index == 6, "preset_pr5 should map to zero-based preset slot 7");
+
+    const auto mappedSidechain = mapper.mapWidget({"sidechain_decay_t4", WidgetEventType::Change, 0.3F});
+    expect(mappedSidechain.has_value(), "Yaeltex sidechain knob should map to a command");
+    expect(mappedSidechain->type == CommandType::SetSidechainParameter, "sidechain knob should set sidechain parameter");
+    expect(mappedSidechain->index == 7, "sidechain_decay_t4 should map to zero-based sidechain parameter 8");
+    expect(mappedSidechain->value == 0.3F, "sidechain value should pass through");
+
+    const auto mappedBottomRecord = mapper.mapWidget({"bottom_record", WidgetEventType::Press, 1.0F});
+    expect(mappedBottomRecord.has_value(), "Yaeltex bottom record widget should map to a command");
+    expect(mappedBottomRecord->type == CommandType::ToggleTrackRecording, "bottom Record should toggle selected track recording");
+
+    const auto mappedBottomClear = mapper.mapWidget({"bottom_extra_clear_l", WidgetEventType::Press, 1.0F});
+    expect(mappedBottomClear.has_value(), "Yaeltex bottom Extra/Clear L widget should map to a command");
+    expect(mappedBottomClear->type == CommandType::ResetLooper, "bottom Extra/Clear L should reset selected looper");
 
     expect(normalizeMidiValue(-10) == 0.0F, "negative MIDI values should clamp to zero");
     expect(normalizeMidiValue(200) == 1.0F, "large MIDI values should clamp to one");
@@ -274,6 +407,104 @@ void expectLayoutElementsStayInsideCanvas(const loop_rigger::profile_io::Control
     }
 }
 
+void expectBoundsEqual(
+    const loop_rigger::profile_io::SurfaceBounds& bounds,
+    float x,
+    float y,
+    float width,
+    float height,
+    const std::string& message)
+{
+    expect(bounds.x == x, message + " x");
+    expect(bounds.y == y, message + " y");
+    expect(bounds.width == width, message + " width");
+    expect(bounds.height == height, message + " height");
+}
+
+void expectGroupGeometry(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& group,
+    size_t widgetCount,
+    float x,
+    float y,
+    float width,
+    float height)
+{
+    const auto geometry = findSurfaceGroupGeometry(layout, group);
+    expect(geometry.has_value(), "layout should expose group geometry: " + group);
+    if (!geometry.has_value()) {
+        return;
+    }
+
+    expect(geometry->elementCount == widgetCount, "group element count should match widget count: " + group);
+    expect(geometry->widgetCount == widgetCount, "group widget count should match: " + group);
+    expect(geometry->decorationCount == 0, "group should contain only widgets: " + group);
+    expectBoundsEqual(geometry->bounds, x, y, width, height, "group bounds should match: " + group);
+}
+
+void expectLayoutWidgetGroupsBelongToProfile(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const loop_rigger::control::ControllerProfile& profile)
+{
+    const auto profileGroups = [&profile] {
+        std::set<std::string> groups;
+        for (const auto& widget : profile.widgets) {
+            if (!widget.group.empty()) {
+                groups.insert(widget.group);
+            }
+        }
+        return groups;
+    }();
+
+    for (const auto& geometry : summarizeSurfaceGroups(layout)) {
+        expect(profileGroups.count(geometry.group) == 1, "layout widget group should exist in controller profile: " + geometry.group);
+    }
+}
+
+void expectGroupBoundsContainTheirElements(const loop_rigger::profile_io::ControlSurfaceLayout& layout)
+{
+    for (const auto& element : layout.elements) {
+        if (element.group.empty()) {
+            continue;
+        }
+
+        const auto geometry = findSurfaceGroupGeometry(layout, element.group);
+        expect(geometry.has_value(), "group geometry should exist for element: " + element.id);
+        if (geometry.has_value()) {
+            expect(containsSurfaceBounds(geometry->bounds, element.bounds), "group bounds should contain element: " + element.id);
+        }
+    }
+}
+
+void expectGroupedWidgetsDoNotOverlap(const loop_rigger::profile_io::ControlSurfaceLayout& layout)
+{
+    for (size_t lhs = 0; lhs < layout.elements.size(); ++lhs) {
+        const auto& left = layout.elements[lhs];
+        if (left.group.empty() || left.role != loop_rigger::profile_io::SurfaceElementRole::Widget) {
+            continue;
+        }
+
+        for (size_t rhs = lhs + 1; rhs < layout.elements.size(); ++rhs) {
+            const auto& right = layout.elements[rhs];
+            if (right.group == left.group && right.role == loop_rigger::profile_io::SurfaceElementRole::Widget) {
+                expect(!surfaceBoundsOverlap(left.bounds, right.bounds), "grouped widgets should not overlap: " + left.id + " / " + right.id);
+            }
+        }
+    }
+}
+
+void expectWidgetGroupsDoNotOverlap(const loop_rigger::profile_io::ControlSurfaceLayout& layout)
+{
+    const auto groups = summarizeSurfaceGroups(layout);
+    for (size_t lhs = 0; lhs < groups.size(); ++lhs) {
+        for (size_t rhs = lhs + 1; rhs < groups.size(); ++rhs) {
+            expect(
+                !surfaceBoundsOverlap(groups[lhs].bounds, groups[rhs].bounds),
+                "widget groups should not overlap: " + groups[lhs].group + " / " + groups[rhs].group);
+        }
+    }
+}
+
 void testJsonProfileLoading()
 {
     const MidiMapper micMapper(loadControllerProfileFromFile(profilePath("kaoss_mic.json")));
@@ -290,6 +521,13 @@ void testJsonProfileLoading()
     expect(mappedPage->controller == ControllerId::SynthKaossPad, "JSON synth command should carry synth controller id");
     expect(mappedPage->inputTarget == InputTarget::Synth, "JSON synth page should target synth input");
     expect(mappedPage->index == 1, "JSON synth page_2 should map to zero-based page 2");
+
+    const auto mappedSynthFxFader = synthMapper.mapWidget({"fx_level_fader", WidgetEventType::Change, 0.5F});
+    expect(mappedSynthFxFader.has_value(), "JSON synth profile should map FX level fader widget");
+    expect(mappedSynthFxFader->controller == ControllerId::SynthKaossPad, "JSON synth fader command should carry synth controller id");
+    expect(mappedSynthFxFader->inputTarget == InputTarget::Synth, "JSON synth fader command should target synth input");
+    expect(mappedSynthFxFader->type == CommandType::SetInputFxLevel, "JSON synth fader should set input FX level");
+    expect(mappedSynthFxFader->value == 0.5F, "JSON synth fader should use event value");
 
     const MidiMapper yaeltexMapper(loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json")));
     const auto mappedLength = yaeltexMapper.mapMidi({MidiMessageType::Note, 0, 75, 127});
@@ -314,6 +552,33 @@ void testJsonProfileLoading()
     expect(mappedMaster->type == CommandType::SetMasterParameter, "JSON master output should set master parameter");
     expect(mappedMaster->index == 4, "JSON output volume should map to master parameter 5");
     expect(mappedMaster->value == 0.66F, "JSON master value should pass through");
+
+    const auto mappedTrackSelect = yaeltexMapper.mapWidget({"select_t2", WidgetEventType::Press, 1.0F});
+    expect(mappedTrackSelect.has_value(), "JSON Yaeltex profile should map track select");
+    expect(mappedTrackSelect->type == CommandType::ToggleTrackSelection, "JSON Select T2 should toggle track selection");
+    expect(mappedTrackSelect->index == 1, "JSON Select T2 should target zero-based track 2");
+
+    const auto mappedLooperVolume = yaeltexMapper.mapWidget({"vol_pan_l1", WidgetEventType::Change, 0.2F});
+    expect(mappedLooperVolume.has_value(), "JSON Yaeltex profile should map looper volume");
+    expect(mappedLooperVolume->type == CommandType::SetLooperVolume, "JSON Vol/Pan L1 should set looper volume");
+    expect(mappedLooperVolume->index == 0, "JSON Vol/Pan L1 should target zero-based looper 1");
+    expect(mappedLooperVolume->value == 0.2F, "JSON looper volume should pass through widget value");
+
+    const auto mappedClockDivision = yaeltexMapper.mapWidget({"top_grid_8", WidgetEventType::Press, 1.0F});
+    expect(mappedClockDivision.has_value(), "JSON Yaeltex profile should map clock division");
+    expect(mappedClockDivision->type == CommandType::SelectClockDivision, "JSON top_grid_8 should select clock division");
+    expect(mappedClockDivision->index == 7, "JSON top_grid_8 should map to zero-based clock division 8");
+
+    const auto mappedSidechain = yaeltexMapper.mapWidget({"sidechain_stash_t2", WidgetEventType::Change, 0.55F});
+    expect(mappedSidechain.has_value(), "JSON Yaeltex profile should map sidechain knob");
+    expect(mappedSidechain->type == CommandType::SetSidechainParameter, "JSON sidechain knob should set sidechain parameter");
+    expect(mappedSidechain->index == 1, "JSON sidechain_stash_t2 should map to zero-based sidechain parameter 2");
+    expect(mappedSidechain->value == 0.55F, "JSON sidechain value should pass through");
+
+    const auto mappedMute = yaeltexMapper.mapWidget({"mute_15", WidgetEventType::Press, 1.0F});
+    expect(mappedMute.has_value(), "JSON Yaeltex profile should map Inv L3");
+    expect(mappedMute->type == CommandType::ToggleLooperInvert, "JSON Inv L3 should toggle looper invert");
+    expect(mappedMute->index == 2, "JSON Inv L3 should target zero-based looper 3");
 }
 
 void testJsonSurfaceLayoutLoading()
@@ -328,17 +593,60 @@ void testJsonSurfaceLayoutLoading()
     const auto micProfile = loadControllerProfileFromFile(profilePath("kaoss_mic.json"));
     expectLayoutElementsStayInsideCanvas(kaossLayout);
     expectLayoutWidgetsBelongToProfile(kaossLayout, micProfile);
+    expect(summarizeSurfaceGroups(kaossLayout).size() == 4, "Kaoss layout should expose four widget groups");
+    expectLayoutWidgetGroupsBelongToProfile(kaossLayout, micProfile);
+    expectGroupBoundsContainTheirElements(kaossLayout);
+    expectGroupedWidgetsDoNotOverlap(kaossLayout);
+    expectGroupGeometry(kaossLayout, "hold", 1, 64.0F, 662.0F, 94.0F, 46.0F);
+    expectGroupGeometry(kaossLayout, "levels", 4, 76.0F, 100.0F, 84.0F, 478.0F);
+    expectGroupGeometry(kaossLayout, "pages", 4, 342.0F, 712.0F, 542.0F, 46.0F);
+    expectGroupGeometry(kaossLayout, "presets", 8, 322.0F, 247.0F, 628.0F, 44.0F);
 
     const auto yaeltexLayout = loadControlSurfaceLayoutFromFile(layoutPath("yaeltex_livelooping.json"));
     expect(yaeltexLayout.id == "yaeltex_livelooping", "Yaeltex layout should load id");
     expect(yaeltexLayout.profileId == "yaeltex.livelooping", "Yaeltex layout should target Yaeltex profile");
     expect(yaeltexLayout.baseWidth == 1520, "Yaeltex layout should expose base width");
-    expect(yaeltexLayout.baseHeight == 900, "Yaeltex layout should expose base height");
+    expect(yaeltexLayout.baseHeight == 1080, "Yaeltex layout should expose base height");
     expect(yaeltexLayout.elements.size() >= 80, "Yaeltex layout should include dense faceplate elements");
 
     const auto yaeltexProfile = loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json"));
     expectLayoutElementsStayInsideCanvas(yaeltexLayout);
     expectLayoutWidgetsBelongToProfile(yaeltexLayout, yaeltexProfile);
+    expect(summarizeSurfaceGroups(yaeltexLayout).size() == 26, "Yaeltex layout should expose twenty-six widget groups");
+    expectLayoutWidgetGroupsBelongToProfile(yaeltexLayout, yaeltexProfile);
+    expectGroupBoundsContainTheirElements(yaeltexLayout);
+    expectGroupedWidgetsDoNotOverlap(yaeltexLayout);
+    expectWidgetGroupsDoNotOverlap(yaeltexLayout);
+    expectGroupGeometry(yaeltexLayout, "center_fx_bank", 5, 620.0F, 540.0F, 326.0F, 30.0F);
+    expectGroupGeometry(yaeltexLayout, "center_fx_joystick", 2, 638.0F, 612.0F, 310.0F, 110.0F);
+    expectGroupGeometry(yaeltexLayout, "center_fx_parameter", 4, 632.0F, 326.0F, 400.0F, 86.0F);
+    expectGroupGeometry(yaeltexLayout, "clock_division", 8, 760.0F, 86.0F, 270.0F, 80.0F);
+    expectGroupGeometry(yaeltexLayout, "looper_select", 4, 112.0F, 360.0F, 376.0F, 64.0F);
+    expectGroupGeometry(yaeltexLayout, "master_parameter", 8, 1300.0F, 318.0F, 168.0F, 414.0F);
+    expectGroupGeometry(yaeltexLayout, "mute_invert", 16, 158.0F, 220.0F, 558.0F, 82.0F);
+    expectGroupGeometry(yaeltexLayout, "remixer_mode", 20, 1062.0F, 466.0F, 228.0F, 222.0F);
+    expectGroupGeometry(yaeltexLayout, "sample_length", 8, 112.0F, 462.0F, 256.0F, 94.0F);
+    expectGroupGeometry(yaeltexLayout, "sampler", 8, 1085.0F, 745.0F, 286.0F, 120.0F);
+    expectGroupGeometry(yaeltexLayout, "sidechain_parameter", 8, 620.0F, 846.0F, 384.0F, 182.0F);
+    expectGroupGeometry(yaeltexLayout, "top_fx_parameter", 4, 1058.0F, 86.0F, 400.0F, 86.0F);
+    expectGroupGeometry(yaeltexLayout, "track_volume_pan", 4, 100.0F, 744.0F, 490.0F, 92.0F);
+    expectGroupGeometry(yaeltexLayout, "track_select", 4, 112.0F, 700.0F, 376.0F, 28.0F);
+    expectGroupGeometry(yaeltexLayout, "looper_volume_pan", 4, 92.0F, 946.0F, 466.0F, 84.0F);
+    expectGroupGeometry(yaeltexLayout, "animation_slot", 8, 620.0F, 752.0F, 408.0F, 28.0F);
+    expectGroupGeometry(yaeltexLayout, "preset_slot", 8, 620.0F, 798.0F, 408.0F, 28.0F);
+    expectGroupGeometry(yaeltexLayout, "bottom_record", 1, 112.0F, 888.0F, 76.0F, 34.0F);
+    expectGroupGeometry(yaeltexLayout, "bottom_extra_clear", 1, 516.0F, 888.0F, 92.0F, 34.0F);
+}
+
+void testSurfaceLayoutInteractionProfile()
+{
+    const auto yaeltexLayout = loadControlSurfaceLayoutFromFile(layoutPath("yaeltex_livelooping.json"));
+    const auto profile = profileSurfaceLayout(yaeltexLayout);
+
+    expect(profile.elementCount == yaeltexLayout.elements.size(), "layout profile should count all elements");
+    expect(profile.widgetCount > 100, "Yaeltex layout should expose a large interactive widget set");
+    expect(profile.decorationCount > 0, "Yaeltex layout should have a cacheable static decoration layer");
+    expect(profile.widgetCount < profile.elementCount, "Yaeltex interaction hit-testing should be able to skip decorations");
 }
 
 void testDevicePackageLoading()
@@ -374,6 +682,7 @@ int main()
 #if LIVELOOPING_HAS_PROFILE_IO
     testJsonProfileLoading();
     testJsonSurfaceLayoutLoading();
+    testSurfaceLayoutInteractionProfile();
     testDevicePackageLoading();
 #endif
 

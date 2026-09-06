@@ -138,8 +138,14 @@ core::CommandType parseCommandType(const std::string& value)
     if (value == "set_input_fx_level") {
         return core::CommandType::SetInputFxLevel;
     }
+    if (value == "toggle_input_fx_hold") {
+        return core::CommandType::ToggleInputFxHold;
+    }
     if (value == "set_input_fx_parameter") {
         return core::CommandType::SetInputFxParameter;
+    }
+    if (value == "select_clock_division") {
+        return core::CommandType::SelectClockDivision;
     }
     if (value == "select_looper") {
         return core::CommandType::SelectLooper;
@@ -152,6 +158,18 @@ core::CommandType parseCommandType(const std::string& value)
     }
     if (value == "clear_track") {
         return core::CommandType::ClearTrack;
+    }
+    if (value == "toggle_track_mute") {
+        return core::CommandType::ToggleTrackMute;
+    }
+    if (value == "toggle_looper_mute") {
+        return core::CommandType::ToggleLooperMute;
+    }
+    if (value == "toggle_track_invert") {
+        return core::CommandType::ToggleTrackInvert;
+    }
+    if (value == "toggle_looper_invert") {
+        return core::CommandType::ToggleLooperInvert;
     }
     if (value == "start_resample_selected_looper") {
         return core::CommandType::StartResampleSelectedLooper;
@@ -209,6 +227,21 @@ core::CommandType parseCommandType(const std::string& value)
     }
     if (value == "trigger_remixer_macro") {
         return core::CommandType::TriggerRemixerMacro;
+    }
+    if (value == "trigger_remixer_mode") {
+        return core::CommandType::TriggerRemixerMode;
+    }
+    if (value == "trigger_animation_slot") {
+        return core::CommandType::TriggerAnimationSlot;
+    }
+    if (value == "trigger_preset_slot") {
+        return core::CommandType::TriggerPresetSlot;
+    }
+    if (value == "set_sidechain_parameter") {
+        return core::CommandType::SetSidechainParameter;
+    }
+    if (value == "set_top_fx_parameter") {
+        return core::CommandType::SetTopFxParameter;
     }
     if (value == "set_master_parameter") {
         return core::CommandType::SetMasterParameter;

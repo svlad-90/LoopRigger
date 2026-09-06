@@ -61,6 +61,12 @@ void LiveLoopingEngine::handle(const ControllerCommand& command)
         appendEvent(toString(command.inputTarget) + " FX level: " + std::to_string(input.fxLevel));
         break;
     }
+    case CommandType::ToggleInputFxHold: {
+        auto& input = inputState(command.inputTarget);
+        input.fxHold = !input.fxHold;
+        appendEvent(toString(command.inputTarget) + " FX hold toggled");
+        break;
+    }
     case CommandType::SetInputFxParameter: {
         auto& input = inputState(command.inputTarget);
         const auto parameter = clampIndex(command.index, kInputFxParameters);
@@ -68,6 +74,10 @@ void LiveLoopingEngine::handle(const ControllerCommand& command)
         appendEvent(toString(command.inputTarget) + " FX parameter " + std::to_string(parameter + 1) + ": " + std::to_string(input.fxParameters[parameter]));
         break;
     }
+    case CommandType::SelectClockDivision:
+        state_.yaeltex.selectedClockDivision = clampIndex(command.index, kClockDivisions);
+        appendEvent("clock division selected: " + std::to_string(state_.yaeltex.selectedClockDivision + 1));
+        break;
     case CommandType::SelectLooper:
         state_.selectedLooper = clampIndex(command.index, kLoopers);
         appendEvent("looper selected: " + std::to_string(state_.selectedLooper + 1));
@@ -98,6 +108,34 @@ void LiveLoopingEngine::handle(const ControllerCommand& command)
         appendEvent("track cleared: L" + std::to_string(state_.selectedLooper + 1) + " T" + std::to_string(trackIndex + 1));
         break;
     }
+    case CommandType::ToggleTrackMute: {
+        const auto trackIndex = clampIndex(command.index, kTracksPerLooper);
+        auto& track = state_.loopers[state_.selectedLooper].tracks[trackIndex];
+        track.muted = !track.muted;
+        appendEvent("track mute toggled");
+        break;
+    }
+    case CommandType::ToggleLooperMute: {
+        const auto looperIndex = clampIndex(command.index, kLoopers);
+        auto& looper = state_.loopers[looperIndex];
+        looper.muted = !looper.muted;
+        appendEvent("looper mute toggled");
+        break;
+    }
+    case CommandType::ToggleTrackInvert: {
+        const auto trackIndex = clampIndex(command.index, kTracksPerLooper);
+        auto& track = state_.loopers[state_.selectedLooper].tracks[trackIndex];
+        track.inverted = !track.inverted;
+        appendEvent("track invert toggled");
+        break;
+    }
+    case CommandType::ToggleLooperInvert: {
+        const auto looperIndex = clampIndex(command.index, kLoopers);
+        auto& looper = state_.loopers[looperIndex];
+        looper.inverted = !looper.inverted;
+        appendEvent("looper invert toggled");
+        break;
+    }
     case CommandType::SetTrackVolume: {
         const auto trackIndex = clampIndex(command.index, kTracksPerLooper);
         state_.loopers[state_.selectedLooper].tracks[trackIndex].volume = clampLevel(command.value);
@@ -110,10 +148,12 @@ void LiveLoopingEngine::handle(const ControllerCommand& command)
         appendEvent("track pan changed");
         break;
     }
-    case CommandType::SetLooperVolume:
-        state_.loopers[state_.selectedLooper].volume = clampLevel(command.value);
+    case CommandType::SetLooperVolume: {
+        const auto looperIndex = clampIndex(command.index, kLoopers);
+        state_.loopers[looperIndex].volume = clampLevel(command.value);
         appendEvent("looper volume changed");
         break;
+    }
     case CommandType::ToggleTrackSelection: {
         const auto trackIndex = clampIndex(command.index, kTracksPerLooper);
         auto& track = state_.loopers[state_.selectedLooper].tracks[trackIndex];
@@ -165,6 +205,30 @@ void LiveLoopingEngine::handle(const ControllerCommand& command)
     case CommandType::TriggerRemixerMacro:
         appendEvent("remixer macro: " + std::to_string(command.index + 1));
         break;
+    case CommandType::TriggerRemixerMode:
+        state_.yaeltex.selectedRemixerMode = clampIndex(command.index, kRemixerModes);
+        appendEvent("remixer mode: " + std::to_string(state_.yaeltex.selectedRemixerMode + 1));
+        break;
+    case CommandType::TriggerAnimationSlot:
+        state_.yaeltex.selectedAnimationSlot = clampIndex(command.index, kAnimationSlots);
+        appendEvent("animation slot: " + std::to_string(state_.yaeltex.selectedAnimationSlot + 1));
+        break;
+    case CommandType::TriggerPresetSlot:
+        state_.yaeltex.selectedPresetSlot = clampIndex(command.index, kPresetSlots);
+        appendEvent("preset slot: " + std::to_string(state_.yaeltex.selectedPresetSlot + 1));
+        break;
+    case CommandType::SetSidechainParameter: {
+        const auto parameter = clampIndex(command.index, kSidechainParameters);
+        state_.yaeltex.sidechainParameters[parameter] = clampLevel(command.value);
+        appendEvent("sidechain parameter " + std::to_string(parameter + 1) + ": " + std::to_string(state_.yaeltex.sidechainParameters[parameter]));
+        break;
+    }
+    case CommandType::SetTopFxParameter: {
+        const auto parameter = clampIndex(command.index, kTopFxParameters);
+        state_.yaeltex.topFxParameters[parameter] = clampLevel(command.value);
+        appendEvent("top FX parameter " + std::to_string(parameter + 1) + ": " + std::to_string(state_.yaeltex.topFxParameters[parameter]));
+        break;
+    }
     case CommandType::SetMasterParameter: {
         const auto parameter = clampIndex(command.index, kMasterParameters);
         state_.master.parameters[parameter] = clampLevel(command.value);
@@ -212,9 +276,9 @@ std::string LiveLoopingEngine::renderTextSnapshot() const
     std::ostringstream out;
     out << "LiveLooping state\n";
     out << "Mic   page=" << state_.mic.selectedPage + 1 << " preset=" << state_.mic.selectedPreset + 1
-        << " vol=" << state_.mic.volume << " fx=" << state_.mic.fxLevel << "\n";
+        << " vol=" << state_.mic.volume << " fx=" << state_.mic.fxLevel << " hold=" << (state_.mic.fxHold ? "yes" : "no") << "\n";
     out << "Synth page=" << state_.synth.selectedPage + 1 << " preset=" << state_.synth.selectedPreset + 1
-        << " vol=" << state_.synth.volume << " fx=" << state_.synth.fxLevel << "\n";
+        << " vol=" << state_.synth.volume << " fx=" << state_.synth.fxLevel << " hold=" << (state_.synth.fxHold ? "yes" : "no") << "\n";
     out << "Selected looper=" << state_.selectedLooper + 1
         << " sampleLength=" << state_.selectedSampleLengthBeats
         << " resample=" << toString(state_.resampleMode) << "\n";
@@ -224,13 +288,30 @@ std::string LiveLoopingEngine::renderTextSnapshot() const
         << " target=" << toString(state_.routing.target)
         << " centerFx=slot " << state_.centerFx.selectedSlot + 1
         << "/bank " << state_.centerFx.selectedBank + 1 << "\n";
+    out << "Yaeltex clock=" << state_.yaeltex.selectedClockDivision + 1
+        << " remixerMode=" << state_.yaeltex.selectedRemixerMode + 1
+        << " animation=" << state_.yaeltex.selectedAnimationSlot + 1
+        << " preset=" << state_.yaeltex.selectedPresetSlot + 1 << "\n";
 
     for (int looper = 0; looper < kLoopers; ++looper) {
-        out << "L" << looper + 1 << " vol=" << state_.loopers[looper].volume << ": ";
+        out << "L" << looper + 1 << " vol=" << state_.loopers[looper].volume;
+        if (state_.loopers[looper].muted) {
+            out << " muted";
+        }
+        if (state_.loopers[looper].inverted) {
+            out << " inverted";
+        }
+        out << ": ";
         for (int track = 0; track < kTracksPerLooper; ++track) {
             const auto& trackState = state_.loopers[looper].tracks[track];
             out << "T" << track + 1 << "=" << toString(trackState.state)
                 << "/" << trackState.sampleLengthBeats << "b";
+            if (trackState.muted) {
+                out << "m";
+            }
+            if (trackState.inverted) {
+                out << "i";
+            }
             if (trackState.selected) {
                 out << "*";
             }

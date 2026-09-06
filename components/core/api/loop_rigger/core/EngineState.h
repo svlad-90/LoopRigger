@@ -17,6 +17,12 @@ constexpr int kCenterFxParameters = 4;
 constexpr int kCenterFxJoysticks = 2;
 constexpr int kSamplerSlots = 8;
 constexpr int kMasterParameters = 8;
+constexpr int kClockDivisions = 8;
+constexpr int kTopFxParameters = 4;
+constexpr int kRemixerModes = 20;
+constexpr int kAnimationSlots = 8;
+constexpr int kPresetSlots = 8;
+constexpr int kSidechainParameters = 8;
 
 enum class TrackState {
     Empty,
@@ -55,6 +61,7 @@ struct InputControllerState {
     int selectedPreset = 0;
     float volume = 0.8F;
     float fxLevel = 0.8F;
+    bool fxHold = false;
     std::array<float, kInputFxParameters> fxParameters{};
 };
 
@@ -63,11 +70,15 @@ struct TrackStateData {
     int sampleLengthBeats = 4;
     float volume = 0.8F;
     float pan = 0.5F;
+    bool muted = false;
+    bool inverted = false;
     bool selected = false;
 };
 
 struct LooperState {
     float volume = 0.8F;
+    bool muted = false;
+    bool inverted = false;
     std::array<TrackStateData, kTracksPerLooper> tracks{};
 };
 
@@ -101,6 +112,15 @@ struct MasterState {
     std::array<float, kMasterParameters> parameters{};
 };
 
+struct YaeltexSurfaceState {
+    int selectedClockDivision = 2;
+    std::array<float, kTopFxParameters> topFxParameters{};
+    int selectedRemixerMode = 0;
+    int selectedAnimationSlot = 0;
+    int selectedPresetSlot = 0;
+    std::array<float, kSidechainParameters> sidechainParameters{};
+};
+
 struct EngineState {
     InputControllerState mic;
     InputControllerState synth;
@@ -110,6 +130,7 @@ struct EngineState {
     CenterFxState centerFx;
     SamplerState sampler;
     MasterState master;
+    YaeltexSurfaceState yaeltex;
     int selectedLooper = 0;
     int selectedSampleLengthBeats = 4;
     ResampleMode resampleMode = ResampleMode::Off;

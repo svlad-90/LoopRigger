@@ -195,7 +195,7 @@
     },
     {
       "id": "input_knob",
-      "role": "decoration",
+      "role": "widget",
       "shape": "knob",
       "variant": "metal_knob",
       "bounds": {
@@ -203,7 +203,9 @@
         "y": 100,
         "width": 68,
         "height": 68
-      }
+      },
+      "widgetId": "input_volume_knob",
+      "group": "levels"
     },
     {
       "id": "fx_label",
@@ -220,7 +222,7 @@
     },
     {
       "id": "fx_knob",
-      "role": "decoration",
+      "role": "widget",
       "shape": "knob",
       "variant": "metal_knob",
       "bounds": {
@@ -228,20 +230,24 @@
         "y": 236,
         "width": 68,
         "height": 68
-      }
+      },
+      "widgetId": "fx_level_knob",
+      "group": "levels"
     },
     {
       "id": "hold_button",
-      "role": "decoration",
+      "role": "widget",
       "shape": "round_rect",
-      "variant": "kaoss_light_button",
+      "variant": "interactive_button",
       "label": "HOLD",
       "bounds": {
         "x": 64,
         "y": 662,
         "width": 94,
         "height": 46
-      }
+      },
+      "widgetId": "hold",
+      "group": "hold"
     },
     {
       "id": "program_knob",
@@ -519,28 +525,28 @@
       "role": "widget",
       "shape": "fader",
       "variant": "interactive_fader",
-      "widgetId": "input_volume",
-      "group": "levels",
       "bounds": {
         "x": 94,
         "y": 410,
         "width": 24,
         "height": 168
-      }
+      },
+      "widgetId": "input_volume_fader",
+      "group": "levels"
     },
     {
       "id": "fx_level",
       "role": "widget",
       "shape": "fader",
       "variant": "interactive_fader",
-      "widgetId": "fx_level",
-      "group": "levels",
       "bounds": {
         "x": 136,
         "y": 410,
         "width": 24,
         "height": 168
-      }
+      },
+      "widgetId": "fx_level_fader",
+      "group": "levels"
     }
   ]
 }

@@ -3,173 +3,2663 @@
   "displayName": "Yaeltex LiveLooping",
   "controller": "yaeltex",
   "widgets": [
-    {"id": "looper_1", "label": "Looper 1", "type": "button", "group": "looper_select", "row": 0, "column": 0},
-    {"id": "looper_2", "label": "Looper 2", "type": "button", "group": "looper_select", "row": 0, "column": 1},
-    {"id": "looper_3", "label": "Looper 3", "type": "button", "group": "looper_select", "row": 0, "column": 2},
-    {"id": "looper_4", "label": "Looper 4", "type": "button", "group": "looper_select", "row": 0, "column": 3},
-    {"id": "sample_length_1", "label": "1", "type": "button", "group": "sample_length", "row": 0, "column": 0},
-    {"id": "sample_length_2", "label": "2", "type": "button", "group": "sample_length", "row": 0, "column": 1},
-    {"id": "sample_length_4", "label": "4", "type": "button", "group": "sample_length", "row": 0, "column": 2},
-    {"id": "sample_length_8", "label": "8", "type": "button", "group": "sample_length", "row": 0, "column": 3},
-    {"id": "sample_length_16", "label": "16", "type": "button", "group": "sample_length", "row": 1, "column": 0},
-    {"id": "sample_length_32", "label": "32", "type": "button", "group": "sample_length", "row": 1, "column": 1},
-    {"id": "sample_length_64", "label": "64", "type": "button", "group": "sample_length", "row": 1, "column": 2},
-    {"id": "sample_length_128", "label": "128", "type": "button", "group": "sample_length", "row": 1, "column": 3},
-    {"id": "record_t1", "label": "Record T1", "type": "button", "group": "track_record", "row": 0, "column": 0},
-    {"id": "clear_t1", "label": "Clear T1", "type": "button", "group": "track_clear", "row": 0, "column": 0},
-    {"id": "vol_pan_t1", "label": "Vol/Pan T1", "type": "knob", "group": "track_volume_pan", "row": 0, "column": 0},
-    {"id": "record_t2", "label": "Record T2", "type": "button", "group": "track_record", "row": 0, "column": 1},
-    {"id": "clear_t2", "label": "Clear T2", "type": "button", "group": "track_clear", "row": 0, "column": 1},
-    {"id": "vol_pan_t2", "label": "Vol/Pan T2", "type": "knob", "group": "track_volume_pan", "row": 0, "column": 1},
-    {"id": "record_t3", "label": "Record T3", "type": "button", "group": "track_record", "row": 0, "column": 2},
-    {"id": "clear_t3", "label": "Clear T3", "type": "button", "group": "track_clear", "row": 0, "column": 2},
-    {"id": "vol_pan_t3", "label": "Vol/Pan T3", "type": "knob", "group": "track_volume_pan", "row": 0, "column": 2},
-    {"id": "record_t4", "label": "Record T4", "type": "button", "group": "track_record", "row": 0, "column": 3},
-    {"id": "clear_t4", "label": "Clear T4", "type": "button", "group": "track_clear", "row": 0, "column": 3},
-    {"id": "vol_pan_t4", "label": "Vol/Pan T4", "type": "knob", "group": "track_volume_pan", "row": 0, "column": 3},
-    {"id": "resample_selected", "label": "Resample L", "type": "button", "group": "resampling", "row": 0, "column": 0},
-    {"id": "resample_all", "label": "Resample all", "type": "button", "group": "resampling", "row": 0, "column": 1},
-    {"id": "reset_all", "label": "Clear", "type": "button", "group": "session", "row": 0, "column": 1},
-    {"id": "transport_start", "label": "Start", "type": "button", "group": "session", "row": 0, "column": 0},
-    {"id": "transport_stop", "label": "Stop", "type": "button", "group": "session", "row": 0, "column": 2},
-    {"id": "restart_all_loopers", "label": "Restart all", "type": "button", "group": "session", "row": 0, "column": 3},
-    {"id": "routing_mic", "label": "MIC", "type": "button", "group": "routing_source", "row": 0, "column": 0},
-    {"id": "routing_synth", "label": "SYNTH", "type": "button", "group": "routing_source", "row": 0, "column": 1},
-    {"id": "routing_looper_all", "label": "LOOPER ALL", "type": "button", "group": "routing_source", "row": 0, "column": 2},
-    {"id": "routing_recording_bus", "label": "RECORD", "type": "button", "group": "routing_source", "row": 0, "column": 3},
-    {"id": "routing_looper", "label": "LOOPER", "type": "button", "group": "routing_source", "row": 1, "column": 0},
-    {"id": "routing_looper_2", "label": "LOOPER 2", "type": "button", "group": "routing_source", "row": 1, "column": 1},
-    {"id": "routing_looper_3", "label": "LOOPER 3", "type": "button", "group": "routing_source", "row": 1, "column": 2},
-    {"id": "routing_looper_4", "label": "LOOPER 4", "type": "button", "group": "routing_source", "row": 1, "column": 3},
-    {"id": "center_fx_slot_1", "label": "FX1", "type": "button", "group": "center_fx_slot", "row": 0, "column": 0},
-    {"id": "center_fx_slot_2", "label": "FX2", "type": "button", "group": "center_fx_slot", "row": 0, "column": 1},
-    {"id": "center_fx_slot_3", "label": "FX3", "type": "button", "group": "center_fx_slot", "row": 0, "column": 2},
-    {"id": "center_fx_slot_4", "label": "FX4", "type": "button", "group": "center_fx_slot", "row": 0, "column": 3},
-    {"id": "center_fx_slot_5", "label": "FX5", "type": "button", "group": "center_fx_slot", "row": 0, "column": 4},
-    {"id": "center_fx_slot_6", "label": "FX6", "type": "button", "group": "center_fx_slot", "row": 1, "column": 0},
-    {"id": "center_fx_slot_7", "label": "FX7", "type": "button", "group": "center_fx_slot", "row": 1, "column": 1},
-    {"id": "center_fx_slot_8", "label": "FX8", "type": "button", "group": "center_fx_slot", "row": 1, "column": 2},
-    {"id": "center_fx_slot_9", "label": "FX9", "type": "button", "group": "center_fx_slot", "row": 1, "column": 3},
-    {"id": "center_fx_slot_10", "label": "FX10", "type": "button", "group": "center_fx_slot", "row": 1, "column": 4},
-    {"id": "center_fx_bank_1", "label": "B1", "type": "button", "group": "center_fx_bank", "row": 0, "column": 0},
-    {"id": "center_fx_bank_2", "label": "B2", "type": "button", "group": "center_fx_bank", "row": 0, "column": 1},
-    {"id": "center_fx_bank_3", "label": "B3", "type": "button", "group": "center_fx_bank", "row": 0, "column": 2},
-    {"id": "center_fx_bank_4", "label": "B4", "type": "button", "group": "center_fx_bank", "row": 1, "column": 0},
-    {"id": "center_fx_bank_5", "label": "B5", "type": "button", "group": "center_fx_bank", "row": 1, "column": 1},
-    {"id": "center_fx_dry_wet", "label": "Dry/Wet", "type": "knob", "group": "center_fx_parameter", "row": 0, "column": 0},
-    {"id": "center_fx_lfo1_speed", "label": "LFO1 Speed", "type": "knob", "group": "center_fx_parameter", "row": 0, "column": 1},
-    {"id": "center_fx_lfo2_speed", "label": "LFO2 Speed", "type": "knob", "group": "center_fx_parameter", "row": 0, "column": 2},
-    {"id": "center_fx_drop", "label": "Drop FX", "type": "knob", "group": "center_fx_parameter", "row": 0, "column": 3},
-    {"id": "center_fx_joystick_1", "label": "Value 1", "type": "joystick", "group": "center_fx_joystick", "row": 0, "column": 0, "width": 2, "height": 2},
-    {"id": "center_fx_joystick_2", "label": "Value 2", "type": "joystick", "group": "center_fx_joystick", "row": 0, "column": 1, "width": 2, "height": 2},
-    {"id": "remixer_freeze", "label": "FRZ", "type": "button", "group": "remixer_macro", "row": 0, "column": 0},
-    {"id": "remixer_drop", "label": "Drop", "type": "button", "group": "remixer_macro", "row": 0, "column": 1},
-    {"id": "remixer_extra_1", "label": "Extra", "type": "button", "group": "remixer_macro", "row": 0, "column": 2},
-    {"id": "remixer_record", "label": "REC", "type": "button", "group": "remixer_macro", "row": 0, "column": 3},
-    {"id": "remixer_reset_current", "label": "RST", "type": "button", "group": "remixer_macro", "row": 1, "column": 0},
-    {"id": "remixer_reset_all", "label": "RST all", "type": "button", "group": "remixer_macro", "row": 1, "column": 1},
-    {"id": "remixer_extra_2", "label": "Extra 2", "type": "button", "group": "remixer_macro", "row": 1, "column": 2},
-    {"id": "remixer_stop", "label": "STOP", "type": "button", "group": "remixer_macro", "row": 1, "column": 3},
-    {"id": "master_tempo", "label": "Master tempo", "type": "knob", "group": "master_parameter", "row": 0, "column": 0},
-    {"id": "master_pitch_shift", "label": "Pitch shift", "type": "knob", "group": "master_parameter", "row": 0, "column": 1},
-    {"id": "master_volume", "label": "Master vol.", "type": "knob", "group": "master_parameter", "row": 1, "column": 0},
-    {"id": "master_pitch_dry_wet", "label": "Pitch dry/wet", "type": "knob", "group": "master_parameter", "row": 1, "column": 1},
-    {"id": "master_output_volume", "label": "VOLUME", "type": "knob", "group": "master_parameter", "row": 2, "column": 0},
-    {"id": "master_distortion", "label": "Distortion", "type": "knob", "group": "master_parameter", "row": 2, "column": 1},
-    {"id": "master_pan", "label": "Pan", "type": "knob", "group": "master_parameter", "row": 3, "column": 0},
-    {"id": "master_distortion_dry_wet", "label": "Dist dry/wet", "type": "knob", "group": "master_parameter", "row": 3, "column": 1},
-    {"id": "sampler_slot_1", "label": "1", "type": "button", "group": "sampler", "row": 0, "column": 0},
-    {"id": "sampler_slot_2", "label": "2", "type": "button", "group": "sampler", "row": 0, "column": 1},
-    {"id": "sampler_slot_3", "label": "3", "type": "button", "group": "sampler", "row": 0, "column": 2},
-    {"id": "sampler_slot_4", "label": "4", "type": "button", "group": "sampler", "row": 0, "column": 3},
-    {"id": "sampler_slot_5", "label": "5", "type": "button", "group": "sampler", "row": 1, "column": 0},
-    {"id": "sampler_slot_6", "label": "6", "type": "button", "group": "sampler", "row": 1, "column": 1},
-    {"id": "sampler_slot_7", "label": "7", "type": "button", "group": "sampler", "row": 1, "column": 2},
-    {"id": "sampler_slot_8", "label": "8", "type": "button", "group": "sampler", "row": 1, "column": 3}
+    {
+      "id": "looper_1",
+      "label": "Looper 1",
+      "type": "button",
+      "group": "looper_select",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "looper_2",
+      "label": "Looper 2",
+      "type": "button",
+      "group": "looper_select",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "looper_3",
+      "label": "Looper 3",
+      "type": "button",
+      "group": "looper_select",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "looper_4",
+      "label": "Looper 4",
+      "type": "button",
+      "group": "looper_select",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "sample_length_1",
+      "label": "1",
+      "type": "button",
+      "group": "sample_length",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "sample_length_2",
+      "label": "2",
+      "type": "button",
+      "group": "sample_length",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "sample_length_4",
+      "label": "4",
+      "type": "button",
+      "group": "sample_length",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "sample_length_8",
+      "label": "8",
+      "type": "button",
+      "group": "sample_length",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "sample_length_16",
+      "label": "16",
+      "type": "button",
+      "group": "sample_length",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "sample_length_32",
+      "label": "32",
+      "type": "button",
+      "group": "sample_length",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "sample_length_64",
+      "label": "64",
+      "type": "button",
+      "group": "sample_length",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "sample_length_128",
+      "label": "128",
+      "type": "button",
+      "group": "sample_length",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "record_t1",
+      "label": "Record T1",
+      "type": "button",
+      "group": "track_record",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "clear_t1",
+      "label": "Clear T1",
+      "type": "button",
+      "group": "track_clear",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "vol_pan_t1",
+      "label": "Vol/Pan T1",
+      "type": "knob",
+      "group": "track_volume_pan",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "record_t2",
+      "label": "Record T2",
+      "type": "button",
+      "group": "track_record",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "clear_t2",
+      "label": "Clear T2",
+      "type": "button",
+      "group": "track_clear",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "vol_pan_t2",
+      "label": "Vol/Pan T2",
+      "type": "knob",
+      "group": "track_volume_pan",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "record_t3",
+      "label": "Record T3",
+      "type": "button",
+      "group": "track_record",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "clear_t3",
+      "label": "Clear T3",
+      "type": "button",
+      "group": "track_clear",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "vol_pan_t3",
+      "label": "Vol/Pan T3",
+      "type": "knob",
+      "group": "track_volume_pan",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "record_t4",
+      "label": "Record T4",
+      "type": "button",
+      "group": "track_record",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "clear_t4",
+      "label": "Clear T4",
+      "type": "button",
+      "group": "track_clear",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "vol_pan_t4",
+      "label": "Vol/Pan T4",
+      "type": "knob",
+      "group": "track_volume_pan",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "resample_selected",
+      "label": "Resample L",
+      "type": "button",
+      "group": "resampling",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "resample_all",
+      "label": "Resample all",
+      "type": "button",
+      "group": "resampling",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "reset_all",
+      "label": "Clear",
+      "type": "button",
+      "group": "session",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "transport_start",
+      "label": "Start",
+      "type": "button",
+      "group": "session",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "transport_stop",
+      "label": "Stop",
+      "type": "button",
+      "group": "session",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "restart_all_loopers",
+      "label": "Restart all",
+      "type": "button",
+      "group": "session",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "routing_mic",
+      "label": "MIC",
+      "type": "button",
+      "group": "routing_source",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "routing_synth",
+      "label": "SYNTH",
+      "type": "button",
+      "group": "routing_source",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "routing_looper_all",
+      "label": "LOOPER ALL",
+      "type": "button",
+      "group": "routing_source",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "routing_recording_bus",
+      "label": "RECORD",
+      "type": "button",
+      "group": "routing_source",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "routing_looper",
+      "label": "LOOPER",
+      "type": "button",
+      "group": "routing_source",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "routing_looper_2",
+      "label": "LOOPER 2",
+      "type": "button",
+      "group": "routing_source",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "routing_looper_3",
+      "label": "LOOPER 3",
+      "type": "button",
+      "group": "routing_source",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "routing_looper_4",
+      "label": "LOOPER 4",
+      "type": "button",
+      "group": "routing_source",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "center_fx_slot_1",
+      "label": "FX1",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "center_fx_slot_2",
+      "label": "FX2",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "center_fx_slot_3",
+      "label": "FX3",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "center_fx_slot_4",
+      "label": "FX4",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "center_fx_slot_5",
+      "label": "FX5",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 0,
+      "column": 4
+    },
+    {
+      "id": "center_fx_slot_6",
+      "label": "FX6",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "center_fx_slot_7",
+      "label": "FX7",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "center_fx_slot_8",
+      "label": "FX8",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "center_fx_slot_9",
+      "label": "FX9",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "center_fx_slot_10",
+      "label": "FX10",
+      "type": "button",
+      "group": "center_fx_slot",
+      "row": 1,
+      "column": 4
+    },
+    {
+      "id": "center_fx_bank_1",
+      "label": "B1",
+      "type": "button",
+      "group": "center_fx_bank",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "center_fx_bank_2",
+      "label": "B2",
+      "type": "button",
+      "group": "center_fx_bank",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "center_fx_bank_3",
+      "label": "B3",
+      "type": "button",
+      "group": "center_fx_bank",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "center_fx_bank_4",
+      "label": "B4",
+      "type": "button",
+      "group": "center_fx_bank",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "center_fx_bank_5",
+      "label": "B5",
+      "type": "button",
+      "group": "center_fx_bank",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "center_fx_dry_wet",
+      "label": "Dry/Wet",
+      "type": "knob",
+      "group": "center_fx_parameter",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "center_fx_lfo1_speed",
+      "label": "LFO1 Speed",
+      "type": "knob",
+      "group": "center_fx_parameter",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "center_fx_lfo2_speed",
+      "label": "LFO2 Speed",
+      "type": "knob",
+      "group": "center_fx_parameter",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "center_fx_drop",
+      "label": "Drop FX",
+      "type": "knob",
+      "group": "center_fx_parameter",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "center_fx_joystick_1",
+      "label": "Value 1",
+      "type": "joystick",
+      "group": "center_fx_joystick",
+      "row": 0,
+      "column": 0,
+      "width": 2,
+      "height": 2
+    },
+    {
+      "id": "center_fx_joystick_2",
+      "label": "Value 2",
+      "type": "joystick",
+      "group": "center_fx_joystick",
+      "row": 0,
+      "column": 1,
+      "width": 2,
+      "height": 2
+    },
+    {
+      "id": "remixer_freeze",
+      "label": "FRZ",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "remixer_drop",
+      "label": "Drop",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "remixer_extra_1",
+      "label": "Extra",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "remixer_record",
+      "label": "REC",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "remixer_reset_current",
+      "label": "RST",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "remixer_reset_all",
+      "label": "RST all",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "remixer_extra_2",
+      "label": "Extra 2",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "remixer_stop",
+      "label": "STOP",
+      "type": "button",
+      "group": "remixer_macro",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "master_tempo",
+      "label": "Master tempo",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "master_pitch_shift",
+      "label": "Pitch shift",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "master_volume",
+      "label": "Master vol.",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "master_pitch_dry_wet",
+      "label": "Pitch dry/wet",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "master_output_volume",
+      "label": "VOLUME",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 2,
+      "column": 0
+    },
+    {
+      "id": "master_distortion",
+      "label": "Distortion",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 2,
+      "column": 1
+    },
+    {
+      "id": "master_pan",
+      "label": "Pan",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 3,
+      "column": 0
+    },
+    {
+      "id": "master_distortion_dry_wet",
+      "label": "Dist dry/wet",
+      "type": "knob",
+      "group": "master_parameter",
+      "row": 3,
+      "column": 1
+    },
+    {
+      "id": "sampler_slot_1",
+      "label": "1",
+      "type": "button",
+      "group": "sampler",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "sampler_slot_2",
+      "label": "2",
+      "type": "button",
+      "group": "sampler",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "sampler_slot_3",
+      "label": "3",
+      "type": "button",
+      "group": "sampler",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "sampler_slot_4",
+      "label": "4",
+      "type": "button",
+      "group": "sampler",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "sampler_slot_5",
+      "label": "5",
+      "type": "button",
+      "group": "sampler",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "sampler_slot_6",
+      "label": "6",
+      "type": "button",
+      "group": "sampler",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "sampler_slot_7",
+      "label": "7",
+      "type": "button",
+      "group": "sampler",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "sampler_slot_8",
+      "label": "8",
+      "type": "button",
+      "group": "sampler",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "select_t1",
+      "label": "Select T1",
+      "type": "button",
+      "group": "track_select",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "vol_pan_l1",
+      "label": "Vol/Pan L1",
+      "type": "knob",
+      "group": "looper_volume_pan",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "select_t2",
+      "label": "Select T2",
+      "type": "button",
+      "group": "track_select",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "vol_pan_l2",
+      "label": "Vol/Pan L2",
+      "type": "knob",
+      "group": "looper_volume_pan",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "select_t3",
+      "label": "Select T3",
+      "type": "button",
+      "group": "track_select",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "vol_pan_l3",
+      "label": "Vol/Pan L3",
+      "type": "knob",
+      "group": "looper_volume_pan",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "select_t4",
+      "label": "Select T4",
+      "type": "button",
+      "group": "track_select",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "vol_pan_l4",
+      "label": "Vol/Pan L4",
+      "type": "knob",
+      "group": "looper_volume_pan",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "top_grid_1",
+      "label": "4",
+      "type": "button",
+      "group": "clock_division",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "top_grid_2",
+      "label": "2",
+      "type": "button",
+      "group": "clock_division",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "top_grid_3",
+      "label": "1",
+      "type": "button",
+      "group": "clock_division",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "top_grid_4",
+      "label": "1/2",
+      "type": "button",
+      "group": "clock_division",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "top_grid_5",
+      "label": "1/4",
+      "type": "button",
+      "group": "clock_division",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "top_grid_6",
+      "label": "1/8",
+      "type": "button",
+      "group": "clock_division",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "top_grid_7",
+      "label": "1/16",
+      "type": "button",
+      "group": "clock_division",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "top_grid_8",
+      "label": "1/32",
+      "type": "button",
+      "group": "clock_division",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "top_vol_drop",
+      "label": "Vol/Drop",
+      "type": "knob",
+      "group": "top_fx_parameter",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "top_reverb",
+      "label": "Reverb",
+      "type": "knob",
+      "group": "top_fx_parameter",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "top_transpose",
+      "label": "Transpose",
+      "type": "knob",
+      "group": "top_fx_parameter",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "top_phaser",
+      "label": "Phaser",
+      "type": "knob",
+      "group": "top_fx_parameter",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "remixer_mode_1",
+      "label": "Gate",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "remixer_mode_2",
+      "label": "Gate all",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "remixer_mode_3",
+      "label": "Extra 3",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "remixer_mode_4",
+      "label": "REV",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "remixer_mode_5",
+      "label": "CTRL all",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "remixer_mode_6",
+      "label": "min/max",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "remixer_mode_7",
+      "label": "Nat.",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "remixer_mode_8",
+      "label": "Reverb",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "remixer_mode_9",
+      "label": "I",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 2,
+      "column": 0
+    },
+    {
+      "id": "remixer_mode_10",
+      "label": "V",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 2,
+      "column": 1
+    },
+    {
+      "id": "remixer_mode_11",
+      "label": "Harm.",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 2,
+      "column": 2
+    },
+    {
+      "id": "remixer_mode_12",
+      "label": "Delay",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 2,
+      "column": 3
+    },
+    {
+      "id": "remixer_mode_13",
+      "label": "II",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 3,
+      "column": 0
+    },
+    {
+      "id": "remixer_mode_14",
+      "label": "VI",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 3,
+      "column": 1
+    },
+    {
+      "id": "remixer_mode_15",
+      "label": "Melod.",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 3,
+      "column": 2
+    },
+    {
+      "id": "remixer_mode_16",
+      "label": "Phaser",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 3,
+      "column": 3
+    },
+    {
+      "id": "remixer_mode_17",
+      "label": "III",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 4,
+      "column": 0
+    },
+    {
+      "id": "remixer_mode_18",
+      "label": "VII",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 4,
+      "column": 1
+    },
+    {
+      "id": "remixer_mode_19",
+      "label": "CLEAR",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 4,
+      "column": 2
+    },
+    {
+      "id": "remixer_mode_20",
+      "label": "",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 4,
+      "column": 3
+    },
+    {
+      "id": "animation_1",
+      "label": "Ani. 1",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "animation_2",
+      "label": "Ani. 2",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "animation_3",
+      "label": "Ani. 3",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "animation_4",
+      "label": "Ani. 4",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "animation_5",
+      "label": "Ani. 5",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 4
+    },
+    {
+      "id": "animation_6",
+      "label": "Ani. 6",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 5
+    },
+    {
+      "id": "animation_7",
+      "label": "Ani. 7",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 6
+    },
+    {
+      "id": "animation_8",
+      "label": "Ani. 8",
+      "type": "button",
+      "group": "animation_slot",
+      "row": 0,
+      "column": 7
+    },
+    {
+      "id": "preset_on_off",
+      "label": "On/Off",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "preset_default",
+      "label": "Default",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "preset_pr1",
+      "label": "Pr.1",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "preset_pr2",
+      "label": "Pr.2",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "preset_pr3",
+      "label": "Pr.3",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 4
+    },
+    {
+      "id": "preset_pr4",
+      "label": "Pr.4",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 5
+    },
+    {
+      "id": "preset_pr5",
+      "label": "Pr.5",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 6
+    },
+    {
+      "id": "preset_pr6",
+      "label": "Pr.6",
+      "type": "button",
+      "group": "preset_slot",
+      "row": 0,
+      "column": 7
+    },
+    {
+      "id": "sidechain_stash_t1",
+      "label": "Sidechain Vol/Stash T1",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "sidechain_decay_t1",
+      "label": "Sidechain Dec/Ten T1",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "sidechain_stash_t2",
+      "label": "Sidechain Vol/Stash T2",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "sidechain_decay_t2",
+      "label": "Sidechain Dec/Ten T2",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "sidechain_stash_t3",
+      "label": "Sidechain Vol/Stash T3",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "sidechain_decay_t3",
+      "label": "Sidechain Dec/Ten T3",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "sidechain_stash_t4",
+      "label": "Sidechain Vol/Stash T4",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "sidechain_decay_t4",
+      "label": "Sidechain Dec/Ten T4",
+      "type": "knob",
+      "group": "sidechain_parameter",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "bottom_record",
+      "label": "Record",
+      "type": "button",
+      "group": "bottom_record",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "bottom_extra_clear_l",
+      "label": "Extra/Clear L",
+      "type": "button",
+      "group": "bottom_extra_clear",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "mute_1",
+      "label": "Mute T1",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "mute_2",
+      "label": "Mute T2",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "mute_3",
+      "label": "Mute T3",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "mute_4",
+      "label": "Mute T4",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "mute_5",
+      "label": "Mute L1",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 4
+    },
+    {
+      "id": "mute_6",
+      "label": "Mute L2",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 5
+    },
+    {
+      "id": "mute_7",
+      "label": "Mute L3",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 6
+    },
+    {
+      "id": "mute_8",
+      "label": "Mute L4",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 0,
+      "column": 7
+    },
+    {
+      "id": "mute_9",
+      "label": "Inv T1",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "mute_10",
+      "label": "Inv T2",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "mute_11",
+      "label": "Inv T3",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "mute_12",
+      "label": "Inv T4",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "mute_13",
+      "label": "Inv L1",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 4
+    },
+    {
+      "id": "mute_14",
+      "label": "Inv L2",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 5
+    },
+    {
+      "id": "mute_15",
+      "label": "Inv L3",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 6
+    },
+    {
+      "id": "mute_16",
+      "label": "Inv L4",
+      "type": "button",
+      "group": "mute_invert",
+      "row": 1,
+      "column": 7
+    }
   ],
   "bindings": [
-    {"widgetId": "looper_1", "midi": {"type": "note", "channel": 0, "number": 60}, "command": {"type": "select_looper", "index": 0}},
-    {"widgetId": "looper_2", "midi": {"type": "note", "channel": 0, "number": 61}, "command": {"type": "select_looper", "index": 1}},
-    {"widgetId": "looper_3", "midi": {"type": "note", "channel": 0, "number": 62}, "command": {"type": "select_looper", "index": 2}},
-    {"widgetId": "looper_4", "midi": {"type": "note", "channel": 0, "number": 63}, "command": {"type": "select_looper", "index": 3}},
-    {"widgetId": "sample_length_1", "midi": {"type": "note", "channel": 0, "number": 72}, "command": {"type": "select_sample_length", "index": 1}},
-    {"widgetId": "sample_length_2", "midi": {"type": "note", "channel": 0, "number": 73}, "command": {"type": "select_sample_length", "index": 2}},
-    {"widgetId": "sample_length_4", "midi": {"type": "note", "channel": 0, "number": 74}, "command": {"type": "select_sample_length", "index": 4}},
-    {"widgetId": "sample_length_8", "midi": {"type": "note", "channel": 0, "number": 75}, "command": {"type": "select_sample_length", "index": 8}},
-    {"widgetId": "sample_length_16", "midi": {"type": "note", "channel": 0, "number": 76}, "command": {"type": "select_sample_length", "index": 16}},
-    {"widgetId": "sample_length_32", "midi": {"type": "note", "channel": 0, "number": 77}, "command": {"type": "select_sample_length", "index": 32}},
-    {"widgetId": "sample_length_64", "midi": {"type": "note", "channel": 0, "number": 78}, "command": {"type": "select_sample_length", "index": 64}},
-    {"widgetId": "sample_length_128", "midi": {"type": "note", "channel": 0, "number": 79}, "command": {"type": "select_sample_length", "index": 128}},
-    {"widgetId": "record_t1", "midi": {"type": "note", "channel": 0, "number": 80}, "command": {"type": "toggle_track_recording", "index": 0}},
-    {"widgetId": "clear_t1", "midi": {"type": "note", "channel": 0, "number": 84}, "command": {"type": "clear_track", "index": 0}},
-    {"widgetId": "vol_pan_t1", "widgetEventType": "change", "command": {"type": "set_track_volume", "index": 0}, "useEventValue": true},
-    {"widgetId": "record_t2", "midi": {"type": "note", "channel": 0, "number": 81}, "command": {"type": "toggle_track_recording", "index": 1}},
-    {"widgetId": "clear_t2", "midi": {"type": "note", "channel": 0, "number": 85}, "command": {"type": "clear_track", "index": 1}},
-    {"widgetId": "vol_pan_t2", "widgetEventType": "change", "command": {"type": "set_track_volume", "index": 1}, "useEventValue": true},
-    {"widgetId": "record_t3", "midi": {"type": "note", "channel": 0, "number": 82}, "command": {"type": "toggle_track_recording", "index": 2}},
-    {"widgetId": "clear_t3", "midi": {"type": "note", "channel": 0, "number": 86}, "command": {"type": "clear_track", "index": 2}},
-    {"widgetId": "vol_pan_t3", "widgetEventType": "change", "command": {"type": "set_track_volume", "index": 2}, "useEventValue": true},
-    {"widgetId": "record_t4", "midi": {"type": "note", "channel": 0, "number": 83}, "command": {"type": "toggle_track_recording", "index": 3}},
-    {"widgetId": "clear_t4", "midi": {"type": "note", "channel": 0, "number": 87}, "command": {"type": "clear_track", "index": 3}},
-    {"widgetId": "vol_pan_t4", "widgetEventType": "change", "command": {"type": "set_track_volume", "index": 3}, "useEventValue": true},
-    {"widgetId": "resample_selected", "midi": {"type": "note", "channel": 0, "number": 90}, "command": {"type": "start_resample_selected_looper"}},
-    {"widgetId": "resample_all", "midi": {"type": "note", "channel": 0, "number": 91}, "command": {"type": "start_resample_all_loopers"}},
-    {"widgetId": "reset_all", "midi": {"type": "note", "channel": 0, "number": 92}, "command": {"type": "reset_all"}},
-    {"widgetId": "transport_start", "command": {"type": "start_transport"}},
-    {"widgetId": "transport_stop", "command": {"type": "stop_transport"}},
-    {"widgetId": "restart_all_loopers", "command": {"type": "restart_all_loopers"}},
-    {"widgetId": "routing_mic", "command": {"type": "select_routing_source", "index": 0}},
-    {"widgetId": "routing_synth", "command": {"type": "select_routing_source", "index": 1}},
-    {"widgetId": "routing_looper", "command": {"type": "select_routing_source", "index": 3}},
-    {"widgetId": "routing_looper_2", "command": {"type": "select_routing_source", "index": 4}},
-    {"widgetId": "routing_looper_3", "command": {"type": "select_routing_source", "index": 5}},
-    {"widgetId": "routing_looper_4", "command": {"type": "select_routing_source", "index": 6}},
-    {"widgetId": "routing_looper_all", "command": {"type": "select_routing_source", "index": 7}},
-    {"widgetId": "routing_recording_bus", "command": {"type": "select_routing_source", "index": 8}},
-    {"widgetId": "center_fx_slot_1", "command": {"type": "select_center_fx_slot", "index": 0}},
-    {"widgetId": "center_fx_slot_2", "command": {"type": "select_center_fx_slot", "index": 1}},
-    {"widgetId": "center_fx_slot_3", "command": {"type": "select_center_fx_slot", "index": 2}},
-    {"widgetId": "center_fx_slot_4", "command": {"type": "select_center_fx_slot", "index": 3}},
-    {"widgetId": "center_fx_slot_5", "command": {"type": "select_center_fx_slot", "index": 4}},
-    {"widgetId": "center_fx_slot_6", "command": {"type": "select_center_fx_slot", "index": 5}},
-    {"widgetId": "center_fx_slot_7", "command": {"type": "select_center_fx_slot", "index": 6}},
-    {"widgetId": "center_fx_slot_8", "command": {"type": "select_center_fx_slot", "index": 7}},
-    {"widgetId": "center_fx_slot_9", "command": {"type": "select_center_fx_slot", "index": 8}},
-    {"widgetId": "center_fx_slot_10", "command": {"type": "select_center_fx_slot", "index": 9}},
-    {"widgetId": "center_fx_bank_1", "command": {"type": "select_center_fx_bank", "index": 0}},
-    {"widgetId": "center_fx_bank_2", "command": {"type": "select_center_fx_bank", "index": 1}},
-    {"widgetId": "center_fx_bank_3", "command": {"type": "select_center_fx_bank", "index": 2}},
-    {"widgetId": "center_fx_bank_4", "command": {"type": "select_center_fx_bank", "index": 3}},
-    {"widgetId": "center_fx_bank_5", "command": {"type": "select_center_fx_bank", "index": 4}},
-    {"widgetId": "center_fx_dry_wet", "widgetEventType": "change", "command": {"type": "set_center_fx_parameter", "index": 0}, "useEventValue": true},
-    {"widgetId": "center_fx_lfo1_speed", "widgetEventType": "change", "command": {"type": "set_center_fx_parameter", "index": 1}, "useEventValue": true},
-    {"widgetId": "center_fx_lfo2_speed", "widgetEventType": "change", "command": {"type": "set_center_fx_parameter", "index": 2}, "useEventValue": true},
-    {"widgetId": "center_fx_drop", "widgetEventType": "change", "command": {"type": "set_center_fx_parameter", "index": 3}, "useEventValue": true},
-    {"widgetId": "center_fx_joystick_1", "widgetEventType": "change", "command": {"type": "set_center_fx_joystick", "index": 0}, "useEventValue": true},
-    {"widgetId": "center_fx_joystick_2", "widgetEventType": "change", "command": {"type": "set_center_fx_joystick", "index": 1}, "useEventValue": true},
-    {"widgetId": "remixer_freeze", "command": {"type": "trigger_remixer_macro", "index": 0}},
-    {"widgetId": "remixer_drop", "command": {"type": "trigger_remixer_macro", "index": 1}},
-    {"widgetId": "remixer_extra_1", "command": {"type": "trigger_remixer_macro", "index": 2}},
-    {"widgetId": "remixer_record", "command": {"type": "trigger_remixer_macro", "index": 3}},
-    {"widgetId": "remixer_reset_current", "command": {"type": "trigger_remixer_macro", "index": 4}},
-    {"widgetId": "remixer_reset_all", "command": {"type": "trigger_remixer_macro", "index": 5}},
-    {"widgetId": "remixer_extra_2", "command": {"type": "trigger_remixer_macro", "index": 6}},
-    {"widgetId": "remixer_stop", "command": {"type": "trigger_remixer_macro", "index": 7}},
-    {"widgetId": "master_tempo", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 0}, "useEventValue": true},
-    {"widgetId": "master_pitch_shift", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 1}, "useEventValue": true},
-    {"widgetId": "master_volume", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 2}, "useEventValue": true},
-    {"widgetId": "master_pitch_dry_wet", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 3}, "useEventValue": true},
-    {"widgetId": "master_output_volume", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 4}, "useEventValue": true},
-    {"widgetId": "master_distortion", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 5}, "useEventValue": true},
-    {"widgetId": "master_pan", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 6}, "useEventValue": true},
-    {"widgetId": "master_distortion_dry_wet", "widgetEventType": "change", "command": {"type": "set_master_parameter", "index": 7}, "useEventValue": true},
-    {"widgetId": "sampler_slot_1", "command": {"type": "trigger_sampler_slot", "index": 0}},
-    {"widgetId": "sampler_slot_2", "command": {"type": "trigger_sampler_slot", "index": 1}},
-    {"widgetId": "sampler_slot_3", "command": {"type": "trigger_sampler_slot", "index": 2}},
-    {"widgetId": "sampler_slot_4", "command": {"type": "trigger_sampler_slot", "index": 3}},
-    {"widgetId": "sampler_slot_5", "command": {"type": "trigger_sampler_slot", "index": 4}},
-    {"widgetId": "sampler_slot_6", "command": {"type": "trigger_sampler_slot", "index": 5}},
-    {"widgetId": "sampler_slot_7", "command": {"type": "trigger_sampler_slot", "index": 6}},
-    {"widgetId": "sampler_slot_8", "command": {"type": "trigger_sampler_slot", "index": 7}}
+    {
+      "widgetId": "looper_1",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 60
+      },
+      "command": {
+        "type": "select_looper",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "looper_2",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 61
+      },
+      "command": {
+        "type": "select_looper",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "looper_3",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 62
+      },
+      "command": {
+        "type": "select_looper",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "looper_4",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 63
+      },
+      "command": {
+        "type": "select_looper",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "sample_length_1",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 72
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "sample_length_2",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 73
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "sample_length_4",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 74
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "sample_length_8",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 75
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 8
+      }
+    },
+    {
+      "widgetId": "sample_length_16",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 76
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 16
+      }
+    },
+    {
+      "widgetId": "sample_length_32",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 77
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 32
+      }
+    },
+    {
+      "widgetId": "sample_length_64",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 78
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 64
+      }
+    },
+    {
+      "widgetId": "sample_length_128",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 79
+      },
+      "command": {
+        "type": "select_sample_length",
+        "index": 128
+      }
+    },
+    {
+      "widgetId": "record_t1",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 80
+      },
+      "command": {
+        "type": "toggle_track_recording",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "clear_t1",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 84
+      },
+      "command": {
+        "type": "clear_track",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "vol_pan_t1",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_volume",
+        "index": 0
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "record_t2",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 81
+      },
+      "command": {
+        "type": "toggle_track_recording",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "clear_t2",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 85
+      },
+      "command": {
+        "type": "clear_track",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "vol_pan_t2",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_volume",
+        "index": 1
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "record_t3",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 82
+      },
+      "command": {
+        "type": "toggle_track_recording",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "clear_t3",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 86
+      },
+      "command": {
+        "type": "clear_track",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "vol_pan_t3",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_volume",
+        "index": 2
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "record_t4",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 83
+      },
+      "command": {
+        "type": "toggle_track_recording",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "clear_t4",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 87
+      },
+      "command": {
+        "type": "clear_track",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "vol_pan_t4",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_volume",
+        "index": 3
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "resample_selected",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 90
+      },
+      "command": {
+        "type": "start_resample_selected_looper"
+      }
+    },
+    {
+      "widgetId": "resample_all",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 91
+      },
+      "command": {
+        "type": "start_resample_all_loopers"
+      }
+    },
+    {
+      "widgetId": "reset_all",
+      "midi": {
+        "type": "note",
+        "channel": 0,
+        "number": 92
+      },
+      "command": {
+        "type": "reset_all"
+      }
+    },
+    {
+      "widgetId": "transport_start",
+      "command": {
+        "type": "start_transport"
+      }
+    },
+    {
+      "widgetId": "transport_stop",
+      "command": {
+        "type": "stop_transport"
+      }
+    },
+    {
+      "widgetId": "restart_all_loopers",
+      "command": {
+        "type": "restart_all_loopers"
+      }
+    },
+    {
+      "widgetId": "routing_mic",
+      "command": {
+        "type": "select_routing_source",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "routing_synth",
+      "command": {
+        "type": "select_routing_source",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "routing_looper",
+      "command": {
+        "type": "select_routing_source",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "routing_looper_2",
+      "command": {
+        "type": "select_routing_source",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "routing_looper_3",
+      "command": {
+        "type": "select_routing_source",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "routing_looper_4",
+      "command": {
+        "type": "select_routing_source",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "routing_looper_all",
+      "command": {
+        "type": "select_routing_source",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "routing_recording_bus",
+      "command": {
+        "type": "select_routing_source",
+        "index": 8
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_1",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_2",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_3",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_4",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_5",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_6",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_7",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_8",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_9",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 8
+      }
+    },
+    {
+      "widgetId": "center_fx_slot_10",
+      "command": {
+        "type": "select_center_fx_slot",
+        "index": 9
+      }
+    },
+    {
+      "widgetId": "center_fx_bank_1",
+      "command": {
+        "type": "select_center_fx_bank",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "center_fx_bank_2",
+      "command": {
+        "type": "select_center_fx_bank",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "center_fx_bank_3",
+      "command": {
+        "type": "select_center_fx_bank",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "center_fx_bank_4",
+      "command": {
+        "type": "select_center_fx_bank",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "center_fx_bank_5",
+      "command": {
+        "type": "select_center_fx_bank",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "center_fx_dry_wet",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_center_fx_parameter",
+        "index": 0
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "center_fx_lfo1_speed",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_center_fx_parameter",
+        "index": 1
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "center_fx_lfo2_speed",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_center_fx_parameter",
+        "index": 2
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "center_fx_drop",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_center_fx_parameter",
+        "index": 3
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "center_fx_joystick_1",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_center_fx_joystick",
+        "index": 0
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "center_fx_joystick_2",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_center_fx_joystick",
+        "index": 1
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "remixer_freeze",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "remixer_drop",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "remixer_extra_1",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "remixer_record",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "remixer_reset_current",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "remixer_reset_all",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "remixer_extra_2",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "remixer_stop",
+      "command": {
+        "type": "trigger_remixer_macro",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "master_tempo",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 0
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_pitch_shift",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 1
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_volume",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 2
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_pitch_dry_wet",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 3
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_output_volume",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 4
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_distortion",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 5
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_pan",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 6
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "master_distortion_dry_wet",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_master_parameter",
+        "index": 7
+      },
+      "useEventValue": true
+    },
+    {
+      "widgetId": "sampler_slot_1",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "sampler_slot_2",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "sampler_slot_3",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "sampler_slot_4",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "sampler_slot_5",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "sampler_slot_6",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "sampler_slot_7",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "sampler_slot_8",
+      "command": {
+        "type": "trigger_sampler_slot",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "select_t1",
+      "command": {
+        "type": "toggle_track_selection",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "vol_pan_l1",
+      "command": {
+        "type": "set_looper_volume",
+        "index": 0
+      },
+      "widgetEventType": "change",
+      "useEventValue": true
+    },
+    {
+      "widgetId": "select_t2",
+      "command": {
+        "type": "toggle_track_selection",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "vol_pan_l2",
+      "command": {
+        "type": "set_looper_volume",
+        "index": 1
+      },
+      "widgetEventType": "change",
+      "useEventValue": true
+    },
+    {
+      "widgetId": "select_t3",
+      "command": {
+        "type": "toggle_track_selection",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "vol_pan_l3",
+      "command": {
+        "type": "set_looper_volume",
+        "index": 2
+      },
+      "widgetEventType": "change",
+      "useEventValue": true
+    },
+    {
+      "widgetId": "select_t4",
+      "command": {
+        "type": "toggle_track_selection",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "vol_pan_l4",
+      "command": {
+        "type": "set_looper_volume",
+        "index": 3
+      },
+      "widgetEventType": "change",
+      "useEventValue": true
+    },
+    {
+      "widgetId": "top_grid_1",
+      "command": {
+        "type": "select_clock_division",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "top_grid_2",
+      "command": {
+        "type": "select_clock_division",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "top_grid_3",
+      "command": {
+        "type": "select_clock_division",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "top_grid_4",
+      "command": {
+        "type": "select_clock_division",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "top_grid_5",
+      "command": {
+        "type": "select_clock_division",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "top_grid_6",
+      "command": {
+        "type": "select_clock_division",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "top_grid_7",
+      "command": {
+        "type": "select_clock_division",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "top_grid_8",
+      "command": {
+        "type": "select_clock_division",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "top_vol_drop",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_top_fx_parameter",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "top_reverb",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_top_fx_parameter",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "top_transpose",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_top_fx_parameter",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "top_phaser",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_top_fx_parameter",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "remixer_mode_1",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "remixer_mode_2",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "remixer_mode_3",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "remixer_mode_4",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "remixer_mode_5",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "remixer_mode_6",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "remixer_mode_7",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "remixer_mode_8",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "remixer_mode_9",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 8
+      }
+    },
+    {
+      "widgetId": "remixer_mode_10",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 9
+      }
+    },
+    {
+      "widgetId": "remixer_mode_11",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 10
+      }
+    },
+    {
+      "widgetId": "remixer_mode_12",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 11
+      }
+    },
+    {
+      "widgetId": "remixer_mode_13",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 12
+      }
+    },
+    {
+      "widgetId": "remixer_mode_14",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 13
+      }
+    },
+    {
+      "widgetId": "remixer_mode_15",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 14
+      }
+    },
+    {
+      "widgetId": "remixer_mode_16",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 15
+      }
+    },
+    {
+      "widgetId": "remixer_mode_17",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 16
+      }
+    },
+    {
+      "widgetId": "remixer_mode_18",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 17
+      }
+    },
+    {
+      "widgetId": "remixer_mode_19",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 18
+      }
+    },
+    {
+      "widgetId": "remixer_mode_20",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 19
+      }
+    },
+    {
+      "widgetId": "animation_1",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "animation_2",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "animation_3",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "animation_4",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "animation_5",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "animation_6",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "animation_7",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "animation_8",
+      "command": {
+        "type": "trigger_animation_slot",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "preset_on_off",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "preset_default",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "preset_pr1",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "preset_pr2",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "preset_pr3",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "preset_pr4",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "preset_pr5",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "preset_pr6",
+      "command": {
+        "type": "trigger_preset_slot",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "sidechain_stash_t1",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "sidechain_decay_t1",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 4
+      }
+    },
+    {
+      "widgetId": "sidechain_stash_t2",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "sidechain_decay_t2",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 5
+      }
+    },
+    {
+      "widgetId": "sidechain_stash_t3",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "sidechain_decay_t3",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 6
+      }
+    },
+    {
+      "widgetId": "sidechain_stash_t4",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "sidechain_decay_t4",
+      "widgetEventType": "change",
+      "useEventValue": true,
+      "command": {
+        "type": "set_sidechain_parameter",
+        "index": 7
+      }
+    },
+    {
+      "widgetId": "bottom_record",
+      "command": {
+        "type": "toggle_track_recording",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "bottom_extra_clear_l",
+      "command": {
+        "type": "reset_looper",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "mute_1",
+      "command": {
+        "type": "toggle_track_mute",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "mute_2",
+      "command": {
+        "type": "toggle_track_mute",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "mute_3",
+      "command": {
+        "type": "toggle_track_mute",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "mute_4",
+      "command": {
+        "type": "toggle_track_mute",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "mute_5",
+      "command": {
+        "type": "toggle_looper_mute",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "mute_6",
+      "command": {
+        "type": "toggle_looper_mute",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "mute_7",
+      "command": {
+        "type": "toggle_looper_mute",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "mute_8",
+      "command": {
+        "type": "toggle_looper_mute",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "mute_9",
+      "command": {
+        "type": "toggle_track_invert",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "mute_10",
+      "command": {
+        "type": "toggle_track_invert",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "mute_11",
+      "command": {
+        "type": "toggle_track_invert",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "mute_12",
+      "command": {
+        "type": "toggle_track_invert",
+        "index": 3
+      }
+    },
+    {
+      "widgetId": "mute_13",
+      "command": {
+        "type": "toggle_looper_invert",
+        "index": 0
+      }
+    },
+    {
+      "widgetId": "mute_14",
+      "command": {
+        "type": "toggle_looper_invert",
+        "index": 1
+      }
+    },
+    {
+      "widgetId": "mute_15",
+      "command": {
+        "type": "toggle_looper_invert",
+        "index": 2
+      }
+    },
+    {
+      "widgetId": "mute_16",
+      "command": {
+        "type": "toggle_looper_invert",
+        "index": 3
+      }
+    }
   ]
 }

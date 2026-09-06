@@ -9,7 +9,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <fstream>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <sstream>
@@ -39,6 +41,12 @@ using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
 namespace {
 
 constexpr int kGroupHeaderHeight = 22;
+constexpr int kProductWindowWidth = 700;
+constexpr int kProductWindowHeight = 520;
+constexpr int kPseudoDevicesPreferredWidth = 1520;
+constexpr int kPseudoDevicesPreferredHeight = 900;
+constexpr int kPseudoDevicesMinimumWidth = 560;
+constexpr int kPseudoDevicesMinimumHeight = 360;
 #if LIVELOOPING_HAS_PROFILE_IO
 constexpr float kEditSnapStep = 4.0F;
 #endif
@@ -69,7 +77,6 @@ std::optional<ControlSurfaceLayout> loadOptionalLayout(const char* fileName)
 #endif
 
 class ProfileSurfaceComponent final : public juce::Component,
-                                      private juce::Timer,
                                       private juce::KeyListener {
 public:
     ProfileSurfaceComponent(
@@ -91,15 +98,36 @@ public:
 #endif
     {
         setWantsKeyboardFocus(true);
+        setOpaque(true);
         for (const auto& widget : mapper_.profile().widgets) {
             addWidget(widget);
         }
 #if LIVELOOPING_HAS_PROFILE_IO
         if (layout_.has_value()) {
+            profileLayoutGui_ = std::getenv("LIVELOOPING_PROFILE_GUI") != nullptr;
             setupEditToolbar();
-            startTimerHz(30);
         }
 #endif
+    }
+
+    int getPreferredWidth() const
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value() && layout_->baseWidth > 0) {
+            return layout_->baseWidth;
+        }
+#endif
+        return kind_ == SurfaceKind::Yaeltex ? kPseudoDevicesPreferredWidth : 1100;
+    }
+
+    int getPreferredHeight() const
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value() && layout_->baseHeight > 0) {
+            return layout_->baseHeight;
+        }
+#endif
+        return kind_ == SurfaceKind::Yaeltex ? kPseudoDevicesPreferredHeight : 760;
     }
 
     void paint(juce::Graphics& graphics) override
@@ -121,6 +149,7 @@ public:
     {
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
 #if LIVELOOPING_HAS_PROFILE_IO
+        invalidateLayoutCaches();
         layoutEditToolbar();
 #endif
     }
@@ -193,6 +222,7 @@ public:
     {
 #if LIVELOOPING_HAS_PROFILE_IO
         if (!editMode_ || !layout_.has_value()) {
+            handleLayoutMouseDown(event);
             return;
         }
 
@@ -217,6 +247,7 @@ public:
     {
 #if LIVELOOPING_HAS_PROFILE_IO
         if (!editMode_ || !layout_.has_value() || selectedElement_ < 0 || editDragMode_ == EditDragMode::None) {
+            handleLayoutMouseDrag(event);
             return;
         }
 
@@ -231,6 +262,7 @@ public:
             bounds.y = editStartBounds_.y + delta.y;
         }
         element.bounds = clampBounds(snapBounds(bounds, event.mods.isShiftDown()));
+        invalidateLayoutCaches();
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
         updateEditToolbar();
         repaint();
@@ -242,23 +274,85 @@ public:
     void mouseUp(const juce::MouseEvent& event) override
     {
 #if LIVELOOPING_HAS_PROFILE_IO
-        juce::ignoreUnused(event);
+        if (!editMode_) {
+            handleLayoutMouseUp(event);
+            return;
+        }
         editDragMode_ = EditDragMode::None;
 #else
         juce::ignoreUnused(event);
 #endif
     }
 
-    void timerCallback() override
+    void mouseMove(const juce::MouseEvent& event) override
     {
 #if LIVELOOPING_HAS_PROFILE_IO
-        if (layout_.has_value()) {
-            repaint();
+        if (!editMode_) {
+            setLayoutHover(findLayoutControlAt(event.position));
+            return;
         }
 #endif
+        juce::ignoreUnused(event);
+    }
+
+    void mouseExit(const juce::MouseEvent& event) override
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (!editMode_) {
+            juce::ignoreUnused(event);
+            setLayoutHover(nullptr);
+            return;
+        }
+#endif
+        juce::ignoreUnused(event);
     }
 
 private:
+    class SurfaceButton final : public juce::TextButton {
+    public:
+        using juce::TextButton::TextButton;
+
+        std::function<void()> onPointerStateChanged;
+
+        void mouseEnter(const juce::MouseEvent& event) override
+        {
+            juce::TextButton::mouseEnter(event);
+            notifyPointerStateChanged();
+        }
+
+        void mouseExit(const juce::MouseEvent& event) override
+        {
+            juce::TextButton::mouseExit(event);
+            notifyPointerStateChanged();
+        }
+
+        void mouseDown(const juce::MouseEvent& event) override
+        {
+            juce::TextButton::mouseDown(event);
+            notifyPointerStateChanged();
+        }
+
+        void mouseDrag(const juce::MouseEvent& event) override
+        {
+            juce::TextButton::mouseDrag(event);
+            notifyPointerStateChanged();
+        }
+
+        void mouseUp(const juce::MouseEvent& event) override
+        {
+            juce::TextButton::mouseUp(event);
+            notifyPointerStateChanged();
+        }
+
+    private:
+        void notifyPointerStateChanged()
+        {
+            if (onPointerStateChanged != nullptr) {
+                onPointerStateChanged();
+            }
+        }
+    };
+
     enum class SurfaceKind {
         Kaoss,
         Yaeltex
@@ -279,6 +373,7 @@ private:
         int column = 0;
         int width = 1;
         int height = 1;
+        float value = 0.0F;
     };
 
     struct WidgetVisualState {
@@ -328,8 +423,15 @@ private:
     {
         ensureGroup(widget);
 
+#if LIVELOOPING_HAS_PROFILE_IO
+        if (layout_.has_value()) {
+            controls_.push_back(makeControl(nullptr, widget));
+            return;
+        }
+#endif
+
         if (widget.type == WidgetType::Button) {
-            auto button = std::make_unique<juce::TextButton>(widget.label);
+            auto button = std::make_unique<SurfaceButton>(widget.label);
             button->setWantsKeyboardFocus(false);
             button->addKeyListener(this);
             const auto isYaeltex = kind_ == SurfaceKind::Yaeltex;
@@ -339,10 +441,13 @@ private:
             button->setColour(juce::TextButton::textColourOnId, juce::Colours::white);
             button->onClick = [this, id = widget.id] {
                 dispatch({id, WidgetEventType::Press, 1.0F});
-                repaint();
+                repaintWidget(id);
             };
-            button->onStateChange = [this] {
-                repaint();
+            button->onStateChange = [this, id = widget.id] {
+                repaintWidget(id);
+            };
+            button->onPointerStateChanged = [this, id = widget.id] {
+                repaintWidget(id);
             };
 #if LIVELOOPING_HAS_PROFILE_IO
             if (layout_.has_value()) {
@@ -350,7 +455,7 @@ private:
             }
 #endif
             addAndMakeVisible(*button);
-            controls_.push_back(makeControl(*button, widget));
+            controls_.push_back(makeControl(button.get(), widget));
             buttons_.push_back(std::move(button));
             return;
         }
@@ -374,13 +479,13 @@ private:
         }
         slider->onValueChange = [this, id = widget.id, slider = slider.get()] {
             dispatch({id, WidgetEventType::Change, static_cast<float>(slider->getValue())});
-            repaint();
+            repaintWidget(id);
         };
-        slider->onDragStart = [this] {
-            repaint();
+        slider->onDragStart = [this, id = widget.id] {
+            repaintWidget(id);
         };
-        slider->onDragEnd = [this] {
-            repaint();
+        slider->onDragEnd = [this, id = widget.id] {
+            repaintWidget(id);
         };
 #if LIVELOOPING_HAS_PROFILE_IO
         if (layout_.has_value()) {
@@ -388,14 +493,13 @@ private:
         }
 #endif
         addAndMakeVisible(*slider);
-        controls_.push_back(makeControl(*slider, widget));
+        controls_.push_back(makeControl(slider.get(), widget));
         sliders_.push_back(std::move(slider));
     }
 
 #if LIVELOOPING_HAS_PROFILE_IO
     juce::Rectangle<int> scaledBounds(const SurfaceBounds& bounds) const
     {
-        const auto area = getLocalBounds();
         const auto transform = layoutTransform();
         return {
             static_cast<int>(std::round(transform.offsetX + bounds.x * transform.scale)),
@@ -403,6 +507,65 @@ private:
             static_cast<int>(std::round(bounds.width * transform.scale)),
             static_cast<int>(std::round(bounds.height * transform.scale)),
         };
+    }
+
+    juce::Rectangle<int> scaledBoundsForElement(size_t index) const
+    {
+        ensureLayoutCaches();
+        if (index < layoutScaledBounds_.size()) {
+            return layoutScaledBounds_[index];
+        }
+        return {};
+    }
+
+    void invalidateLayoutCaches() const
+    {
+        layoutCacheDirty_ = true;
+        staticLayoutImageDirty_ = true;
+    }
+
+    void ensureLayoutCaches() const
+    {
+        if (!layout_.has_value() || !layoutCacheDirty_) {
+            return;
+        }
+
+        layoutScaledBounds_.clear();
+        layoutScaledBounds_.reserve(layout_->elements.size());
+        layoutWidgetElementIndices_.clear();
+        for (size_t index = 0; index < layout_->elements.size(); ++index) {
+            const auto& element = layout_->elements[index];
+            layoutScaledBounds_.push_back(scaledBounds(element.bounds));
+            if (element.role == SurfaceElementRole::Widget) {
+                layoutWidgetElementIndices_.push_back(index);
+            }
+        }
+        layoutCacheDirty_ = false;
+    }
+
+    void ensureStaticLayoutImage()
+    {
+        if (!layout_.has_value()) {
+            return;
+        }
+
+        ensureLayoutCaches();
+        const auto area = getLocalBounds();
+        if (!staticLayoutImageDirty_ && staticLayoutImage_.isValid()
+            && staticLayoutImage_.getWidth() == area.getWidth()
+            && staticLayoutImage_.getHeight() == area.getHeight()) {
+            return;
+        }
+
+        staticLayoutImage_ = juce::Image(juce::Image::ARGB, juce::jmax(1, area.getWidth()), juce::jmax(1, area.getHeight()), true);
+        juce::Graphics imageGraphics(staticLayoutImage_);
+        imageGraphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
+        for (const auto& element : layout_->elements) {
+            if (element.role != SurfaceElementRole::Widget) {
+                paintLayoutDecoration(imageGraphics, element);
+            }
+        }
+        staticLayoutImageDirty_ = false;
     }
 
     struct LayoutTransform {
@@ -467,8 +630,9 @@ private:
 
     int findElementAt(juce::Point<float> position) const
     {
+        ensureLayoutCaches();
         for (int index = static_cast<int>(layout_->elements.size()) - 1; index >= 0; --index) {
-            if (scaledBounds(layout_->elements[static_cast<size_t>(index)].bounds).contains(position.roundToInt())) {
+            if (layoutScaledBounds_[static_cast<size_t>(index)].contains(position.roundToInt())) {
                 return index;
             }
         }
@@ -481,14 +645,41 @@ private:
             return nullptr;
         }
 
-        for (const auto& element : layout_->elements) {
+        ensureLayoutCaches();
+        for (const auto index : layoutWidgetElementIndices_) {
+            const auto& element = layout_->elements[index];
             if (element.role == SurfaceElementRole::Widget && element.widgetId == widgetId.toStdString()) {
                 return &element;
             }
         }
         return nullptr;
     }
+#endif
 
+    void repaintWidget(const std::string& widgetId)
+    {
+#if LIVELOOPING_HAS_PROFILE_IO
+        auto repainted = false;
+        if (layout_.has_value()) {
+            ensureLayoutCaches();
+            for (const auto index : layoutWidgetElementIndices_) {
+                const auto& element = layout_->elements[index];
+                if (element.role == SurfaceElementRole::Widget && element.widgetId == widgetId) {
+                    repaint(layoutScaledBounds_[index].expanded(8));
+                    repainted = true;
+                }
+            }
+        }
+        if (repainted) {
+            return;
+        }
+#else
+        juce::ignoreUnused(widgetId);
+#endif
+        repaint();
+    }
+
+#if LIVELOOPING_HAS_PROFILE_IO
     const Control* findControl(const std::string& widgetId) const
     {
         const auto id = juce::String(widgetId);
@@ -500,6 +691,176 @@ private:
         return nullptr;
     }
 
+    Control* findControl(const std::string& widgetId)
+    {
+        const auto id = juce::String(widgetId);
+        for (auto& control : controls_) {
+            if (control.id == id) {
+                return &control;
+            }
+        }
+        return nullptr;
+    }
+
+    const Control* findLayoutControlAt(juce::Point<float> position) const
+    {
+        if (!layout_.has_value()) {
+            return nullptr;
+        }
+
+        const auto startTime = juce::Time::getMillisecondCounterHiRes();
+        const auto point = position.roundToInt();
+        const Control* result = nullptr;
+        auto scanned = 0;
+        ensureLayoutCaches();
+        for (int index = static_cast<int>(layoutWidgetElementIndices_.size()) - 1; index >= 0; --index) {
+            const auto elementIndex = layoutWidgetElementIndices_[static_cast<size_t>(index)];
+            const auto& element = layout_->elements[elementIndex];
+            ++scanned;
+            if (!element.widgetId.empty() && layoutScaledBounds_[elementIndex].contains(point)) {
+                result = findControl(element.widgetId);
+                break;
+            }
+        }
+        recordLayoutHitTestProfile(juce::Time::getMillisecondCounterHiRes() - startTime, scanned);
+        return result;
+    }
+
+    const SurfaceElement* findLayoutElementAt(const juce::String& widgetId, juce::Point<float> position) const
+    {
+        if (!layout_.has_value()) {
+            return nullptr;
+        }
+
+        ensureLayoutCaches();
+        for (int index = static_cast<int>(layoutWidgetElementIndices_.size()) - 1; index >= 0; --index) {
+            const auto elementIndex = layoutWidgetElementIndices_[static_cast<size_t>(index)];
+            const auto& element = layout_->elements[elementIndex];
+            if (element.role == SurfaceElementRole::Widget && element.widgetId == widgetId.toStdString()
+                && layoutScaledBounds_[elementIndex].contains(position.roundToInt())) {
+                return &element;
+            }
+        }
+        return findLayoutWidget(widgetId);
+    }
+
+    const SurfaceElement* findLayoutElementById(const juce::String& elementId) const
+    {
+        if (!layout_.has_value()) {
+            return nullptr;
+        }
+
+        for (const auto& element : layout_->elements) {
+            if (element.id == elementId.toStdString()) {
+                return &element;
+            }
+        }
+        return nullptr;
+    }
+
+    void repaintLayoutWidget(const juce::String& widgetId)
+    {
+        if (widgetId.isNotEmpty()) {
+            repaintWidget(widgetId.toStdString());
+        }
+    }
+
+    void setLayoutHover(const Control* control)
+    {
+        const auto nextId = control != nullptr ? control->id : juce::String();
+        if (layoutHoverWidget_ == nextId) {
+            return;
+        }
+        repaintLayoutWidget(layoutHoverWidget_);
+        layoutHoverWidget_ = nextId;
+        repaintLayoutWidget(layoutHoverWidget_);
+    }
+
+    void handleLayoutMouseDown(const juce::MouseEvent& event)
+    {
+        if (!layout_.has_value()) {
+            juce::ignoreUnused(event);
+            return;
+        }
+
+        grabKeyboardFocus();
+        const auto* control = findLayoutControlAt(event.position);
+        setLayoutHover(control);
+        layoutDownWidget_ = control != nullptr ? control->id : juce::String();
+        if (control == nullptr) {
+            layoutDragElement_.clear();
+            return;
+        }
+
+        if (control->type == WidgetType::Button) {
+            layoutDragElement_.clear();
+            dispatch({control->id.toStdString(), WidgetEventType::Press, 1.0F});
+        } else if (auto* mutableControl = findControl(control->id.toStdString())) {
+            const auto* element = findLayoutElementAt(mutableControl->id, event.position);
+            layoutDragElement_ = element != nullptr ? juce::String(element->id) : juce::String();
+            layoutDragStartPosition_ = event.position;
+            layoutDragStartValue_ = mutableControl->value;
+            if (element != nullptr && element->shape == SurfaceElementShape::Fader) {
+                updateLayoutControlValue(*mutableControl, event.position, element, false);
+            }
+        }
+        repaintWidget(control->id.toStdString());
+    }
+
+    void handleLayoutMouseDrag(const juce::MouseEvent& event)
+    {
+        if (!layout_.has_value() || layoutDownWidget_.isEmpty()) {
+            juce::ignoreUnused(event);
+            return;
+        }
+
+        setLayoutHover(findLayoutControlAt(event.position));
+        if (auto* control = findControl(layoutDownWidget_.toStdString())) {
+            if (control->type != WidgetType::Button) {
+                updateLayoutControlValue(*control, event.position, findLayoutElementById(layoutDragElement_), true);
+            }
+            repaintWidget(control->id.toStdString());
+        }
+    }
+
+    void handleLayoutMouseUp(const juce::MouseEvent& event)
+    {
+        if (!layout_.has_value()) {
+            juce::ignoreUnused(event);
+            return;
+        }
+
+        const auto previousDown = layoutDownWidget_;
+        layoutDownWidget_.clear();
+        layoutDragElement_.clear();
+        setLayoutHover(findLayoutControlAt(event.position));
+        repaintLayoutWidget(previousDown);
+    }
+
+    void updateLayoutControlValue(Control& control, juce::Point<float> position, const SurfaceElement* element, bool relativeDrag)
+    {
+        if (element == nullptr) {
+            return;
+        }
+
+        const auto bounds = scaledBounds(element->bounds).toFloat();
+        float value = control.value;
+        if (element->shape == SurfaceElementShape::Fader) {
+            value = 1.0F - ((position.y - bounds.getY()) / juce::jmax(1.0F, bounds.getHeight()));
+        } else if (relativeDrag) {
+            value = layoutDragStartValue_ - ((position.y - layoutDragStartPosition_.y) / 180.0F);
+        } else {
+            value = (position.x - bounds.getX()) / juce::jmax(1.0F, bounds.getWidth());
+        }
+
+        const auto clamped = juce::jlimit(0.0F, 1.0F, value);
+        if (std::abs(clamped - control.value) < 0.001F) {
+            return;
+        }
+        control.value = clamped;
+        dispatch({control.id.toStdString(), WidgetEventType::Change, control.value});
+    }
+
     WidgetVisualState visualStateFor(const SurfaceElement& element) const
     {
         WidgetVisualState state;
@@ -508,9 +869,12 @@ private:
         }
 
         if (const auto* control = findControl(element.widgetId)) {
-            state.hover = control->component != nullptr && control->component->isMouseOver();
-            state.down = control->component != nullptr && control->component->isMouseButtonDown();
-            if (const auto* slider = dynamic_cast<const juce::Slider*>(control->component)) {
+            state.hover = control->component != nullptr ? control->component->isMouseOver() : layoutHoverWidget_ == control->id;
+            state.down = control->component != nullptr ? control->component->isMouseButtonDown() : layoutDownWidget_ == control->id;
+            if (control->component == nullptr && control->type != WidgetType::Button) {
+                state.hasValue = true;
+                state.value = control->value;
+            } else if (const auto* slider = dynamic_cast<const juce::Slider*>(control->component)) {
                 state.hasValue = true;
                 state.value = static_cast<float>(juce::jlimit(0.0, 1.0, slider->getValue()));
             }
@@ -520,17 +884,81 @@ private:
 
     void paintLayoutSurface(juce::Graphics& graphics)
     {
-        graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
-
-        if (editMode_) {
-            graphics.setColour(juce::Colour(0xee151b20));
-            graphics.fillRect(getLocalBounds().withHeight(48));
+        const auto startTime = juce::Time::getMillisecondCounterHiRes();
+        if (!editMode_) {
+            ensureStaticLayoutImage();
+            if (staticLayoutImage_.isValid()) {
+                graphics.drawImageAt(staticLayoutImage_, 0, 0);
+            } else {
+                graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
+            }
+            paintLayoutWidgets(graphics);
+            recordLayoutPaintProfile(juce::Time::getMillisecondCounterHiRes() - startTime);
+            return;
         }
+
+        graphics.fillAll(kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff090909) : juce::Colour(0xfff5f5f5));
+        graphics.setColour(juce::Colour(0xee151b20));
+        graphics.fillRect(getLocalBounds().withHeight(48));
 
         for (const auto& element : layout_->elements) {
             paintLayoutDecoration(graphics, element);
         }
         paintEditOverlay(graphics);
+        recordLayoutPaintProfile(juce::Time::getMillisecondCounterHiRes() - startTime);
+    }
+
+    void paintLayoutWidgets(juce::Graphics& graphics)
+    {
+        ensureLayoutCaches();
+        const auto clip = graphics.getClipBounds();
+        for (const auto index : layoutWidgetElementIndices_) {
+            if (layoutScaledBounds_[index].intersects(clip)) {
+                paintLayoutDecoration(graphics, layout_->elements[index]);
+            }
+        }
+    }
+
+    void recordLayoutPaintProfile(double elapsedMs) const
+    {
+        if (!profileLayoutGui_) {
+            return;
+        }
+
+        layoutPaintTotalMs_ += elapsedMs;
+        layoutPaintMaxMs_ = std::max(layoutPaintMaxMs_, elapsedMs);
+        ++layoutPaintSamples_;
+        if (layoutPaintSamples_ % 120 == 0) {
+            juce::Logger::writeToLog(
+                "layout-profile paint surface=" + juce::String(kind_ == SurfaceKind::Yaeltex ? "yaeltex" : "kaoss")
+                + " samples=" + juce::String(layoutPaintSamples_)
+                + " avg_ms=" + juce::String(layoutPaintTotalMs_ / static_cast<double>(layoutPaintSamples_), 3)
+                + " max_ms=" + juce::String(layoutPaintMaxMs_, 3)
+                + " widgets=" + juce::String(static_cast<int>(layoutWidgetElementIndices_.size()))
+                + " elements=" + juce::String(static_cast<int>(layout_->elements.size())));
+        }
+    }
+
+    void recordLayoutHitTestProfile(double elapsedMs, int scanned) const
+    {
+        if (!profileLayoutGui_) {
+            return;
+        }
+
+        layoutHitTestTotalMs_ += elapsedMs;
+        layoutHitTestMaxMs_ = std::max(layoutHitTestMaxMs_, elapsedMs);
+        layoutHitTestScannedTotal_ += scanned;
+        ++layoutHitTestSamples_;
+        if (layoutHitTestSamples_ % 240 == 0) {
+            juce::Logger::writeToLog(
+                "layout-profile hit-test surface=" + juce::String(kind_ == SurfaceKind::Yaeltex ? "yaeltex" : "kaoss")
+                + " samples=" + juce::String(layoutHitTestSamples_)
+                + " avg_ms=" + juce::String(layoutHitTestTotalMs_ / static_cast<double>(layoutHitTestSamples_), 3)
+                + " max_ms=" + juce::String(layoutHitTestMaxMs_, 3)
+                + " avg_scanned=" + juce::String(static_cast<double>(layoutHitTestScannedTotal_) / static_cast<double>(layoutHitTestSamples_), 1)
+                + " widgets=" + juce::String(static_cast<int>(layoutWidgetElementIndices_.size()))
+                + " elements=" + juce::String(static_cast<int>(layout_->elements.size())));
+        }
     }
 
     void paintEditOverlay(juce::Graphics& graphics)
@@ -542,6 +970,9 @@ private:
         for (int index = 0; index < static_cast<int>(layout_->elements.size()); ++index) {
             const auto& element = layout_->elements[static_cast<size_t>(index)];
             const auto bounds = scaledBounds(element.bounds);
+            if (!bounds.intersects(graphics.getClipBounds())) {
+                continue;
+            }
             const auto selected = index == selectedElement_;
             graphics.setColour(selected ? juce::Colour(0xffffd21f) : juce::Colour(0x6631b8d8));
             graphics.drawRect(bounds, selected ? 2 : 1);
@@ -564,6 +995,9 @@ private:
     void paintLayoutDecoration(juce::Graphics& graphics, const SurfaceElement& element)
     {
         const auto bounds = scaledBounds(element.bounds);
+        if (!bounds.intersects(graphics.getClipBounds())) {
+            return;
+        }
         const auto variant = juce::String(element.variant);
         const auto darkPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colours::black : juce::Colour(0xff1d2023);
         const auto softPanel = kind_ == SurfaceKind::Yaeltex ? juce::Colour(0xff101010) : juce::Colour(0xff252b30);
@@ -586,7 +1020,7 @@ private:
             } else if (variant == "kaoss_red_button") {
                 drawHardwareButton(graphics, bounds, element.label, juce::Colour(0xffd35a70), juce::Colours::black, 30.0F);
             } else if (variant.startsWith("arcade_")) {
-                drawYaeltexArcadeButton(graphics, bounds.getX(), bounds.getY(), buttonFill(arcadeColour(variant), state), element.label, state);
+                drawYaeltexArcadeButton(graphics, bounds, buttonFill(arcadeColour(variant), state), element.label, state);
             } else {
                 graphics.setColour(variant == "display" ? juce::Colours::black : (variant == "top_deck" ? softPanel : darkPanel));
                 graphics.fillRoundedRectangle(bounds.toFloat(), variant == "top_deck" ? 6.0F : 14.0F);
@@ -633,9 +1067,9 @@ private:
             break;
         case SurfaceElementShape::Knob:
             if (variant == "metal_knob") {
-                drawKaossMetalKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), bounds.getWidth() / 2, element.label);
+                drawKaossMetalKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), bounds.getWidth() / 2, element.label, state);
             } else {
-                drawKnob(graphics, bounds.getCentreX(), bounds.getCentreY(), juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2, element.label, state);
+                drawKnobInBounds(graphics, bounds, element.label, state);
             }
             break;
         case SurfaceElementShape::Fader:
@@ -746,9 +1180,39 @@ private:
 
     void drawPanelLabel(juce::Graphics& graphics, const juce::String& text, juce::Rectangle<int> area, float size = 11.0F)
     {
+        drawFittedLabel(graphics, text, area, juce::Colour(0xfff0f0f0), size, 5.5F);
+    }
+
+    void drawFittedLabel(
+        juce::Graphics& graphics,
+        const juce::String& text,
+        juce::Rectangle<int> area,
+        juce::Colour colour,
+        float preferredSize,
+        float minimumSize = 6.0F)
+    {
+        if (text.isEmpty() || area.isEmpty()) {
+            return;
+        }
+
+        auto size = preferredSize;
+        auto font = juce::Font(juce::FontOptions(size).withStyle("Bold"));
+        const auto maxWidth = static_cast<float>(juce::jmax(1, area.reduced(2, 0).getWidth()));
+        while (size > minimumSize && textWidth(font, text) > maxWidth) {
+            size -= 0.5F;
+            font = juce::Font(juce::FontOptions(size).withStyle("Bold"));
+        }
         graphics.setColour(juce::Colour(0xfff0f0f0));
-        graphics.setFont(juce::Font(juce::FontOptions(size).withStyle("Bold")));
-        graphics.drawText(text, area, juce::Justification::centred);
+        graphics.setColour(colour);
+        graphics.setFont(font);
+        graphics.drawText(text, area.reduced(1, 0), juce::Justification::centred, false);
+    }
+
+    static float textWidth(const juce::Font& font, const juce::String& text)
+    {
+        juce::GlyphArrangement glyphs;
+        glyphs.addLineOfText(font, text, 0.0F, 0.0F);
+        return glyphs.getBoundingBox(0, glyphs.getNumGlyphs(), true).getWidth();
     }
 
     void drawHardwareButton(
@@ -760,6 +1224,11 @@ private:
         float corner = 4.0F,
         WidgetVisualState state = WidgetVisualState())
     {
+        if (kind_ == SurfaceKind::Yaeltex && text.isNotEmpty()) {
+            drawYaeltexKeycapButton(graphics, area, text, fill, textColour, corner, state);
+            return;
+        }
+
         if (state.down) {
             area.translate(1, 1);
         }
@@ -770,13 +1239,51 @@ private:
         graphics.setColour(juce::Colour(0xff9ca4a8));
         graphics.drawRoundedRectangle(area.toFloat(), corner, 1.0F);
         if (text.isNotEmpty()) {
-            graphics.setColour(textColour);
-            graphics.setFont(juce::Font(juce::FontOptions(12.0F).withStyle("Bold")));
-            graphics.drawText(text, area.reduced(3), juce::Justification::centred);
+            drawFittedLabel(graphics, text, area.reduced(3), textColour, 12.0F, 6.0F);
         }
         if (state.hover || state.down) {
             graphics.setColour(state.down ? juce::Colour(0x99ffffff) : juce::Colour(0x55ffffff));
             graphics.drawRoundedRectangle(area.reduced(1).toFloat(), corner, state.down ? 2.0F : 1.2F);
+        }
+    }
+
+    void drawYaeltexKeycapButton(
+        juce::Graphics& graphics,
+        juce::Rectangle<int> area,
+        const juce::String& text,
+        juce::Colour fill,
+        juce::Colour textColour,
+        float corner,
+        WidgetVisualState state)
+    {
+        auto shifted = area;
+        if (state.down) {
+            shifted.translate(1, 1);
+        }
+
+        const auto labelHeight = juce::jlimit(10, 16, shifted.getHeight() / 3);
+        auto keycap = shifted.withTrimmedBottom(labelHeight);
+        if (keycap.getHeight() < 12) {
+            keycap = shifted;
+        }
+        auto labelArea = shifted.withTop(keycap.getBottom()).withHeight(labelHeight);
+
+        graphics.setColour(juce::Colour(0x77000000));
+        graphics.fillRoundedRectangle(keycap.translated(2, 2).toFloat(), corner);
+        graphics.setColour(fill);
+        graphics.fillRoundedRectangle(keycap.toFloat(), corner);
+        graphics.setColour(juce::Colour(0xff9ca4a8));
+        graphics.drawRoundedRectangle(keycap.toFloat(), corner, 1.0F);
+
+        if (!labelArea.isEmpty()) {
+            graphics.setColour(juce::Colour(0xffe7e8e2));
+            graphics.fillRoundedRectangle(labelArea.reduced(1, 0).toFloat(), 1.5F);
+            drawFittedLabel(graphics, text, labelArea, textColour, 8.5F, 4.5F);
+        }
+
+        if (state.hover || state.down) {
+            graphics.setColour(state.down ? juce::Colour(0x99ffffff) : juce::Colour(0x55ffffff));
+            graphics.drawRoundedRectangle(keycap.reduced(1).toFloat(), corner, state.down ? 2.0F : 1.2F);
         }
     }
 
@@ -816,6 +1323,16 @@ private:
         drawPanelLabel(graphics, label, {centreX - 52, centreY + radius + 15, 104, 16}, 9.5F);
     }
 
+    void drawKnobInBounds(juce::Graphics& graphics, juce::Rectangle<int> area, const juce::String& label, WidgetVisualState state = WidgetVisualState())
+    {
+        auto labelArea = area.removeFromBottom(18);
+        const auto knobArea = area.reduced(2, 2).withTrimmedBottom(4);
+        const auto outerRadius = juce::jmax(14, juce::jmin(knobArea.getWidth(), knobArea.getHeight()) / 2);
+        const auto radius = juce::jmax(8, outerRadius - 18);
+        drawKnob(graphics, knobArea.getCentreX(), knobArea.getCentreY(), radius, {}, state);
+        drawPanelLabel(graphics, label, labelArea, 9.5F);
+    }
+
     void drawJoystick(juce::Graphics& graphics, juce::Rectangle<int> area, const juce::String& rangeLabel, const juce::String& valueLabel, WidgetVisualState state = WidgetVisualState())
     {
         graphics.setColour(juce::Colour(0xff111111));
@@ -848,35 +1365,62 @@ private:
         }
     }
 
-    void drawYaeltexArcadeButton(juce::Graphics& graphics, int x, int y, juce::Colour colour, const juce::String& label, WidgetVisualState state = WidgetVisualState())
+    void drawYaeltexArcadeButton(juce::Graphics& graphics, juce::Rectangle<int> area, juce::Colour colour, const juce::String& label, WidgetVisualState state = WidgetVisualState())
     {
+        auto buttonArea = area.toFloat();
         if (state.down) {
-            x += 2;
-            y += 2;
+            buttonArea.translate(2.0F, 2.0F);
         }
+        const auto diameter = juce::jmin(buttonArea.getWidth(), buttonArea.getHeight());
+        buttonArea = buttonArea.withSizeKeepingCentre(diameter, diameter);
+        const auto shadow = buttonArea.translated(diameter * 0.07F, diameter * 0.07F);
         graphics.setColour(juce::Colour(0xaa000000));
-        graphics.fillEllipse(static_cast<float>(x + 5), static_cast<float>(y + 5), 68.0F, 68.0F);
+        graphics.fillEllipse(shadow);
         graphics.setColour(colour);
-        graphics.fillEllipse(static_cast<float>(x), static_cast<float>(y), 68.0F, 68.0F);
+        graphics.fillEllipse(buttonArea);
         graphics.setColour(colour.brighter(0.45F));
-        graphics.fillEllipse(static_cast<float>(x + 8), static_cast<float>(y + 7), 30.0F, 18.0F);
+        graphics.fillEllipse(
+            buttonArea.getX() + diameter * 0.12F,
+            buttonArea.getY() + diameter * 0.10F,
+            diameter * 0.44F,
+            diameter * 0.26F);
         graphics.setColour(juce::Colour(0xff101010));
-        graphics.drawEllipse(static_cast<float>(x), static_cast<float>(y), 68.0F, 68.0F, 2.0F);
+        graphics.drawEllipse(buttonArea, 2.0F);
         if (state.hover || state.down) {
             graphics.setColour(state.down ? juce::Colour(0xaaffffff) : juce::Colour(0x66ffffff));
-            graphics.drawEllipse(static_cast<float>(x + 2), static_cast<float>(y + 2), 64.0F, 64.0F, state.down ? 3.0F : 2.0F);
+            graphics.drawEllipse(buttonArea.reduced(2.0F), state.down ? 3.0F : 2.0F);
         }
-        drawPanelLabel(graphics, label, {x + 48, y + 48, 24, 18}, 13.0F);
+        drawPanelLabel(
+            graphics,
+            label,
+            {
+                static_cast<int>(std::round(buttonArea.getRight() - diameter * 0.30F)),
+                static_cast<int>(std::round(buttonArea.getBottom() - diameter * 0.30F)),
+                static_cast<int>(std::round(diameter * 0.35F)),
+                static_cast<int>(std::round(diameter * 0.28F)),
+            },
+            13.0F);
     }
 
-    void drawKaossMetalKnob(juce::Graphics& graphics, int centreX, int centreY, int radius, const juce::String& label)
+    void drawKaossMetalKnob(juce::Graphics& graphics, int centreX, int centreY, int radius, const juce::String& label, WidgetVisualState state = WidgetVisualState())
     {
         graphics.setColour(juce::Colour(0xffc7b7a2));
         graphics.fillEllipse(static_cast<float>(centreX - radius), static_cast<float>(centreY - radius), static_cast<float>(radius * 2), static_cast<float>(radius * 2));
         graphics.setColour(juce::Colour(0xff2f2926));
         graphics.fillEllipse(static_cast<float>(centreX - radius + 10), static_cast<float>(centreY - radius + 10), static_cast<float>((radius - 10) * 2), static_cast<float>((radius - 10) * 2));
+        if (state.hover || state.down) {
+            graphics.setColour(state.down ? juce::Colour(0x66ffffff) : juce::Colour(0x33ffffff));
+            graphics.fillEllipse(static_cast<float>(centreX - radius + 10), static_cast<float>(centreY - radius + 10), static_cast<float>((radius - 10) * 2), static_cast<float>((radius - 10) * 2));
+        }
         graphics.setColour(juce::Colour(0xfff4eadc));
-        graphics.drawLine(static_cast<float>(centreX), static_cast<float>(centreY), static_cast<float>(centreX + radius - 5), static_cast<float>(centreY - 8), 3.0F);
+        const auto value = state.hasValue ? state.value : 0.68F;
+        const auto angle = juce::MathConstants<float>::pi * (0.72F + value * 1.56F);
+        graphics.drawLine(
+            static_cast<float>(centreX),
+            static_cast<float>(centreY),
+            static_cast<float>(centreX) + std::cos(angle) * static_cast<float>(radius - 5),
+            static_cast<float>(centreY) + std::sin(angle) * static_cast<float>(radius - 5),
+            3.0F);
         graphics.setColour(juce::Colour(0xffd6d9dc));
         graphics.setFont(juce::Font(juce::FontOptions(11.0F).withStyle("Bold")));
         graphics.drawText(label, centreX - 52, centreY - radius - 34, 104, 28, juce::Justification::centred);
@@ -1029,14 +1573,14 @@ private:
         drawKnob(graphics, masterX, body.getY() + 735, 30, "Pan");
         drawKnob(graphics, masterX + 120, body.getY() + 735, 30, "Dist dry/wet");
 
-        drawYaeltexArcadeButton(graphics, body.getX() + 1130, body.getY() + 648, juce::Colour(0xff24d947), "1");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1212, body.getY() + 648, juce::Colour(0xffe32626), "2");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1294, body.getY() + 648, juce::Colour(0xff20aeea), "3");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1376, body.getY() + 648, juce::Colour(0xffffd21f), "4");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1130, body.getY() + 735, juce::Colour(0xff24d947), "5");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1212, body.getY() + 735, juce::Colour(0xffe32626), "6");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1294, body.getY() + 735, juce::Colour(0xff20aeea), "7");
-        drawYaeltexArcadeButton(graphics, body.getX() + 1376, body.getY() + 735, juce::Colour(0xffffd21f), "8");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1130, body.getY() + 648, 68, 68}, juce::Colour(0xff24d947), "1");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1212, body.getY() + 648, 68, 68}, juce::Colour(0xffe32626), "2");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1294, body.getY() + 648, 68, 68}, juce::Colour(0xff20aeea), "3");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1376, body.getY() + 648, 68, 68}, juce::Colour(0xffffd21f), "4");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1130, body.getY() + 735, 68, 68}, juce::Colour(0xff24d947), "5");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1212, body.getY() + 735, 68, 68}, juce::Colour(0xffe32626), "6");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1294, body.getY() + 735, 68, 68}, juce::Colour(0xff20aeea), "7");
+        drawYaeltexArcadeButton(graphics, {body.getX() + 1376, body.getY() + 735, 68, 68}, juce::Colour(0xffffd21f), "8");
     }
 
     juce::Rectangle<int> kaossPadBounds() const
@@ -1162,15 +1706,22 @@ private:
                     continue;
                 }
 
-                control.component->setBounds(controlBounds(control, horizontalGap, verticalGap));
+                if (control.component != nullptr) {
+                    control.component->setBounds(controlBounds(control, horizontalGap, verticalGap));
+                }
             }
         }
     }
 
-    Control makeControl(juce::Component& component, const ControllerWidget& widget) const
+    Control makeControl(juce::Component* component, const ControllerWidget& widget) const
     {
+        const auto initialValue =
+            (widget.id == "input_volume" || widget.id == "input_volume_knob" || widget.id == "input_volume_fader" ||
+             widget.id == "fx_level" || widget.id == "fx_level_knob" || widget.id == "fx_level_fader") ?
+                0.8F :
+                0.0F;
         return Control{
-            &component,
+            component,
             juce::String(widget.id),
             juce::String(widget.group),
             widget.type,
@@ -1178,6 +1729,7 @@ private:
             widget.column,
             widget.width,
             widget.height,
+            initialValue,
         };
     }
 
@@ -1306,6 +1858,7 @@ private:
             bounds.y += secondaryDelta;
         }
         element.bounds = clampBounds(snapBounds(bounds, !snapToGrid_));
+        invalidateLayoutCaches();
         editorStatus_.clear();
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
         updateEditToolbar();
@@ -1315,6 +1868,7 @@ private:
     void setEditMode(bool enabled)
     {
         editMode_ = enabled;
+        invalidateLayoutCaches();
         selectedElement_ = -1;
         editDragMode_ = EditDragMode::None;
         editorStatus_ = editMode_
@@ -1480,6 +2034,7 @@ private:
             layout_->elements[index].bounds = snapshot[index];
         }
         editorStatus_ = "Undo";
+        invalidateLayoutCaches();
         layoutByGroup(kind_ == SurfaceKind::Yaeltex ? 14 : 12, kind_ == SurfaceKind::Yaeltex ? 10 : 8);
         updateEditToolbar();
         repaint();
@@ -1499,6 +2054,24 @@ private:
     SurfaceBounds editStartBounds_;
     std::vector<std::vector<SurfaceBounds>> undoStack_;
     bool snapToGrid_ = true;
+    juce::String layoutHoverWidget_;
+    juce::String layoutDownWidget_;
+    juce::String layoutDragElement_;
+    juce::Point<float> layoutDragStartPosition_;
+    float layoutDragStartValue_ = 0.0F;
+    mutable bool layoutCacheDirty_ = true;
+    mutable bool staticLayoutImageDirty_ = true;
+    mutable std::vector<juce::Rectangle<int>> layoutScaledBounds_;
+    mutable std::vector<size_t> layoutWidgetElementIndices_;
+    juce::Image staticLayoutImage_;
+    bool profileLayoutGui_ = false;
+    mutable int layoutPaintSamples_ = 0;
+    mutable double layoutPaintTotalMs_ = 0.0;
+    mutable double layoutPaintMaxMs_ = 0.0;
+    mutable int layoutHitTestSamples_ = 0;
+    mutable double layoutHitTestTotalMs_ = 0.0;
+    mutable double layoutHitTestMaxMs_ = 0.0;
+    mutable int layoutHitTestScannedTotal_ = 0;
     juce::String editorStatus_;
     std::unique_ptr<juce::TextButton> editModeButton_;
     std::unique_ptr<juce::TextButton> saveLayoutButton_;
@@ -1571,26 +2144,66 @@ public:
         tabs_.addTab("Yaeltex", juce::Colours::darkslategrey,
             makeProfileSurface(engine, makeYaeltexLiveLoopingProfile(), "yaeltex_livelooping.json", "yaeltex_livelooping.json").release(),
             true);
-        addAndMakeVisible(tabs_);
+        viewport_.setViewedComponent(&tabs_, false);
+        viewport_.setScrollBarsShown(true, true);
+        viewport_.setScrollOnDragMode(juce::Viewport::ScrollOnDragMode::all);
+        addAndMakeVisible(viewport_);
     }
 
     void resized() override
     {
-        tabs_.setBounds(getLocalBounds());
+        viewport_.setBounds(getLocalBounds());
+
+        const auto visibleBounds = viewport_.getLocalBounds();
+        const auto contentSize = contentBoundsFor(visibleBounds.getWidth(), visibleBounds.getHeight());
+        tabs_.setBounds(0, 0, contentSize.getWidth(), contentSize.getHeight());
+
+        if (auto* surface = currentSurface()) {
+            surface->setBounds(tabs_.getLocalBounds().withTrimmedTop(tabs_.getTabBarDepth()));
+        }
     }
 
 private:
+    juce::Rectangle<int> contentBoundsFor(int availableWidth, int availableHeight) const
+    {
+        auto preferredWidth = kPseudoDevicesPreferredWidth;
+        auto preferredHeight = kPseudoDevicesPreferredHeight;
+        if (const auto* surface = currentSurface()) {
+            preferredWidth = surface->getPreferredWidth();
+            preferredHeight = surface->getPreferredHeight() + tabs_.getTabBarDepth();
+        }
+
+        const auto scale = juce::jmin(
+            availableWidth > 0 ? static_cast<float>(availableWidth) / static_cast<float>(preferredWidth) : 1.0F,
+            availableHeight > 0 ? static_cast<float>(availableHeight) / static_cast<float>(preferredHeight) : 1.0F);
+        const auto readableScale = juce::jmax(0.45F, juce::jmin(1.0F, scale));
+        return {
+            0,
+            0,
+            juce::jmax(availableWidth, static_cast<int>(std::round(static_cast<float>(preferredWidth) * readableScale))),
+            juce::jmax(availableHeight, static_cast<int>(std::round(static_cast<float>(preferredHeight) * readableScale))),
+        };
+    }
+
+    ProfileSurfaceComponent* currentSurface() const
+    {
+        return dynamic_cast<ProfileSurfaceComponent*>(tabs_.getCurrentContentComponent());
+    }
+
+    juce::Viewport viewport_;
     juce::TabbedComponent tabs_{juce::TabbedButtonBar::TabsAtTop};
 };
 
 class Window final : public juce::DocumentWindow {
 public:
-    Window(const juce::String& name, std::unique_ptr<juce::Component> content)
+    Window(const juce::String& name, std::unique_ptr<juce::Component> content, int width = kProductWindowWidth, int height = kProductWindowHeight)
         : DocumentWindow(name, juce::Colours::black, DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar(true);
+        setResizable(true, false);
+        setResizeLimits(420, 300, 2400, 1600);
         setContentOwned(content.release(), true);
-        centreWithSize(700, 520);
+        centreWithSize(width, height);
         setVisible(true);
     }
 
@@ -1614,10 +2227,17 @@ public:
 
     void initialise(const juce::String&) override
     {
-        productWindow_ = std::make_unique<Window>("LiveLooping Product", std::make_unique<ProductComponent>(engine_));
-        pseudoDevicesWindow_ = std::make_unique<Window>("Pseudo Devices", std::make_unique<PseudoDevicesComponent>(engine_));
-        pseudoDevicesWindow_->setSize(1520, 900);
-        pseudoDevicesWindow_->setTopLeftPosition(productWindow_->getRight() + 20, productWindow_->getY());
+        productWindow_ = std::make_unique<Window>(
+            "LiveLooping Product",
+            std::make_unique<ProductComponent>(engine_),
+            kProductWindowWidth,
+            kProductWindowHeight);
+        pseudoDevicesWindow_ = std::make_unique<Window>(
+            "Pseudo Devices",
+            std::make_unique<PseudoDevicesComponent>(engine_),
+            pseudoDevicesInitialSize().getWidth(),
+            pseudoDevicesInitialSize().getHeight());
+        positionPseudoDevicesWindow();
     }
 
     void shutdown() override
@@ -1627,6 +2247,44 @@ public:
     }
 
 private:
+    juce::Rectangle<int> pseudoDevicesInitialSize() const
+    {
+        const auto display = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay();
+        if (display == nullptr) {
+            return {0, 0, kPseudoDevicesMinimumWidth, kPseudoDevicesMinimumHeight};
+        }
+
+        const auto workArea = display->userBounds.toNearestInt().reduced(32);
+        return {
+            0,
+            0,
+            juce::jlimit(kPseudoDevicesMinimumWidth, kPseudoDevicesPreferredWidth, workArea.getWidth()),
+            juce::jlimit(kPseudoDevicesMinimumHeight, kPseudoDevicesPreferredHeight, workArea.getHeight()),
+        };
+    }
+
+    void positionPseudoDevicesWindow()
+    {
+        if (productWindow_ == nullptr || pseudoDevicesWindow_ == nullptr) {
+            return;
+        }
+
+        const auto display = juce::Desktop::getInstance().getDisplays().getDisplayForRect(productWindow_->getBounds());
+        const auto workArea = display != nullptr ? display->userBounds.toNearestInt().reduced(12) : juce::Rectangle<int>(0, 0, 1920, 1080);
+        auto bounds = pseudoDevicesWindow_->getBounds();
+        bounds.setX(productWindow_->getRight() + 20);
+        bounds.setY(productWindow_->getY());
+        if (bounds.getRight() > workArea.getRight()) {
+            bounds.setX(workArea.getRight() - bounds.getWidth());
+        }
+        if (bounds.getBottom() > workArea.getBottom()) {
+            bounds.setY(workArea.getBottom() - bounds.getHeight());
+        }
+        bounds.setX(juce::jmax(workArea.getX(), bounds.getX()));
+        bounds.setY(juce::jmax(workArea.getY(), bounds.getY()));
+        pseudoDevicesWindow_->setBounds(bounds);
+    }
+
     LiveLoopingEngine engine_;
     std::unique_ptr<Window> productWindow_;
     std::unique_ptr<Window> pseudoDevicesWindow_;

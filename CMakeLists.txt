@@ -275,6 +275,7 @@ if(LIVELOOPING_BUILD_PROFILE_IO)
 
     add_library(livelooping_profile_io
         components/profile_io/src/ProfileLoader.cpp
+        components/profile_io/src/SurfaceLayoutGeometry.cpp
     )
 
     target_include_directories(livelooping_profile_io
