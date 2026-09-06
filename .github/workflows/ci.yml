@@ -48,3 +48,48 @@ jobs:
 
       - name: Test factory-profile fallback
         run: ctest --test-dir build-no-profile-io --build-config Release --output-on-failure
+
+  juce-gui:
+    name: JUCE GUI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux JUCE packages
+        if: runner.os == 'Linux'
+        run: >
+          sudo apt-get update &&
+          sudo apt-get install -y
+          pkg-config
+          libfreetype-dev
+          libfontconfig1-dev
+          libx11-dev
+          libxcomposite-dev
+          libxcursor-dev
+          libxext-dev
+          libxinerama-dev
+          libxrandr-dev
+          libxrender-dev
+          libxi-dev
+
+      - name: Configure JUCE GUI build
+        run: >
+          cmake -S . -B build-juce-gui
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          -DLIVELOOPING_BUILD_JUCE_APP=ON
+
+      - name: Build JUCE GUI targets
+        run: cmake --build build-juce-gui --config Release --parallel
+
+      - name: Test JUCE GUI build
+        run: ctest --test-dir build-juce-gui --build-config Release --output-on-failure
