@@ -37,6 +37,7 @@ using loop_rigger::profile_io::findSurfaceGroupGeometry;
 using loop_rigger::profile_io::profileSurfaceLayout;
 using loop_rigger::profile_io::summarizeSurfaceGroups;
 using loop_rigger::profile_io::surfaceBoundsOverlap;
+using loop_rigger::profile_io::visualSurfaceBounds;
 #endif
 
 namespace {
@@ -505,6 +506,79 @@ void expectWidgetGroupsDoNotOverlap(const loop_rigger::profile_io::ControlSurfac
     }
 }
 
+const loop_rigger::profile_io::SurfaceElement* findLayoutElement(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& id)
+{
+    for (const auto& element : layout.elements) {
+        if (element.id == id) {
+            return &element;
+        }
+    }
+    return nullptr;
+}
+
+void expectVisualBoundsContainRawBounds(const loop_rigger::profile_io::SurfaceElement& element)
+{
+    expect(containsSurfaceBounds(visualSurfaceBounds(element), element.bounds), "visual bounds should contain raw bounds: " + element.id);
+}
+
+void expectVisualBoundsAddsBottomRepaintMargin(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& elementId,
+    float minimumMargin)
+{
+    const auto* element = findLayoutElement(layout, elementId);
+    expect(element != nullptr, "layout element should exist for visual repaint profile: " + elementId);
+    if (element == nullptr) {
+        return;
+    }
+
+    const auto visualBounds = visualSurfaceBounds(*element);
+    expectVisualBoundsContainRawBounds(*element);
+    expect(
+        visualBounds.y + visualBounds.height >= element->bounds.y + element->bounds.height + minimumMargin,
+        "visual bounds should include bottom label/shadow repaint margin: " + elementId);
+}
+
+void expectGroupStartsAfterElement(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& group,
+    const std::string& elementId,
+    float horizontalGap)
+{
+    const auto geometry = findSurfaceGroupGeometry(layout, group);
+    const auto* element = findLayoutElement(layout, elementId);
+    expect(geometry.has_value(), "layout should expose group geometry: " + group);
+    expect(element != nullptr, "layout should expose element: " + elementId);
+    if (!geometry.has_value() || element == nullptr) {
+        return;
+    }
+
+    expect(
+        geometry->bounds.x >= element->bounds.x + element->bounds.width + horizontalGap,
+        "group should not overlap visual brand area: " + group + " / " + elementId);
+}
+
+void expectVerticalGapBetweenGroups(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& upperGroup,
+    const std::string& lowerGroup,
+    float verticalGap)
+{
+    const auto upper = findSurfaceGroupGeometry(layout, upperGroup);
+    const auto lower = findSurfaceGroupGeometry(layout, lowerGroup);
+    expect(upper.has_value(), "layout should expose upper group geometry: " + upperGroup);
+    expect(lower.has_value(), "layout should expose lower group geometry: " + lowerGroup);
+    if (!upper.has_value() || !lower.has_value()) {
+        return;
+    }
+
+    expect(
+        lower->bounds.y >= upper->bounds.y + upper->bounds.height + verticalGap,
+        "widget groups should leave visual label clearance: " + upperGroup + " / " + lowerGroup);
+}
+
 void testJsonProfileLoading()
 {
     const MidiMapper micMapper(loadControllerProfileFromFile(profilePath("kaoss_mic.json")));
@@ -629,13 +703,18 @@ void testJsonSurfaceLayoutLoading()
     expectGroupGeometry(yaeltexLayout, "sampler", 8, 1085.0F, 745.0F, 286.0F, 120.0F);
     expectGroupGeometry(yaeltexLayout, "sidechain_parameter", 8, 620.0F, 846.0F, 384.0F, 182.0F);
     expectGroupGeometry(yaeltexLayout, "top_fx_parameter", 4, 1058.0F, 86.0F, 400.0F, 86.0F);
-    expectGroupGeometry(yaeltexLayout, "track_volume_pan", 4, 100.0F, 744.0F, 490.0F, 92.0F);
+    expectGroupGeometry(yaeltexLayout, "track_volume_pan", 4, 100.0F, 764.0F, 490.0F, 92.0F);
     expectGroupGeometry(yaeltexLayout, "track_select", 4, 112.0F, 700.0F, 376.0F, 28.0F);
     expectGroupGeometry(yaeltexLayout, "looper_volume_pan", 4, 92.0F, 946.0F, 466.0F, 84.0F);
     expectGroupGeometry(yaeltexLayout, "animation_slot", 8, 620.0F, 752.0F, 408.0F, 28.0F);
     expectGroupGeometry(yaeltexLayout, "preset_slot", 8, 620.0F, 798.0F, 408.0F, 28.0F);
     expectGroupGeometry(yaeltexLayout, "bottom_record", 1, 112.0F, 888.0F, 76.0F, 34.0F);
     expectGroupGeometry(yaeltexLayout, "bottom_extra_clear", 1, 516.0F, 888.0F, 92.0F, 34.0F);
+    expectGroupStartsAfterElement(yaeltexLayout, "session", "brand_main", 12.0F);
+    expectVerticalGapBetweenGroups(yaeltexLayout, "track_select", "track_volume_pan", 28.0F);
+    expectVisualBoundsAddsBottomRepaintMargin(yaeltexLayout, "animation_1", 12.0F);
+    expectVisualBoundsAddsBottomRepaintMargin(yaeltexLayout, "preset_on_off", 12.0F);
+    expectVisualBoundsAddsBottomRepaintMargin(yaeltexLayout, "center_fx_joystick_1", 28.0F);
 }
 
 void testSurfaceLayoutInteractionProfile()

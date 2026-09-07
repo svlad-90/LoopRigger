@@ -26,6 +26,7 @@ struct SurfaceLayoutProfile {
 SurfaceLayoutProfile profileSurfaceLayout(const ControlSurfaceLayout& layout);
 std::vector<SurfaceGroupGeometry> summarizeSurfaceGroups(const ControlSurfaceLayout& layout);
 std::optional<SurfaceGroupGeometry> findSurfaceGroupGeometry(const ControlSurfaceLayout& layout, const std::string& group);
+SurfaceBounds visualSurfaceBounds(const SurfaceElement& element);
 bool containsSurfaceBounds(const SurfaceBounds& outer, const SurfaceBounds& inner);
 bool surfaceBoundsOverlap(const SurfaceBounds& lhs, const SurfaceBounds& rhs);
 

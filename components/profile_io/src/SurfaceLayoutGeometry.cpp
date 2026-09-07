@@ -30,6 +30,26 @@ void expandToInclude(SurfaceBounds& target, const SurfaceBounds& bounds)
     target.height = bottom - top;
 }
 
+SurfaceBounds expandedBounds(const SurfaceBounds& bounds, float horizontal, float vertical)
+{
+    return {
+        bounds.x - horizontal,
+        bounds.y - vertical,
+        bounds.width + horizontal * 2.0F,
+        bounds.height + vertical * 2.0F,
+    };
+}
+
+SurfaceBounds expandedBounds(const SurfaceBounds& bounds, float left, float top, float right, float bottom)
+{
+    return {
+        bounds.x - left,
+        bounds.y - top,
+        bounds.width + left + right,
+        bounds.height + top + bottom,
+    };
+}
+
 } // namespace
 
 SurfaceLayoutProfile profileSurfaceLayout(const ControlSurfaceLayout& layout)
@@ -96,6 +116,35 @@ bool containsSurfaceBounds(const SurfaceBounds& outer, const SurfaceBounds& inne
         && inner.y >= outer.y
         && rightEdge(inner) <= rightEdge(outer)
         && bottomEdge(inner) <= bottomEdge(outer);
+}
+
+SurfaceBounds visualSurfaceBounds(const SurfaceElement& element)
+{
+    if (element.role != SurfaceElementRole::Widget) {
+        return element.bounds;
+    }
+
+    switch (element.shape) {
+    case SurfaceElementShape::RoundRect:
+        if (element.variant == "hardware_button" || element.variant == "interactive_button" || element.variant == "kaoss_button"
+            || element.variant == "kaoss_light_button" || element.variant == "kaoss_red_button") {
+            return expandedBounds(element.bounds, 8.0F, 8.0F, 8.0F, 14.0F);
+        }
+        if (element.variant.rfind("arcade_", 0) == 0) {
+            return expandedBounds(element.bounds, 8.0F, 8.0F);
+        }
+        return expandedBounds(element.bounds, 4.0F, 4.0F);
+    case SurfaceElementShape::Knob:
+        return expandedBounds(element.bounds, 20.0F, 24.0F);
+    case SurfaceElementShape::Fader:
+        return expandedBounds(element.bounds, 8.0F, 8.0F);
+    case SurfaceElementShape::Joystick:
+        return expandedBounds(element.bounds, 8.0F, 8.0F, 8.0F, 30.0F);
+    case SurfaceElementShape::Circle:
+        return expandedBounds(element.bounds, 8.0F, 8.0F);
+    default:
+        return expandedBounds(element.bounds, 4.0F, 4.0F);
+    }
 }
 
 bool surfaceBoundsOverlap(const SurfaceBounds& lhs, const SurfaceBounds& rhs)

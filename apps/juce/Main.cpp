@@ -3,6 +3,7 @@
 
 #if LIVELOOPING_HAS_PROFILE_IO
 #include "loop_rigger/profile_io/ProfileLoader.h"
+#include "loop_rigger/profile_io/SurfaceLayoutGeometry.h"
 #endif
 
 #include <juce_gui_extra/juce_gui_extra.h>
@@ -36,6 +37,7 @@ using loop_rigger::profile_io::SurfaceElementShape;
 using loop_rigger::profile_io::SurfaceElementRole;
 using loop_rigger::profile_io::loadControllerProfileFromFile;
 using loop_rigger::profile_io::loadControlSurfaceLayoutFromFile;
+using loop_rigger::profile_io::visualSurfaceBounds;
 #endif
 
 namespace {
@@ -374,6 +376,8 @@ private:
         int width = 1;
         int height = 1;
         float value = 0.0F;
+        float valueX = 0.5F;
+        float valueY = 0.5F;
     };
 
     struct WidgetVisualState {
@@ -386,6 +390,8 @@ private:
         bool down;
         bool hasValue;
         float value;
+        float valueX = 0.5F;
+        float valueY = 0.5F;
     };
 
 #if LIVELOOPING_HAS_PROFILE_IO
@@ -532,10 +538,13 @@ private:
 
         layoutScaledBounds_.clear();
         layoutScaledBounds_.reserve(layout_->elements.size());
+        layoutVisualBounds_.clear();
+        layoutVisualBounds_.reserve(layout_->elements.size());
         layoutWidgetElementIndices_.clear();
         for (size_t index = 0; index < layout_->elements.size(); ++index) {
             const auto& element = layout_->elements[index];
             layoutScaledBounds_.push_back(scaledBounds(element.bounds));
+            layoutVisualBounds_.push_back(scaledBounds(visualSurfaceBounds(element)));
             if (element.role == SurfaceElementRole::Widget) {
                 layoutWidgetElementIndices_.push_back(index);
             }
@@ -665,7 +674,7 @@ private:
             for (const auto index : layoutWidgetElementIndices_) {
                 const auto& element = layout_->elements[index];
                 if (element.role == SurfaceElementRole::Widget && element.widgetId == widgetId) {
-                    repaint(layoutScaledBounds_[index].expanded(8));
+                    repaint(layoutVisualBounds_[index]);
                     repainted = true;
                 }
             }
@@ -800,7 +809,8 @@ private:
             layoutDragElement_ = element != nullptr ? juce::String(element->id) : juce::String();
             layoutDragStartPosition_ = event.position;
             layoutDragStartValue_ = mutableControl->value;
-            if (element != nullptr && element->shape == SurfaceElementShape::Fader) {
+            if (element != nullptr
+                && (element->shape == SurfaceElementShape::Fader || element->shape == SurfaceElementShape::Joystick)) {
                 updateLayoutControlValue(*mutableControl, event.position, element, false);
             }
         }
@@ -847,6 +857,20 @@ private:
         float value = control.value;
         if (element->shape == SurfaceElementShape::Fader) {
             value = 1.0F - ((position.y - bounds.getY()) / juce::jmax(1.0F, bounds.getHeight()));
+        } else if (element->shape == SurfaceElementShape::Joystick) {
+            const auto pad = bounds.reduced(17.0F);
+            const auto valueX = (position.x - pad.getX()) / juce::jmax(1.0F, pad.getWidth());
+            const auto valueY = (position.y - pad.getY()) / juce::jmax(1.0F, pad.getHeight());
+            const auto clampedX = juce::jlimit(0.0F, 1.0F, valueX);
+            const auto clampedY = juce::jlimit(0.0F, 1.0F, valueY);
+            if (std::abs(clampedX - control.valueX) < 0.001F && std::abs(clampedY - control.valueY) < 0.001F) {
+                return;
+            }
+            control.valueX = clampedX;
+            control.valueY = clampedY;
+            control.value = clampedX;
+            dispatch({control.id.toStdString(), WidgetEventType::Change, control.value});
+            return;
         } else if (relativeDrag) {
             value = layoutDragStartValue_ - ((position.y - layoutDragStartPosition_.y) / 180.0F);
         } else {
@@ -874,9 +898,13 @@ private:
             if (control->component == nullptr && control->type != WidgetType::Button) {
                 state.hasValue = true;
                 state.value = control->value;
+                state.valueX = control->valueX;
+                state.valueY = control->valueY;
             } else if (const auto* slider = dynamic_cast<const juce::Slider*>(control->component)) {
                 state.hasValue = true;
                 state.value = static_cast<float>(juce::jlimit(0.0, 1.0, slider->getValue()));
+                state.valueX = state.value;
+                state.valueY = 0.5F;
             }
         }
         return state;
@@ -913,7 +941,7 @@ private:
         ensureLayoutCaches();
         const auto clip = graphics.getClipBounds();
         for (const auto index : layoutWidgetElementIndices_) {
-            if (layoutScaledBounds_[index].intersects(clip)) {
+            if (layoutVisualBounds_[index].intersects(clip)) {
                 paintLayoutDecoration(graphics, layout_->elements[index]);
             }
         }
@@ -995,7 +1023,8 @@ private:
     void paintLayoutDecoration(juce::Graphics& graphics, const SurfaceElement& element)
     {
         const auto bounds = scaledBounds(element.bounds);
-        if (!bounds.intersects(graphics.getClipBounds())) {
+        const auto paintBounds = element.role == SurfaceElementRole::Widget ? scaledBounds(visualSurfaceBounds(element)) : bounds;
+        if (!paintBounds.intersects(graphics.getClipBounds())) {
             return;
         }
         const auto variant = juce::String(element.variant);
@@ -1345,10 +1374,24 @@ private:
         graphics.setColour(juce::Colour(0xff1f1f1f));
         graphics.drawRoundedRectangle(well.toFloat(), 7.0F, 2.0F);
         graphics.setColour(juce::Colour(0xff202020));
-        const auto offset = state.hasValue ? static_cast<int>(std::round((state.value - 0.5F) * 22.0F)) : 0;
-        graphics.fillEllipse(static_cast<float>(well.getCentreX() - 14 + offset), static_cast<float>(well.getCentreY() - 14), 28.0F, 28.0F);
+        constexpr auto handleDiameter = 24.0F;
+        constexpr auto handleRadius = handleDiameter * 0.5F;
+        const auto maxOffsetX = juce::jmax(0.0F, static_cast<float>(well.getWidth()) * 0.5F - handleRadius);
+        const auto maxOffsetY = juce::jmax(0.0F, static_cast<float>(well.getHeight()) * 0.5F - handleRadius);
+        const auto offsetX = state.hasValue ? static_cast<int>(std::round((state.valueX - 0.5F) * 2.0F * static_cast<float>(maxOffsetX))) : 0;
+        const auto offsetY = state.hasValue ? static_cast<int>(std::round((state.valueY - 0.5F) * 2.0F * static_cast<float>(maxOffsetY))) : 0;
+        graphics.fillEllipse(
+            static_cast<float>(well.getCentreX()) - handleRadius + static_cast<float>(offsetX),
+            static_cast<float>(well.getCentreY()) - handleRadius + static_cast<float>(offsetY),
+            handleDiameter,
+            handleDiameter);
         graphics.setColour(juce::Colour(0xff565656));
-        graphics.drawLine(static_cast<float>(well.getCentreX() - 12 + offset), static_cast<float>(well.getCentreY() - 12), static_cast<float>(well.getCentreX() + 12 + offset), static_cast<float>(well.getCentreY() + 12), 3.0F);
+        graphics.drawLine(
+            static_cast<float>(well.getCentreX()) - handleRadius + 2.0F + static_cast<float>(offsetX),
+            static_cast<float>(well.getCentreY()) - handleRadius + 2.0F + static_cast<float>(offsetY),
+            static_cast<float>(well.getCentreX()) + handleRadius - 2.0F + static_cast<float>(offsetX),
+            static_cast<float>(well.getCentreY()) + handleRadius - 2.0F + static_cast<float>(offsetY),
+            3.0F);
         drawPanelLabel(graphics, valueLabel, {area.getRight() - 22, area.getY() + 8, 18, area.getHeight() - 16}, 12.0F);
         drawPanelLabel(graphics, rangeLabel, {area.getX(), area.getBottom() + 8, area.getWidth(), 18}, 13.0F);
     }
@@ -2062,6 +2105,7 @@ private:
     mutable bool layoutCacheDirty_ = true;
     mutable bool staticLayoutImageDirty_ = true;
     mutable std::vector<juce::Rectangle<int>> layoutScaledBounds_;
+    mutable std::vector<juce::Rectangle<int>> layoutVisualBounds_;
     mutable std::vector<size_t> layoutWidgetElementIndices_;
     juce::Image staticLayoutImage_;
     bool profileLayoutGui_ = false;
