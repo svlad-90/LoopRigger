@@ -380,6 +380,7 @@ private:
         float value = 0.0F;
         float valueX = 0.5F;
         float valueY = 0.5F;
+        bool buttonLatched = false;
     };
 
     struct WidgetVisualState {
@@ -808,11 +809,21 @@ private:
             return;
         }
 
+        const auto* element = findLayoutElementAt(control->id, event.position);
         if (control->type == WidgetType::Button) {
             layoutDragElement_.clear();
             dispatch({control->id.toStdString(), WidgetEventType::Press, 1.0F});
+        } else if (kind_ == SurfaceKind::Yaeltex && control->type == WidgetType::Knob && event.getNumberOfClicks() >= 2) {
+            layoutDragElement_.clear();
+            if (auto* mutableControl = findControl(control->id.toStdString())) {
+                mutableControl->buttonLatched = !mutableControl->buttonLatched;
+                dispatch({
+                    control->id.toStdString(),
+                    WidgetEventType::Press,
+                    mutableControl->buttonLatched ? 1.0F : 0.0F,
+                });
+            }
         } else if (auto* mutableControl = findControl(control->id.toStdString())) {
-            const auto* element = findLayoutElementAt(mutableControl->id, event.position);
             layoutDragElement_ = element != nullptr ? juce::String(element->id) : juce::String();
             layoutDragStartPosition_ = event.position;
             layoutDragStartValue_ = mutableControl->value;
@@ -902,6 +913,9 @@ private:
         if (const auto* control = findControl(element.widgetId)) {
             state.hover = control->component != nullptr ? control->component->isMouseOver() : layoutHoverWidget_ == control->id;
             state.down = control->component != nullptr ? control->component->isMouseButtonDown() : layoutDownWidget_ == control->id;
+            if (kind_ == SurfaceKind::Yaeltex && control->type == WidgetType::Knob && control->buttonLatched) {
+                state.down = true;
+            }
             if (control->component == nullptr && control->type != WidgetType::Button) {
                 state.hasValue = true;
                 state.value = control->value;
