@@ -6,9 +6,13 @@
 #include "loop_rigger/profile_io/SurfaceLayoutGeometry.h"
 #endif
 
+#include <algorithm>
+#include <cmath>
 #include <cstdlib>
-#include <set>
+#include <initializer_list>
 #include <iostream>
+#include <iterator>
+#include <set>
 #include <string>
 
 using loop_rigger::core::CommandType;
@@ -16,6 +20,7 @@ using loop_rigger::core::ControllerCommand;
 using loop_rigger::core::ControllerId;
 using loop_rigger::core::InputTarget;
 using loop_rigger::core::LiveLoopingEngine;
+using loop_rigger::core::kRemixerModes;
 using loop_rigger::control::MidiEvent;
 using loop_rigger::control::MidiMapper;
 using loop_rigger::control::MidiMessageType;
@@ -318,10 +323,10 @@ void testYaeltexMapping()
     expect(mappedTopFx->index == 1, "top Reverb should map to zero-based top FX parameter 2");
     expect(mappedTopFx->value == 0.7F, "top FX value should pass through");
 
-    const auto mappedRemixerMode = mapper.mapWidget({"remixer_mode_19", WidgetEventType::Press, 1.0F});
+    const auto mappedRemixerMode = mapper.mapWidget({"remixer_mode_24", WidgetEventType::Press, 1.0F});
     expect(mappedRemixerMode.has_value(), "Yaeltex remixer mode widget should map to a command");
     expect(mappedRemixerMode->type == CommandType::TriggerRemixerMode, "remixer mode button should trigger remixer mode");
-    expect(mappedRemixerMode->index == 18, "remixer_mode_19 should map to zero-based mode 19");
+    expect(mappedRemixerMode->index == 23, "remixer_mode_24 should map to zero-based mode 24");
 
     const auto mappedAnimation = mapper.mapWidget({"animation_4", WidgetEventType::Press, 1.0F});
     expect(mappedAnimation.has_value(), "Yaeltex animation widget should map to a command");
@@ -374,6 +379,30 @@ std::set<std::string> widgetIds(const loop_rigger::control::ControllerProfile& p
         ids.insert(widget.id);
     }
     return ids;
+}
+
+const loop_rigger::control::ControllerWidget* findProfileWidget(
+    const loop_rigger::control::ControllerProfile& profile,
+    const std::string& id)
+{
+    for (const auto& widget : profile.widgets) {
+        if (widget.id == id) {
+            return &widget;
+        }
+    }
+    return nullptr;
+}
+
+void expectProfileWidgetLabel(
+    const loop_rigger::control::ControllerProfile& profile,
+    const std::string& id,
+    const std::string& label)
+{
+    const auto* widget = findProfileWidget(profile, id);
+    expect(widget != nullptr, "profile widget should exist for label check: " + id);
+    if (widget != nullptr) {
+        expect(widget->label == label, "profile widget label should match hardware reference: " + id);
+    }
 }
 
 void expectLayoutWidgetsBelongToProfile(
@@ -494,6 +523,25 @@ void expectGroupedWidgetsDoNotOverlap(const loop_rigger::profile_io::ControlSurf
     }
 }
 
+void expectGroupedWidgetVisualBoundsDoNotOverlap(const loop_rigger::profile_io::ControlSurfaceLayout& layout, const std::string& group)
+{
+    for (size_t lhs = 0; lhs < layout.elements.size(); ++lhs) {
+        const auto& left = layout.elements[lhs];
+        if (left.group != group || left.role != loop_rigger::profile_io::SurfaceElementRole::Widget) {
+            continue;
+        }
+
+        for (size_t rhs = lhs + 1; rhs < layout.elements.size(); ++rhs) {
+            const auto& right = layout.elements[rhs];
+            if (right.group == group && right.role == loop_rigger::profile_io::SurfaceElementRole::Widget) {
+                expect(
+                    !surfaceBoundsOverlap(visualSurfaceBounds(left), visualSurfaceBounds(right)),
+                    "grouped widget visual repaint bounds should not overlap: " + left.id + " / " + right.id);
+            }
+        }
+    }
+}
+
 void expectWidgetGroupsDoNotOverlap(const loop_rigger::profile_io::ControlSurfaceLayout& layout)
 {
     const auto groups = summarizeSurfaceGroups(layout);
@@ -516,6 +564,124 @@ const loop_rigger::profile_io::SurfaceElement* findLayoutElement(
         }
     }
     return nullptr;
+}
+
+loop_rigger::profile_io::SurfaceBounds boundsForElements(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    std::initializer_list<const char*> elementIds)
+{
+    loop_rigger::profile_io::SurfaceBounds bounds {};
+    bool hasBounds = false;
+    for (const auto* id : elementIds) {
+        const auto* element = findLayoutElement(layout, id);
+        expect(element != nullptr, std::string("layout should expose block edge element: ") + id);
+        if (element == nullptr) {
+            continue;
+        }
+
+        if (!hasBounds) {
+            bounds = element->bounds;
+            hasBounds = true;
+            continue;
+        }
+
+        const auto right = std::max(bounds.x + bounds.width, element->bounds.x + element->bounds.width);
+        const auto bottom = std::max(bounds.y + bounds.height, element->bounds.y + element->bounds.height);
+        bounds.x = std::min(bounds.x, element->bounds.x);
+        bounds.y = std::min(bounds.y, element->bounds.y);
+        bounds.width = right - bounds.x;
+        bounds.height = bottom - bounds.y;
+    }
+
+    expect(hasBounds, "layout block should contain at least one edge element");
+    return bounds;
+}
+
+void expectLayoutWidgetLabel(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& id,
+    const std::string& label)
+{
+    const auto* element = findLayoutElement(layout, id);
+    expect(element != nullptr, "layout widget should exist for label check: " + id);
+    if (element != nullptr) {
+        expect(element->label == label, "layout widget label should match hardware reference: " + id);
+    }
+}
+
+void expectLayoutWidgetShape(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& id,
+    loop_rigger::profile_io::SurfaceElementShape shape)
+{
+    const auto* element = findLayoutElement(layout, id);
+    expect(element != nullptr, "layout widget should exist for shape check: " + id);
+    if (element != nullptr) {
+        expect(element->shape == shape, "layout widget shape should match hardware control type: " + id);
+    }
+}
+
+void expectYaeltexRemixerReferenceLabels(
+    const loop_rigger::control::ControllerProfile& profile,
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout)
+{
+    const char* macroIds[] = {
+        "remixer_freeze",
+        "remixer_drop",
+        "remixer_extra_1",
+        "remixer_record",
+        "remixer_reset_current",
+        "remixer_reset_all",
+        "remixer_extra_2",
+        "remixer_stop",
+    };
+    const char* macroLabels[] = {
+        "FREEZE\ncurrent",
+        "Drop",
+        "Extra",
+        "SEQ REC",
+        "RESET\ncurrent",
+        "RESET\nall",
+        "Extra 2",
+        "STOP\nSEQ REC",
+    };
+    for (size_t index = 0; index < std::size(macroIds); ++index) {
+        expectProfileWidgetLabel(profile, macroIds[index], macroLabels[index]);
+        expectLayoutWidgetLabel(layout, macroIds[index], macroLabels[index]);
+    }
+
+    const char* modeLabels[] = {
+        "GATE\ncurrent",
+        "GATE\nall",
+        "Extra 3",
+        "REVERSE",
+        "CTRL all",
+        "min/max",
+        "Nat.",
+        "Reverb",
+        "I",
+        "V",
+        "Harm.",
+        "Delay",
+        "II",
+        "VI",
+        "Melod.",
+        "Phaser",
+        "III",
+        "VII",
+        "",
+        "",
+        "IV",
+        "VIII",
+        "MIDI\nSCALE",
+        "CLEAR",
+    };
+    static_assert(std::size(modeLabels) == kRemixerModes);
+    for (size_t index = 0; index < std::size(modeLabels); ++index) {
+        const auto id = "remixer_mode_" + std::to_string(index + 1);
+        expectProfileWidgetLabel(profile, id, modeLabels[index]);
+        expectLayoutWidgetLabel(layout, id, modeLabels[index]);
+    }
 }
 
 void expectVisualBoundsContainRawBounds(const loop_rigger::profile_io::SurfaceElement& element)
@@ -560,6 +726,22 @@ void expectGroupStartsAfterElement(
         "group should not overlap visual brand area: " + group + " / " + elementId);
 }
 
+void expectGroupInsideElement(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& group,
+    const std::string& elementId)
+{
+    const auto geometry = findSurfaceGroupGeometry(layout, group);
+    const auto* element = findLayoutElement(layout, elementId);
+    expect(geometry.has_value(), "layout should expose group geometry: " + group);
+    expect(element != nullptr, "layout should expose containing element: " + elementId);
+    if (!geometry.has_value() || element == nullptr) {
+        return;
+    }
+
+    expect(containsSurfaceBounds(element->bounds, geometry->bounds), "group should stay inside containing frame: " + group + " / " + elementId);
+}
+
 void expectVerticalGapBetweenGroups(
     const loop_rigger::profile_io::ControlSurfaceLayout& layout,
     const std::string& upperGroup,
@@ -577,6 +759,46 @@ void expectVerticalGapBetweenGroups(
     expect(
         lower->bounds.y >= upper->bounds.y + upper->bounds.height + verticalGap,
         "widget groups should leave visual label clearance: " + upperGroup + " / " + lowerGroup);
+}
+
+void expectElementCentersAligned(
+    const loop_rigger::profile_io::ControlSurfaceLayout& layout,
+    const std::string& upperElementId,
+    const std::string& lowerElementId,
+    float tolerance)
+{
+    const auto* upper = findLayoutElement(layout, upperElementId);
+    const auto* lower = findLayoutElement(layout, lowerElementId);
+    expect(upper != nullptr, "layout should expose upper aligned element: " + upperElementId);
+    expect(lower != nullptr, "layout should expose lower aligned element: " + lowerElementId);
+    if (upper == nullptr || lower == nullptr) {
+        return;
+    }
+
+    const auto upperCenter = upper->bounds.x + upper->bounds.width * 0.5F;
+    const auto lowerCenter = lower->bounds.x + lower->bounds.width * 0.5F;
+    expect(
+        std::abs(upperCenter - lowerCenter) <= tolerance,
+        "layout elements should share a visual column center: " + upperElementId + " / " + lowerElementId);
+}
+
+void expectYaeltexMainBlockGapsAligned(const loop_rigger::profile_io::ControlSurfaceLayout& layout)
+{
+    const auto leftBlock = boundsForElements(
+        layout,
+        {"vol_pan_t1", "vol_pan_t4", "bottom_record", "bottom_extra_clear_l", "looper_1", "looper_4"});
+    const auto centerBlock = boundsForElements(
+        layout,
+        {"animation_1", "animation_8", "fx_bank_extra_2", "sidechain_stash_t1", "sidechain_decay_t4"});
+    const auto rightBlock = boundsForElements(
+        layout,
+        {"top_vol_drop", "top_phaser", "remixer_freeze", "remixer_mode_24", "master_tempo", "master_distortion_dry_wet"});
+
+    const auto leftToCenterGap = centerBlock.x - (leftBlock.x + leftBlock.width);
+    const auto centerToRightGap = rightBlock.x - (centerBlock.x + centerBlock.width);
+    expect(std::abs(leftToCenterGap - 55.0F) <= 1.0F, "left and center Yaeltex blocks should keep a 55px visual gap");
+    expect(std::abs(centerToRightGap - 55.0F) <= 1.0F, "center and right Yaeltex blocks should keep a 55px visual gap");
+    expect(std::abs(leftToCenterGap - centerToRightGap) <= 1.0F, "Yaeltex main block gaps should match");
 }
 
 void testJsonProfileLoading()
@@ -667,11 +889,15 @@ void testJsonSurfaceLayoutLoading()
     const auto micProfile = loadControllerProfileFromFile(profilePath("kaoss_mic.json"));
     expectLayoutElementsStayInsideCanvas(kaossLayout);
     expectLayoutWidgetsBelongToProfile(kaossLayout, micProfile);
-    expect(summarizeSurfaceGroups(kaossLayout).size() == 4, "Kaoss layout should expose four widget groups");
+    expect(summarizeSurfaceGroups(kaossLayout).size() == 5, "Kaoss layout should expose five widget groups");
     expectLayoutWidgetGroupsBelongToProfile(kaossLayout, micProfile);
     expectGroupBoundsContainTheirElements(kaossLayout);
     expectGroupedWidgetsDoNotOverlap(kaossLayout);
     expectGroupGeometry(kaossLayout, "hold", 1, 64.0F, 662.0F, 94.0F, 46.0F);
+    expectGroupGeometry(kaossLayout, "fx_parameters", 8, 308.0F, 358.0F, 512.0F, 268.0F);
+    for (int index = 1; index <= 8; ++index) {
+        expectLayoutWidgetShape(kaossLayout, "fx_parameter_" + std::to_string(index), loop_rigger::profile_io::SurfaceElementShape::Fader);
+    }
     expectGroupGeometry(kaossLayout, "levels", 4, 76.0F, 100.0F, 84.0F, 478.0F);
     expectGroupGeometry(kaossLayout, "pages", 4, 342.0F, 712.0F, 542.0F, 46.0F);
     expectGroupGeometry(kaossLayout, "presets", 8, 322.0F, 247.0F, 628.0F, 44.0F);
@@ -691,30 +917,82 @@ void testJsonSurfaceLayoutLoading()
     expectGroupBoundsContainTheirElements(yaeltexLayout);
     expectGroupedWidgetsDoNotOverlap(yaeltexLayout);
     expectWidgetGroupsDoNotOverlap(yaeltexLayout);
-    expectGroupGeometry(yaeltexLayout, "center_fx_bank", 5, 620.0F, 540.0F, 326.0F, 30.0F);
-    expectGroupGeometry(yaeltexLayout, "center_fx_joystick", 2, 638.0F, 612.0F, 310.0F, 110.0F);
-    expectGroupGeometry(yaeltexLayout, "center_fx_parameter", 4, 632.0F, 326.0F, 400.0F, 86.0F);
-    expectGroupGeometry(yaeltexLayout, "clock_division", 8, 760.0F, 86.0F, 270.0F, 80.0F);
+    expectGroupGeometry(yaeltexLayout, "center_fx_bank", 5, 826.0F, 440.0F, 156.0F, 80.0F);
+    expectGroupGeometry(yaeltexLayout, "center_fx_joystick", 2, 564.0F, 612.0F, 310.0F, 110.0F);
+    expectGroupGeometry(yaeltexLayout, "center_fx_parameter", 4, 558.0F, 326.0F, 400.0F, 86.0F);
+    expectGroupGeometry(yaeltexLayout, "clock_division", 8, 1051.0F, 76.0F, 372.0F, 80.0F);
     expectGroupGeometry(yaeltexLayout, "looper_select", 4, 112.0F, 360.0F, 376.0F, 64.0F);
-    expectGroupGeometry(yaeltexLayout, "master_parameter", 8, 1300.0F, 318.0F, 168.0F, 414.0F);
-    expectGroupGeometry(yaeltexLayout, "mute_invert", 16, 158.0F, 220.0F, 558.0F, 82.0F);
-    expectGroupGeometry(yaeltexLayout, "remixer_mode", 20, 1062.0F, 466.0F, 228.0F, 222.0F);
-    expectGroupGeometry(yaeltexLayout, "sample_length", 8, 112.0F, 462.0F, 256.0F, 94.0F);
-    expectGroupGeometry(yaeltexLayout, "sampler", 8, 1085.0F, 745.0F, 286.0F, 120.0F);
-    expectGroupGeometry(yaeltexLayout, "sidechain_parameter", 8, 620.0F, 846.0F, 384.0F, 182.0F);
-    expectGroupGeometry(yaeltexLayout, "top_fx_parameter", 4, 1058.0F, 86.0F, 400.0F, 86.0F);
-    expectGroupGeometry(yaeltexLayout, "track_volume_pan", 4, 100.0F, 764.0F, 490.0F, 92.0F);
+    expectGroupGeometry(yaeltexLayout, "master_parameter", 8, 1287.0F, 318.0F, 158.0F, 414.0F);
+    expectGroupGeometry(yaeltexLayout, "mute_invert", 16, 112.0F, 220.0F, 840.0F, 82.0F);
+    expectGroupGeometry(yaeltexLayout, "remixer_macro", 8, 1041.0F, 396.0F, 228.0F, 82.0F);
+    expectGroupGeometry(yaeltexLayout, "remixer_mode", 24, 1041.0F, 500.0F, 228.0F, 270.0F);
+    expectGroupGeometry(yaeltexLayout, "routing_source", 8, 1037.0F, 292.0F, 248.0F, 82.0F);
+    expectGroupGeometry(yaeltexLayout, "sample_length", 8, 112.0F, 462.0F, 376.0F, 94.0F);
+    expectGroupGeometry(yaeltexLayout, "sampler", 8, 1064.0F, 820.0F, 277.0F, 120.0F);
+    expectGroupGeometry(yaeltexLayout, "sidechain_parameter", 8, 550.0F, 884.0F, 376.0F, 164.0F);
+    expectGroupGeometry(yaeltexLayout, "top_fx_parameter", 4, 1037.0F, 186.0F, 400.0F, 86.0F);
+    expectGroupGeometry(yaeltexLayout, "track_volume_pan", 4, 109.0F, 764.0F, 382.0F, 92.0F);
     expectGroupGeometry(yaeltexLayout, "track_select", 4, 112.0F, 700.0F, 376.0F, 28.0F);
-    expectGroupGeometry(yaeltexLayout, "looper_volume_pan", 4, 92.0F, 946.0F, 466.0F, 84.0F);
-    expectGroupGeometry(yaeltexLayout, "animation_slot", 8, 620.0F, 752.0F, 408.0F, 28.0F);
-    expectGroupGeometry(yaeltexLayout, "preset_slot", 8, 620.0F, 798.0F, 408.0F, 28.0F);
-    expectGroupGeometry(yaeltexLayout, "bottom_record", 1, 112.0F, 888.0F, 76.0F, 34.0F);
-    expectGroupGeometry(yaeltexLayout, "bottom_extra_clear", 1, 516.0F, 888.0F, 92.0F, 34.0F);
+    expectGroupGeometry(yaeltexLayout, "looper_volume_pan", 4, 109.0F, 946.0F, 382.0F, 84.0F);
+    expectGroupGeometry(yaeltexLayout, "animation_slot", 8, 546.0F, 772.0F, 408.0F, 28.0F);
+    expectGroupGeometry(yaeltexLayout, "preset_slot", 8, 546.0F, 818.0F, 408.0F, 28.0F);
+    expectGroupGeometry(yaeltexLayout, "bottom_record", 1, 109.0F, 876.0F, 82.0F, 42.0F);
+    expectGroupGeometry(yaeltexLayout, "bottom_extra_clear", 1, 409.0F, 876.0F, 82.0F, 42.0F);
     expectGroupStartsAfterElement(yaeltexLayout, "session", "brand_main", 12.0F);
+    expectGroupInsideElement(yaeltexLayout, "master_parameter", "faceplate");
+    expectYaeltexRemixerReferenceLabels(yaeltexProfile, yaeltexLayout);
+    expectYaeltexMainBlockGapsAligned(yaeltexLayout);
+    expectGroupedWidgetVisualBoundsDoNotOverlap(yaeltexLayout, "sidechain_parameter");
     expectVerticalGapBetweenGroups(yaeltexLayout, "track_select", "track_volume_pan", 28.0F);
+    expectVerticalGapBetweenGroups(yaeltexLayout, "center_fx_joystick", "animation_slot", 50.0F);
+    expectVerticalGapBetweenGroups(yaeltexLayout, "preset_slot", "sidechain_parameter", 20.0F);
     expectVisualBoundsAddsBottomRepaintMargin(yaeltexLayout, "animation_1", 12.0F);
     expectVisualBoundsAddsBottomRepaintMargin(yaeltexLayout, "preset_on_off", 12.0F);
     expectVisualBoundsAddsBottomRepaintMargin(yaeltexLayout, "center_fx_joystick_1", 28.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t1", "bottom_record", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t2", "resample_selected", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t3", "resample_all", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t4", "bottom_extra_clear_l", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_1", "vol_pan_t1", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_2", "vol_pan_t2", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_3", "vol_pan_t3", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_4", "vol_pan_t4", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_1", "bottom_record", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_2", "resample_selected", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_3", "resample_all", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_4", "bottom_extra_clear_l", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t1", "vol_pan_l1", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t2", "vol_pan_l2", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t3", "vol_pan_l3", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "vol_pan_t4", "vol_pan_l4", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_1", "mute_1", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_2", "mute_2", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_3", "mute_3", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_4", "mute_4", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_1", "mute_9", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_2", "mute_10", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_3", "mute_11", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "looper_4", "mute_12", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_dry_wet", "mute_5", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_lfo1_speed", "mute_6", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_lfo2_speed", "mute_7", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_drop", "mute_8", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_dry_wet", "mute_13", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_lfo1_speed", "mute_14", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_lfo2_speed", "mute_15", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "center_fx_drop", "mute_16", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "mute_5", "restart_all_loopers", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "mute_6", "reset_all", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "mute_7", "transport_start", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "mute_8", "transport_stop", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_vol_drop", "top_grid_1", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_reverb", "top_grid_2", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_transpose", "top_grid_3", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_phaser", "top_grid_4", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_vol_drop", "top_grid_5", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_reverb", "top_grid_6", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_transpose", "top_grid_7", 1.0F);
+    expectElementCentersAligned(yaeltexLayout, "top_phaser", "top_grid_8", 1.0F);
 }
 
 void testSurfaceLayoutInteractionProfile()

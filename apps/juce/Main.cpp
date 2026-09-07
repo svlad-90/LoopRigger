@@ -16,6 +16,7 @@
 #include <memory>
 #include <optional>
 #include <sstream>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -104,6 +105,7 @@ public:
         for (const auto& widget : mapper_.profile().widgets) {
             addWidget(widget);
         }
+        rebuildControlIndex();
 #if LIVELOOPING_HAS_PROFILE_IO
         if (layout_.has_value()) {
             profileLayoutGui_ = std::getenv("LIVELOOPING_PROFILE_GUI") != nullptr;
@@ -691,24 +693,29 @@ private:
 #if LIVELOOPING_HAS_PROFILE_IO
     const Control* findControl(const std::string& widgetId) const
     {
-        const auto id = juce::String(widgetId);
-        for (const auto& control : controls_) {
-            if (control.id == id) {
-                return &control;
-            }
+        const auto iterator = controlIndex_.find(widgetId);
+        if (iterator != controlIndex_.end() && iterator->second < controls_.size()) {
+            return &controls_[iterator->second];
         }
         return nullptr;
     }
 
     Control* findControl(const std::string& widgetId)
     {
-        const auto id = juce::String(widgetId);
-        for (auto& control : controls_) {
-            if (control.id == id) {
-                return &control;
-            }
+        const auto iterator = controlIndex_.find(widgetId);
+        if (iterator != controlIndex_.end() && iterator->second < controls_.size()) {
+            return &controls_[iterator->second];
         }
         return nullptr;
+    }
+
+    void rebuildControlIndex()
+    {
+        controlIndex_.clear();
+        controlIndex_.reserve(controls_.size());
+        for (size_t index = 0; index < controls_.size(); ++index) {
+            controlIndex_[controls_[index].id.toStdString()] = index;
+        }
     }
 
     const Control* findLayoutControlAt(juce::Point<float> position) const
@@ -824,8 +831,8 @@ private:
             return;
         }
 
-        setLayoutHover(findLayoutControlAt(event.position));
         if (auto* control = findControl(layoutDownWidget_.toStdString())) {
+            setLayoutHover(control);
             if (control->type != WidgetType::Button) {
                 updateLayoutControlValue(*control, event.position, findLayoutElementById(layoutDragElement_), true);
             }
@@ -1114,7 +1121,7 @@ private:
     juce::Font layoutFont(const juce::String& variant) const
     {
         if (variant == "brand") {
-            return juce::Font(juce::FontOptions(34.0F).withStyle("Bold"));
+            return juce::Font(juce::FontOptions(30.0F).withStyle("Bold"));
         }
         if (variant == "brand_sub") {
             return juce::Font(juce::FontOptions(18.0F).withStyle("Bold"));
@@ -1227,14 +1234,33 @@ private:
         auto size = preferredSize;
         auto font = juce::Font(juce::FontOptions(size).withStyle("Bold"));
         const auto maxWidth = static_cast<float>(juce::jmax(1, area.reduced(2, 0).getWidth()));
-        while (size > minimumSize && textWidth(font, text) > maxWidth) {
+        juce::StringArray lines;
+        lines.addLines(text);
+        if (lines.isEmpty()) {
+            lines.add(text);
+        }
+        auto maxLineWidth = [&lines](const juce::Font& candidateFont) {
+            auto width = 0.0F;
+            for (const auto& line : lines) {
+                width = std::max(width, textWidth(candidateFont, line));
+            }
+            return width;
+        };
+        while (size > minimumSize
+               && (maxLineWidth(font) > maxWidth
+                   || static_cast<float>(lines.size()) * font.getHeight() > static_cast<float>(area.getHeight()))) {
             size -= 0.5F;
             font = juce::Font(juce::FontOptions(size).withStyle("Bold"));
         }
         graphics.setColour(juce::Colour(0xfff0f0f0));
         graphics.setColour(colour);
         graphics.setFont(font);
-        graphics.drawText(text, area.reduced(1, 0), juce::Justification::centred, false);
+        const auto lineHeight = juce::jmax(1, static_cast<int>(std::ceil(font.getHeight())));
+        const auto totalHeight = lineHeight * lines.size();
+        auto lineArea = area.reduced(1, 0).withHeight(totalHeight).withCentre(area.getCentre());
+        for (const auto& line : lines) {
+            graphics.drawText(line, lineArea.removeFromTop(lineHeight), juce::Justification::centred, false);
+        }
     }
 
     static float textWidth(const juce::Font& font, const juce::String& text)
@@ -2125,6 +2151,7 @@ private:
 #endif
     std::vector<Group> groups_;
     std::vector<Control> controls_;
+    std::unordered_map<std::string, size_t> controlIndex_;
     std::vector<std::unique_ptr<juce::TextButton>> buttons_;
     std::vector<std::unique_ptr<juce::Slider>> sliders_;
 };

@@ -1,4 +1,5 @@
 #include "loop_rigger/control/ControlMapping.h"
+#include "loop_rigger/core/EngineState.h"
 
 #include <algorithm>
 #include <utility>
@@ -9,6 +10,7 @@ using core::CommandType;
 using core::ControllerCommand;
 using core::ControllerId;
 using core::InputTarget;
+using core::kRemixerModes;
 
 namespace {
 
@@ -456,17 +458,17 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         "remixer_extra_2",
         "remixer_stop",
     };
-    const char* remixerMacroLabels[] = {"FRZ", "Drop", "Extra", "REC", "RST", "RST all", "Extra 2", "STOP"};
+    const char* remixerMacroLabels[] = {"FREEZE\ncurrent", "Drop", "Extra", "SEQ REC", "RESET\ncurrent", "RESET\nall", "Extra 2", "STOP\nSEQ REC"};
     for (int macro = 0; macro < 8; ++macro) {
         profile.widgets.push_back(button(remixerMacroIds[macro], remixerMacroLabels[macro], "remixer_macro", macro / 4, macro % 4));
         profile.bindings.push_back(widgetBinding(remixerMacroIds[macro], CommandType::TriggerRemixerMacro, macro));
     }
 
     const char* remixerModeLabels[] = {
-        "Gate",
-        "Gate all",
+        "GATE\ncurrent",
+        "GATE\nall",
         "Extra 3",
-        "REV",
+        "REVERSE",
         "CTRL all",
         "min/max",
         "Nat.",
@@ -481,10 +483,14 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         "Phaser",
         "III",
         "VII",
-        "CLEAR",
         "",
+        "",
+        "IV",
+        "VIII",
+        "MIDI\nSCALE",
+        "CLEAR",
     };
-    for (int mode = 0; mode < 20; ++mode) {
+    for (int mode = 0; mode < kRemixerModes; ++mode) {
         profile.widgets.push_back(button("remixer_mode_" + std::to_string(mode + 1), remixerModeLabels[mode], "remixer_mode", mode / 4, mode % 4));
         profile.bindings.push_back(widgetBinding("remixer_mode_" + std::to_string(mode + 1), CommandType::TriggerRemixerMode, mode));
     }

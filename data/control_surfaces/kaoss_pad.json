@@ -169,16 +169,124 @@
       }
     },
     {
-      "id": "xy_pad",
-      "role": "decoration",
-      "shape": "rect",
-      "variant": "xy_pad",
+      "id": "fx_parameter_1",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 1",
       "bounds": {
-        "x": 292,
-        "y": 342,
-        "width": 560,
-        "height": 300
-      }
+        "x": 308,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_1",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_2",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 2",
+      "bounds": {
+        "x": 374,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_2",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_3",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 3",
+      "bounds": {
+        "x": 440,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_3",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_4",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 4",
+      "bounds": {
+        "x": 506,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_4",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_5",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 5",
+      "bounds": {
+        "x": 572,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_5",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_6",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 6",
+      "bounds": {
+        "x": 638,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_6",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_7",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 7",
+      "bounds": {
+        "x": 704,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_7",
+      "group": "fx_parameters"
+    },
+    {
+      "id": "fx_parameter_8",
+      "role": "widget",
+      "shape": "fader",
+      "variant": "interactive_fader",
+      "label": "FX 8",
+      "bounds": {
+        "x": 770,
+        "y": 358,
+        "width": 50,
+        "height": 268
+      },
+      "widgetId": "fx_parameter_8",
+      "group": "fx_parameters"
     },
     {
       "id": "input_label",

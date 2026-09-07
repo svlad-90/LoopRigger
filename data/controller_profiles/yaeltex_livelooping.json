@@ -481,7 +481,7 @@
     },
     {
       "id": "remixer_freeze",
-      "label": "FRZ",
+      "label": "FREEZE\ncurrent",
       "type": "button",
       "group": "remixer_macro",
       "row": 0,
@@ -505,7 +505,7 @@
     },
     {
       "id": "remixer_record",
-      "label": "REC",
+      "label": "SEQ REC",
       "type": "button",
       "group": "remixer_macro",
       "row": 0,
@@ -513,7 +513,7 @@
     },
     {
       "id": "remixer_reset_current",
-      "label": "RST",
+      "label": "RESET\ncurrent",
       "type": "button",
       "group": "remixer_macro",
       "row": 1,
@@ -521,7 +521,7 @@
     },
     {
       "id": "remixer_reset_all",
-      "label": "RST all",
+      "label": "RESET\nall",
       "type": "button",
       "group": "remixer_macro",
       "row": 1,
@@ -537,7 +537,7 @@
     },
     {
       "id": "remixer_stop",
-      "label": "STOP",
+      "label": "STOP\nSEQ REC",
       "type": "button",
       "group": "remixer_macro",
       "row": 1,
@@ -833,7 +833,7 @@
     },
     {
       "id": "remixer_mode_1",
-      "label": "Gate",
+      "label": "GATE\ncurrent",
       "type": "button",
       "group": "remixer_mode",
       "row": 0,
@@ -841,7 +841,7 @@
     },
     {
       "id": "remixer_mode_2",
-      "label": "Gate all",
+      "label": "GATE\nall",
       "type": "button",
       "group": "remixer_mode",
       "row": 0,
@@ -857,7 +857,7 @@
     },
     {
       "id": "remixer_mode_4",
-      "label": "REV",
+      "label": "REVERSE",
       "type": "button",
       "group": "remixer_mode",
       "row": 0,
@@ -977,7 +977,7 @@
     },
     {
       "id": "remixer_mode_19",
-      "label": "CLEAR",
+      "label": "",
       "type": "button",
       "group": "remixer_mode",
       "row": 4,
@@ -989,6 +989,38 @@
       "type": "button",
       "group": "remixer_mode",
       "row": 4,
+      "column": 3
+    },
+    {
+      "id": "remixer_mode_21",
+      "label": "IV",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 5,
+      "column": 0
+    },
+    {
+      "id": "remixer_mode_22",
+      "label": "VIII",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 5,
+      "column": 1
+    },
+    {
+      "id": "remixer_mode_23",
+      "label": "MIDI\nSCALE",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 5,
+      "column": 2
+    },
+    {
+      "id": "remixer_mode_24",
+      "label": "CLEAR",
+      "type": "button",
+      "group": "remixer_mode",
+      "row": 5,
       "column": 3
     },
     {
@@ -2349,6 +2381,34 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 19
+      }
+    },
+    {
+      "widgetId": "remixer_mode_21",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 20
+      }
+    },
+    {
+      "widgetId": "remixer_mode_22",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 21
+      }
+    },
+    {
+      "widgetId": "remixer_mode_23",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 22
+      }
+    },
+    {
+      "widgetId": "remixer_mode_24",
+      "command": {
+        "type": "trigger_remixer_mode",
+        "index": 23
       }
     },
     {

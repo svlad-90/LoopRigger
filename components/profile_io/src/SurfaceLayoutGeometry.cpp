@@ -135,7 +135,7 @@ SurfaceBounds visualSurfaceBounds(const SurfaceElement& element)
         }
         return expandedBounds(element.bounds, 4.0F, 4.0F);
     case SurfaceElementShape::Knob:
-        return expandedBounds(element.bounds, 20.0F, 24.0F);
+        return expandedBounds(element.bounds, 4.0F, 4.0F);
     case SurfaceElementShape::Fader:
         return expandedBounds(element.bounds, 8.0F, 8.0F);
     case SurfaceElementShape::Joystick:
