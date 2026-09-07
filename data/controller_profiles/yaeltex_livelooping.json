@@ -1364,7 +1364,7 @@
     {
       "widgetId": "looper_1",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 60
       },
@@ -1376,7 +1376,7 @@
     {
       "widgetId": "looper_2",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 61
       },
@@ -1388,7 +1388,7 @@
     {
       "widgetId": "looper_3",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 62
       },
@@ -1400,7 +1400,7 @@
     {
       "widgetId": "looper_4",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 63
       },
@@ -1412,7 +1412,7 @@
     {
       "widgetId": "sample_length_1",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 72
       },
@@ -1424,7 +1424,7 @@
     {
       "widgetId": "sample_length_2",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 73
       },
@@ -1436,7 +1436,7 @@
     {
       "widgetId": "sample_length_4",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 74
       },
@@ -1448,7 +1448,7 @@
     {
       "widgetId": "sample_length_8",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 75
       },
@@ -1460,7 +1460,7 @@
     {
       "widgetId": "sample_length_16",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 76
       },
@@ -1472,7 +1472,7 @@
     {
       "widgetId": "sample_length_32",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 77
       },
@@ -1484,7 +1484,7 @@
     {
       "widgetId": "sample_length_64",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 78
       },
@@ -1496,7 +1496,7 @@
     {
       "widgetId": "sample_length_128",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
         "number": 79
       },
@@ -1508,9 +1508,9 @@
     {
       "widgetId": "record_t1",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 80
+        "type": "control_change",
+        "channel": 1,
+        "number": 8
       },
       "command": {
         "type": "toggle_track_recording",
@@ -1520,9 +1520,9 @@
     {
       "widgetId": "clear_t1",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 84
+        "type": "control_change",
+        "channel": 1,
+        "number": 12
       },
       "command": {
         "type": "clear_track",
@@ -1536,14 +1536,33 @@
         "type": "set_track_volume",
         "index": 0
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 16
+      }
+    },
+    {
+      "widgetId": "vol_pan_t1",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_pan",
+        "index": 0
+      },
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 2,
+        "number": 16
+      }
     },
     {
       "widgetId": "record_t2",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 81
+        "type": "control_change",
+        "channel": 1,
+        "number": 9
       },
       "command": {
         "type": "toggle_track_recording",
@@ -1553,9 +1572,9 @@
     {
       "widgetId": "clear_t2",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 85
+        "type": "control_change",
+        "channel": 1,
+        "number": 13
       },
       "command": {
         "type": "clear_track",
@@ -1569,14 +1588,33 @@
         "type": "set_track_volume",
         "index": 1
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 17
+      }
+    },
+    {
+      "widgetId": "vol_pan_t2",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_pan",
+        "index": 1
+      },
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 2,
+        "number": 17
+      }
     },
     {
       "widgetId": "record_t3",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 82
+        "type": "control_change",
+        "channel": 1,
+        "number": 10
       },
       "command": {
         "type": "toggle_track_recording",
@@ -1586,9 +1624,9 @@
     {
       "widgetId": "clear_t3",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 86
+        "type": "control_change",
+        "channel": 1,
+        "number": 14
       },
       "command": {
         "type": "clear_track",
@@ -1602,14 +1640,33 @@
         "type": "set_track_volume",
         "index": 2
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 18
+      }
+    },
+    {
+      "widgetId": "vol_pan_t3",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_pan",
+        "index": 2
+      },
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 2,
+        "number": 18
+      }
     },
     {
       "widgetId": "record_t4",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 83
+        "type": "control_change",
+        "channel": 1,
+        "number": 11
       },
       "command": {
         "type": "toggle_track_recording",
@@ -1619,9 +1676,9 @@
     {
       "widgetId": "clear_t4",
       "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 87
+        "type": "control_change",
+        "channel": 1,
+        "number": 15
       },
       "command": {
         "type": "clear_track",
@@ -1635,26 +1692,35 @@
         "type": "set_track_volume",
         "index": 3
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 19
+      }
+    },
+    {
+      "widgetId": "vol_pan_t4",
+      "widgetEventType": "change",
+      "command": {
+        "type": "set_track_pan",
+        "index": 3
+      },
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 2,
+        "number": 19
+      }
     },
     {
       "widgetId": "resample_selected",
-      "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 90
-      },
       "command": {
         "type": "start_resample_selected_looper"
       }
     },
     {
       "widgetId": "resample_all",
-      "midi": {
-        "type": "note",
-        "channel": 0,
-        "number": 91
-      },
       "command": {
         "type": "start_resample_all_loopers"
       }
@@ -1662,9 +1728,9 @@
     {
       "widgetId": "reset_all",
       "midi": {
-        "type": "note",
+        "type": "control_change",
         "channel": 0,
-        "number": 92
+        "number": 33
       },
       "command": {
         "type": "reset_all"
@@ -1674,6 +1740,11 @@
       "widgetId": "transport_start",
       "command": {
         "type": "start_transport"
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 32
       }
     },
     {
@@ -1693,6 +1764,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 64
       }
     },
     {
@@ -1700,6 +1776,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 65
       }
     },
     {
@@ -1707,6 +1788,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 68
       }
     },
     {
@@ -1714,6 +1800,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 69
       }
     },
     {
@@ -1721,6 +1812,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 70
       }
     },
     {
@@ -1728,6 +1824,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 71
       }
     },
     {
@@ -1735,6 +1836,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 66
       }
     },
     {
@@ -1742,6 +1848,11 @@
       "command": {
         "type": "select_routing_source",
         "index": 8
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 67
       }
     },
     {
@@ -1749,6 +1860,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 88
       }
     },
     {
@@ -1756,6 +1872,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 89
       }
     },
     {
@@ -1763,6 +1884,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 90
       }
     },
     {
@@ -1770,6 +1896,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 91
       }
     },
     {
@@ -1777,6 +1908,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 92
       }
     },
     {
@@ -1784,6 +1920,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 96
       }
     },
     {
@@ -1791,6 +1932,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 97
       }
     },
     {
@@ -1798,6 +1944,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 98
       }
     },
     {
@@ -1805,6 +1956,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 8
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 99
       }
     },
     {
@@ -1812,6 +1968,11 @@
       "command": {
         "type": "select_center_fx_slot",
         "index": 9
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 100
       }
     },
     {
@@ -1819,6 +1980,11 @@
       "command": {
         "type": "select_center_fx_bank",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 93
       }
     },
     {
@@ -1826,6 +1992,11 @@
       "command": {
         "type": "select_center_fx_bank",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 94
       }
     },
     {
@@ -1833,6 +2004,11 @@
       "command": {
         "type": "select_center_fx_bank",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 95
       }
     },
     {
@@ -1840,6 +2016,11 @@
       "command": {
         "type": "select_center_fx_bank",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 101
       }
     },
     {
@@ -1847,6 +2028,11 @@
       "command": {
         "type": "select_center_fx_bank",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 102
       }
     },
     {
@@ -1856,7 +2042,12 @@
         "type": "set_center_fx_parameter",
         "index": 0
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 4
+      }
     },
     {
       "widgetId": "center_fx_lfo1_speed",
@@ -1865,7 +2056,12 @@
         "type": "set_center_fx_parameter",
         "index": 1
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 5
+      }
     },
     {
       "widgetId": "center_fx_lfo2_speed",
@@ -1874,7 +2070,12 @@
         "type": "set_center_fx_parameter",
         "index": 2
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 6
+      }
     },
     {
       "widgetId": "center_fx_drop",
@@ -1883,7 +2084,12 @@
         "type": "set_center_fx_parameter",
         "index": 3
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 7
+      }
     },
     {
       "widgetId": "center_fx_joystick_1",
@@ -1892,7 +2098,12 @@
         "type": "set_center_fx_joystick",
         "index": 0
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 7,
+        "number": 32
+      }
     },
     {
       "widgetId": "center_fx_joystick_2",
@@ -1901,7 +2112,12 @@
         "type": "set_center_fx_joystick",
         "index": 1
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 7,
+        "number": 34
+      }
     },
     {
       "widgetId": "remixer_freeze",
@@ -1966,7 +2182,12 @@
         "type": "set_master_parameter",
         "index": 0
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 8
+      }
     },
     {
       "widgetId": "master_pitch_shift",
@@ -1975,7 +2196,12 @@
         "type": "set_master_parameter",
         "index": 1
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 12
+      }
     },
     {
       "widgetId": "master_volume",
@@ -1984,7 +2210,12 @@
         "type": "set_master_parameter",
         "index": 2
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 10
+      }
     },
     {
       "widgetId": "master_pitch_dry_wet",
@@ -1993,7 +2224,12 @@
         "type": "set_master_parameter",
         "index": 3
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 14
+      }
     },
     {
       "widgetId": "master_output_volume",
@@ -2002,7 +2238,12 @@
         "type": "set_master_parameter",
         "index": 4
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 9
+      }
     },
     {
       "widgetId": "master_distortion",
@@ -2011,7 +2252,12 @@
         "type": "set_master_parameter",
         "index": 5
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 13
+      }
     },
     {
       "widgetId": "master_pan",
@@ -2020,7 +2266,12 @@
         "type": "set_master_parameter",
         "index": 6
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 11
+      }
     },
     {
       "widgetId": "master_distortion_dry_wet",
@@ -2029,13 +2280,23 @@
         "type": "set_master_parameter",
         "index": 7
       },
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 15
+      }
     },
     {
       "widgetId": "sampler_slot_1",
       "command": {
         "type": "trigger_sampler_slot",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 40
       }
     },
     {
@@ -2043,6 +2304,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 41
       }
     },
     {
@@ -2050,6 +2316,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 42
       }
     },
     {
@@ -2057,6 +2328,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 43
       }
     },
     {
@@ -2064,6 +2340,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 44
       }
     },
     {
@@ -2071,6 +2352,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 45
       }
     },
     {
@@ -2078,6 +2364,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 46
       }
     },
     {
@@ -2085,6 +2376,11 @@
       "command": {
         "type": "trigger_sampler_slot",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 47
       }
     },
     {
@@ -2092,6 +2388,11 @@
       "command": {
         "type": "toggle_track_selection",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 16
       }
     },
     {
@@ -2101,13 +2402,23 @@
         "index": 0
       },
       "widgetEventType": "change",
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 24
+      }
     },
     {
       "widgetId": "select_t2",
       "command": {
         "type": "toggle_track_selection",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 17
       }
     },
     {
@@ -2117,13 +2428,23 @@
         "index": 1
       },
       "widgetEventType": "change",
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 25
+      }
     },
     {
       "widgetId": "select_t3",
       "command": {
         "type": "toggle_track_selection",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 18
       }
     },
     {
@@ -2133,13 +2454,23 @@
         "index": 2
       },
       "widgetEventType": "change",
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 26
+      }
     },
     {
       "widgetId": "select_t4",
       "command": {
         "type": "toggle_track_selection",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 19
       }
     },
     {
@@ -2149,13 +2480,23 @@
         "index": 3
       },
       "widgetEventType": "change",
-      "useEventValue": true
+      "useEventValue": true,
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 27
+      }
     },
     {
       "widgetId": "top_grid_1",
       "command": {
         "type": "select_clock_division",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 36
       }
     },
     {
@@ -2163,6 +2504,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 37
       }
     },
     {
@@ -2170,6 +2516,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 38
       }
     },
     {
@@ -2177,6 +2528,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 39
       }
     },
     {
@@ -2184,6 +2540,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 40
       }
     },
     {
@@ -2191,6 +2552,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 41
       }
     },
     {
@@ -2198,6 +2564,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 42
       }
     },
     {
@@ -2205,6 +2576,11 @@
       "command": {
         "type": "select_clock_division",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 43
       }
     },
     {
@@ -2214,6 +2590,11 @@
       "command": {
         "type": "set_top_fx_parameter",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 0
       }
     },
     {
@@ -2223,6 +2604,11 @@
       "command": {
         "type": "set_top_fx_parameter",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 1
       }
     },
     {
@@ -2232,6 +2618,11 @@
       "command": {
         "type": "set_top_fx_parameter",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 2
       }
     },
     {
@@ -2241,6 +2632,11 @@
       "command": {
         "type": "set_top_fx_parameter",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 3
       }
     },
     {
@@ -2248,6 +2644,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 104
       }
     },
     {
@@ -2255,6 +2656,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 105
       }
     },
     {
@@ -2262,6 +2668,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 106
       }
     },
     {
@@ -2269,6 +2680,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 107
       }
     },
     {
@@ -2276,6 +2692,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 108
       }
     },
     {
@@ -2283,6 +2704,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 109
       }
     },
     {
@@ -2290,6 +2716,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 110
       }
     },
     {
@@ -2297,6 +2728,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 111
       }
     },
     {
@@ -2304,6 +2740,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 8
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 112
       }
     },
     {
@@ -2311,6 +2752,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 9
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 113
       }
     },
     {
@@ -2318,6 +2764,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 10
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 114
       }
     },
     {
@@ -2325,6 +2776,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 11
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 115
       }
     },
     {
@@ -2332,6 +2788,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 12
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 116
       }
     },
     {
@@ -2339,6 +2800,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 13
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 117
       }
     },
     {
@@ -2346,6 +2812,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 14
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 118
       }
     },
     {
@@ -2353,6 +2824,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 15
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 119
       }
     },
     {
@@ -2360,6 +2836,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 16
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 120
       }
     },
     {
@@ -2367,6 +2848,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 17
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 121
       }
     },
     {
@@ -2374,6 +2860,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 18
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 122
       }
     },
     {
@@ -2381,6 +2872,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 19
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 123
       }
     },
     {
@@ -2388,6 +2884,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 20
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 124
       }
     },
     {
@@ -2395,6 +2896,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 21
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 125
       }
     },
     {
@@ -2402,6 +2908,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 22
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 126
       }
     },
     {
@@ -2409,6 +2920,11 @@
       "command": {
         "type": "trigger_remixer_mode",
         "index": 23
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 127
       }
     },
     {
@@ -2416,6 +2932,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 20
       }
     },
     {
@@ -2423,6 +2944,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 21
       }
     },
     {
@@ -2430,6 +2956,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 22
       }
     },
     {
@@ -2437,6 +2968,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 23
       }
     },
     {
@@ -2444,6 +2980,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 24
       }
     },
     {
@@ -2451,6 +2992,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 25
       }
     },
     {
@@ -2458,6 +3004,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 26
       }
     },
     {
@@ -2465,6 +3016,11 @@
       "command": {
         "type": "trigger_animation_slot",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 1,
+        "number": 27
       }
     },
     {
@@ -2530,6 +3086,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 20
       }
     },
     {
@@ -2539,6 +3100,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 4
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 28
       }
     },
     {
@@ -2548,6 +3114,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 21
       }
     },
     {
@@ -2557,6 +3128,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 5
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 29
       }
     },
     {
@@ -2566,6 +3142,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 22
       }
     },
     {
@@ -2575,6 +3156,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 6
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 30
       }
     },
     {
@@ -2584,6 +3170,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 23
       }
     },
     {
@@ -2593,6 +3184,11 @@
       "command": {
         "type": "set_sidechain_parameter",
         "index": 7
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 31
       }
     },
     {
@@ -2614,6 +3210,11 @@
       "command": {
         "type": "toggle_track_mute",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 44
       }
     },
     {
@@ -2621,6 +3222,11 @@
       "command": {
         "type": "toggle_track_mute",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 45
       }
     },
     {
@@ -2628,6 +3234,11 @@
       "command": {
         "type": "toggle_track_mute",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 46
       }
     },
     {
@@ -2635,6 +3246,11 @@
       "command": {
         "type": "toggle_track_mute",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 47
       }
     },
     {
@@ -2642,6 +3258,11 @@
       "command": {
         "type": "toggle_looper_mute",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 52
       }
     },
     {
@@ -2649,6 +3270,11 @@
       "command": {
         "type": "toggle_looper_mute",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 53
       }
     },
     {
@@ -2656,6 +3282,11 @@
       "command": {
         "type": "toggle_looper_mute",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 54
       }
     },
     {
@@ -2663,6 +3294,11 @@
       "command": {
         "type": "toggle_looper_mute",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 55
       }
     },
     {
@@ -2670,6 +3306,11 @@
       "command": {
         "type": "toggle_track_invert",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 48
       }
     },
     {
@@ -2677,6 +3318,11 @@
       "command": {
         "type": "toggle_track_invert",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 49
       }
     },
     {
@@ -2684,6 +3330,11 @@
       "command": {
         "type": "toggle_track_invert",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 50
       }
     },
     {
@@ -2691,6 +3342,11 @@
       "command": {
         "type": "toggle_track_invert",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 51
       }
     },
     {
@@ -2698,6 +3354,11 @@
       "command": {
         "type": "toggle_looper_invert",
         "index": 0
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 56
       }
     },
     {
@@ -2705,6 +3366,11 @@
       "command": {
         "type": "toggle_looper_invert",
         "index": 1
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 57
       }
     },
     {
@@ -2712,6 +3378,11 @@
       "command": {
         "type": "toggle_looper_invert",
         "index": 2
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 58
       }
     },
     {
@@ -2719,6 +3390,11 @@
       "command": {
         "type": "toggle_looper_invert",
         "index": 3
+      },
+      "midi": {
+        "type": "control_change",
+        "channel": 0,
+        "number": 59
       }
     }
   ]

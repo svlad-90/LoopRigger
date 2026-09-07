@@ -128,3 +128,36 @@ profiles remain as fallback/reference data while the schema stabilizes.
 Device packages live under `devices/<device-id>/device.json`. A package points
 at its controller profile, control-surface layout, and optional `script.py`.
 The Python files are placeholders until the embedded script host is connected.
+
+## Yaeltex Mapping Sync
+
+Yaeltex `.ytx` exports are treated as hardware configuration snapshots. They
+know the physical digital, encoder, and analog controls, but they do not know
+LoopRigger command names. The bridge from physical controls to semantic
+commands lives in `tools/yaeltex_ytx_mapper.py`.
+
+Check the current profile against a Yaeltex export:
+
+```sh
+python3 tools/yaeltex_ytx_mapper.py check \
+  --ytx /path/to/LIVELOOPING.ytx \
+  --profile data/controller_profiles/yaeltex_livelooping.json
+```
+
+Import MIDI bindings from a `.ytx` export into the LoopRigger profile:
+
+```sh
+python3 tools/yaeltex_ytx_mapper.py import-profile \
+  --ytx /path/to/LIVELOOPING.ytx \
+  --profile data/controller_profiles/yaeltex_livelooping.json \
+  --output data/controller_profiles/yaeltex_livelooping.json
+```
+
+Export profile MIDI bindings back into a Yaeltex configuration:
+
+```sh
+python3 tools/yaeltex_ytx_mapper.py export-ytx \
+  --profile data/controller_profiles/yaeltex_livelooping.json \
+  --ytx /path/to/base/LIVELOOPING.ytx \
+  --output /path/to/generated/LIVELOOPING.ytx
+```

@@ -244,21 +244,27 @@ void testYaeltexMapping()
     expect(!mapper.profile().widgets.empty(), "Yaeltex profile should expose widgets");
     expect(mapper.profile().widgets.front().group == "looper_select", "Yaeltex widgets should carry layout groups");
 
-    const auto mappedLooper = mapper.mapMidi({MidiMessageType::Note, 0, 61, 127});
-    expect(mappedLooper.has_value(), "Yaeltex looper note should map to a command");
+    const auto mappedLooper = mapper.mapMidi({MidiMessageType::ControlChange, 0, 61, 127});
+    expect(mappedLooper.has_value(), "Yaeltex looper CC should map to a command");
     expect(mappedLooper->controller == ControllerId::Yaeltex, "Yaeltex command should carry Yaeltex controller id");
-    expect(mappedLooper->type == CommandType::SelectLooper, "Yaeltex looper note should select looper");
-    expect(mappedLooper->index == 1, "note 61 should map to looper 2");
+    expect(mappedLooper->type == CommandType::SelectLooper, "Yaeltex looper CC should select looper");
+    expect(mappedLooper->index == 1, "CC 61 should map to looper 2");
 
-    const auto mappedLength = mapper.mapMidi({MidiMessageType::Note, 0, 75, 127});
-    expect(mappedLength.has_value(), "Yaeltex sample length note should map to a command");
-    expect(mappedLength->type == CommandType::SelectSampleLength, "Yaeltex length note should select sample length");
-    expect(mappedLength->index == 8, "note 75 should map to 8 beats");
+    const auto mappedLength = mapper.mapMidi({MidiMessageType::ControlChange, 0, 75, 127});
+    expect(mappedLength.has_value(), "Yaeltex sample length CC should map to a command");
+    expect(mappedLength->type == CommandType::SelectSampleLength, "Yaeltex length CC should select sample length");
+    expect(mappedLength->index == 8, "CC 75 should map to 8 beats");
 
-    const auto mappedRecord = mapper.mapMidi({MidiMessageType::Note, 0, 80, 127});
-    expect(mappedRecord.has_value(), "Yaeltex record note should map to a command");
-    expect(mappedRecord->type == CommandType::ToggleTrackRecording, "Yaeltex record note should toggle recording");
-    expect(mappedRecord->index == 0, "note 80 should map to track 1");
+    const auto mappedRecord = mapper.mapMidi({MidiMessageType::ControlChange, 1, 8, 127});
+    expect(mappedRecord.has_value(), "Yaeltex record CC should map to a command");
+    expect(mappedRecord->type == CommandType::ToggleTrackRecording, "Yaeltex record CC should toggle recording");
+    expect(mappedRecord->index == 0, "CC 8 on channel 1 should map to track 1");
+
+    const auto mappedTrackPan = mapper.mapMidi({MidiMessageType::ControlChange, 2, 18, 64});
+    expect(mappedTrackPan.has_value(), "Yaeltex track pan CC should map to a command");
+    expect(mappedTrackPan->type == CommandType::SetTrackPan, "Yaeltex channel 2 Vol/Pan T3 should set track pan");
+    expect(mappedTrackPan->index == 2, "CC 18 on channel 2 should map to track 3 pan");
+    expect(mappedTrackPan->value > 0.5F && mappedTrackPan->value < 0.51F, "track pan CC value should normalize");
 
     const auto mappedPseudoKnob = mapper.mapWidget({"vol_pan_t3", WidgetEventType::Change, 0.25F});
     expect(mappedPseudoKnob.has_value(), "Yaeltex pseudo knob should map to a command");
@@ -266,17 +272,17 @@ void testYaeltexMapping()
     expect(mappedPseudoKnob->index == 2, "Vol/Pan T3 should target zero-based track 3");
     expect(mappedPseudoKnob->value == 0.25F, "pseudo knob value should pass through");
 
-    const auto mappedRoutingSource = mapper.mapWidget({"routing_mic", WidgetEventType::Press, 1.0F});
+    const auto mappedRoutingSource = mapper.mapMidi({MidiMessageType::ControlChange, 0, 64, 127});
     expect(mappedRoutingSource.has_value(), "Yaeltex routing widget should map to a command");
     expect(mappedRoutingSource->type == CommandType::SelectRoutingSource, "MIC should select routing source");
     expect(mappedRoutingSource->index == 0, "MIC should map to routing source index 0");
 
-    const auto mappedFxSlot = mapper.mapWidget({"center_fx_slot_5", WidgetEventType::Press, 1.0F});
+    const auto mappedFxSlot = mapper.mapMidi({MidiMessageType::ControlChange, 0, 92, 127});
     expect(mappedFxSlot.has_value(), "Yaeltex FX slot widget should map to a command");
     expect(mappedFxSlot->type == CommandType::SelectCenterFxSlot, "FX slot should select center FX slot");
     expect(mappedFxSlot->index == 4, "FX5 should map to zero-based slot 5");
 
-    const auto mappedSamplerSlot = mapper.mapWidget({"sampler_slot_7", WidgetEventType::Press, 1.0F});
+    const auto mappedSamplerSlot = mapper.mapMidi({MidiMessageType::ControlChange, 1, 46, 127});
     expect(mappedSamplerSlot.has_value(), "Yaeltex sampler widget should map to a command");
     expect(mappedSamplerSlot->type == CommandType::TriggerSamplerSlot, "sampler button should trigger sampler slot");
     expect(mappedSamplerSlot->index == 6, "sampler button 7 should map to zero-based slot 7");
@@ -317,11 +323,11 @@ void testYaeltexMapping()
     expect(mappedInvertLooper->type == CommandType::ToggleLooperInvert, "Inv L2 should toggle looper invert");
     expect(mappedInvertLooper->index == 1, "Inv L2 should map to zero-based looper 2");
 
-    const auto mappedTopFx = mapper.mapWidget({"top_reverb", WidgetEventType::Change, 0.7F});
+    const auto mappedTopFx = mapper.mapMidi({MidiMessageType::ControlChange, 0, 1, 89});
     expect(mappedTopFx.has_value(), "Yaeltex top FX knob should map to a command");
     expect(mappedTopFx->type == CommandType::SetTopFxParameter, "top Reverb should set top FX parameter");
     expect(mappedTopFx->index == 1, "top Reverb should map to zero-based top FX parameter 2");
-    expect(mappedTopFx->value == 0.7F, "top FX value should pass through");
+    expect(mappedTopFx->value > 0.7F && mappedTopFx->value < 0.71F, "top FX CC value should normalize");
 
     const auto mappedRemixerMode = mapper.mapWidget({"remixer_mode_24", WidgetEventType::Press, 1.0F});
     expect(mappedRemixerMode.has_value(), "Yaeltex remixer mode widget should map to a command");
@@ -826,52 +832,62 @@ void testJsonProfileLoading()
     expect(mappedSynthFxFader->value == 0.5F, "JSON synth fader should use event value");
 
     const MidiMapper yaeltexMapper(loadControllerProfileFromFile(profilePath("yaeltex_livelooping.json")));
-    const auto mappedLength = yaeltexMapper.mapMidi({MidiMessageType::Note, 0, 75, 127});
-    expect(mappedLength.has_value(), "JSON Yaeltex profile should map sample length note");
+    const auto mappedLength = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 75, 127});
+    expect(mappedLength.has_value(), "JSON Yaeltex profile should map sample length CC");
     expect(mappedLength->controller == ControllerId::Yaeltex, "JSON Yaeltex command should carry Yaeltex controller id");
     expect(mappedLength->type == CommandType::SelectSampleLength, "JSON Yaeltex length should select sample length");
-    expect(mappedLength->index == 8, "JSON Yaeltex note 75 should map to 8 beats");
+    expect(mappedLength->index == 8, "JSON Yaeltex CC 75 should map to 8 beats");
 
-    const auto mappedKnob = yaeltexMapper.mapWidget({"vol_pan_t3", WidgetEventType::Change, 0.42F});
+    const auto mappedRecord = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 1, 9, 127});
+    expect(mappedRecord.has_value(), "JSON Yaeltex profile should map track record CC");
+    expect(mappedRecord->type == CommandType::ToggleTrackRecording, "JSON Yaeltex record CC should toggle recording");
+    expect(mappedRecord->index == 1, "JSON Yaeltex CC 9 on channel 1 should map to track 2");
+
+    const auto mappedKnob = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 18, 53});
     expect(mappedKnob.has_value(), "JSON Yaeltex profile should map pseudo knob");
     expect(mappedKnob->type == CommandType::SetTrackVolume, "JSON Vol/Pan T3 should set track volume");
     expect(mappedKnob->index == 2, "JSON Vol/Pan T3 should target zero-based track 3");
-    expect(mappedKnob->value == 0.42F, "JSON pseudo knob value should pass through");
+    expect(mappedKnob->value > 0.41F && mappedKnob->value < 0.42F, "JSON track volume CC should normalize");
 
-    const auto mappedFxBank = yaeltexMapper.mapWidget({"center_fx_bank_3", WidgetEventType::Press, 1.0F});
+    const auto mappedPan = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 2, 18, 64});
+    expect(mappedPan.has_value(), "JSON Yaeltex profile should map Vol/Pan T3 channel 2");
+    expect(mappedPan->type == CommandType::SetTrackPan, "JSON Vol/Pan T3 channel 2 should set track pan");
+    expect(mappedPan->index == 2, "JSON Vol/Pan T3 channel 2 should target zero-based track 3");
+
+    const auto mappedFxBank = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 95, 127});
     expect(mappedFxBank.has_value(), "JSON Yaeltex profile should map center FX bank");
     expect(mappedFxBank->type == CommandType::SelectCenterFxBank, "JSON B3 should select center FX bank");
     expect(mappedFxBank->index == 2, "JSON B3 should map to zero-based bank 3");
 
-    const auto mappedMaster = yaeltexMapper.mapWidget({"master_output_volume", WidgetEventType::Change, 0.66F});
+    const auto mappedMaster = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 9, 84});
     expect(mappedMaster.has_value(), "JSON Yaeltex profile should map master output volume");
     expect(mappedMaster->type == CommandType::SetMasterParameter, "JSON master output should set master parameter");
     expect(mappedMaster->index == 4, "JSON output volume should map to master parameter 5");
-    expect(mappedMaster->value == 0.66F, "JSON master value should pass through");
+    expect(mappedMaster->value > 0.66F && mappedMaster->value < 0.67F, "JSON master CC value should normalize");
 
-    const auto mappedTrackSelect = yaeltexMapper.mapWidget({"select_t2", WidgetEventType::Press, 1.0F});
+    const auto mappedTrackSelect = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 1, 17, 127});
     expect(mappedTrackSelect.has_value(), "JSON Yaeltex profile should map track select");
     expect(mappedTrackSelect->type == CommandType::ToggleTrackSelection, "JSON Select T2 should toggle track selection");
     expect(mappedTrackSelect->index == 1, "JSON Select T2 should target zero-based track 2");
 
-    const auto mappedLooperVolume = yaeltexMapper.mapWidget({"vol_pan_l1", WidgetEventType::Change, 0.2F});
+    const auto mappedLooperVolume = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 24, 25});
     expect(mappedLooperVolume.has_value(), "JSON Yaeltex profile should map looper volume");
     expect(mappedLooperVolume->type == CommandType::SetLooperVolume, "JSON Vol/Pan L1 should set looper volume");
     expect(mappedLooperVolume->index == 0, "JSON Vol/Pan L1 should target zero-based looper 1");
-    expect(mappedLooperVolume->value == 0.2F, "JSON looper volume should pass through widget value");
+    expect(mappedLooperVolume->value > 0.19F && mappedLooperVolume->value < 0.2F, "JSON looper volume CC should normalize");
 
-    const auto mappedClockDivision = yaeltexMapper.mapWidget({"top_grid_8", WidgetEventType::Press, 1.0F});
+    const auto mappedClockDivision = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 43, 127});
     expect(mappedClockDivision.has_value(), "JSON Yaeltex profile should map clock division");
     expect(mappedClockDivision->type == CommandType::SelectClockDivision, "JSON top_grid_8 should select clock division");
     expect(mappedClockDivision->index == 7, "JSON top_grid_8 should map to zero-based clock division 8");
 
-    const auto mappedSidechain = yaeltexMapper.mapWidget({"sidechain_stash_t2", WidgetEventType::Change, 0.55F});
+    const auto mappedSidechain = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 21, 70});
     expect(mappedSidechain.has_value(), "JSON Yaeltex profile should map sidechain knob");
     expect(mappedSidechain->type == CommandType::SetSidechainParameter, "JSON sidechain knob should set sidechain parameter");
     expect(mappedSidechain->index == 1, "JSON sidechain_stash_t2 should map to zero-based sidechain parameter 2");
-    expect(mappedSidechain->value == 0.55F, "JSON sidechain value should pass through");
+    expect(mappedSidechain->value > 0.55F && mappedSidechain->value < 0.56F, "JSON sidechain CC value should normalize");
 
-    const auto mappedMute = yaeltexMapper.mapWidget({"mute_15", WidgetEventType::Press, 1.0F});
+    const auto mappedMute = yaeltexMapper.mapMidi({MidiMessageType::ControlChange, 0, 58, 127});
     expect(mappedMute.has_value(), "JSON Yaeltex profile should map Inv L3");
     expect(mappedMute->type == CommandType::ToggleLooperInvert, "JSON Inv L3 should toggle looper invert");
     expect(mappedMute->index == 2, "JSON Inv L3 should target zero-based looper 3");

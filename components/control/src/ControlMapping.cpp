@@ -275,7 +275,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         profile.widgets.push_back(button("looper_" + std::to_string(looper + 1), "Looper " + std::to_string(looper + 1), "looper_select", 0, looper));
         profile.bindings.push_back(midiBinding(
             "looper_" + std::to_string(looper + 1),
-            MidiMessageType::Note,
+            MidiMessageType::ControlChange,
             0,
             60 + looper,
             CommandType::SelectLooper,
@@ -287,7 +287,7 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         profile.widgets.push_back(button("sample_length_" + std::to_string(lengths[i]), std::to_string(lengths[i]), "sample_length", i / 4, i % 4));
         profile.bindings.push_back(midiBinding(
             "sample_length_" + std::to_string(lengths[i]),
-            MidiMessageType::Note,
+            MidiMessageType::ControlChange,
             0,
             72 + i,
             CommandType::SelectSampleLength,
@@ -297,7 +297,13 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
     const char* clockDivisionLabels[] = {"4", "2", "1", "1/2", "1/4", "1/8", "1/16", "1/32"};
     for (int i = 0; i < 8; ++i) {
         profile.widgets.push_back(button("top_grid_" + std::to_string(i + 1), clockDivisionLabels[i], "clock_division", i / 4, i % 4));
-        profile.bindings.push_back(widgetBinding("top_grid_" + std::to_string(i + 1), CommandType::SelectClockDivision, i));
+        profile.bindings.push_back(midiBinding(
+            "top_grid_" + std::to_string(i + 1),
+            MidiMessageType::ControlChange,
+            0,
+            36 + i,
+            CommandType::SelectClockDivision,
+            i));
     }
 
     for (int i = 0; i < 16; ++i) {
@@ -311,81 +317,90 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
             ? (isLooperTarget ? CommandType::ToggleLooperInvert : CommandType::ToggleTrackInvert)
             : (isLooperTarget ? CommandType::ToggleLooperMute : CommandType::ToggleTrackMute);
         profile.widgets.push_back(button(widgetId, label, "mute_invert", i / 8, local));
-        profile.bindings.push_back(widgetBinding(widgetId, commandType, index));
+        const auto midiNumber = isInvert
+            ? (isLooperTarget ? 56 + index : 48 + index)
+            : (isLooperTarget ? 52 + index : 44 + index);
+        profile.bindings.push_back(midiBinding(widgetId, MidiMessageType::ControlChange, 0, midiNumber, commandType, index));
     }
 
     for (int track = 0; track < 4; ++track) {
         profile.widgets.push_back(button("record_t" + std::to_string(track + 1), "Record T" + std::to_string(track + 1), "track_record", 0, track));
         profile.bindings.push_back(midiBinding(
             "record_t" + std::to_string(track + 1),
-            MidiMessageType::Note,
-            0,
-            80 + track,
+            MidiMessageType::ControlChange,
+            1,
+            8 + track,
             CommandType::ToggleTrackRecording,
             track));
 
         profile.widgets.push_back(button("clear_t" + std::to_string(track + 1), "Clear T" + std::to_string(track + 1), "track_clear", 0, track));
         profile.bindings.push_back(midiBinding(
             "clear_t" + std::to_string(track + 1),
-            MidiMessageType::Note,
-            0,
-            84 + track,
+            MidiMessageType::ControlChange,
+            1,
+            12 + track,
             CommandType::ClearTrack,
             track));
 
         profile.widgets.push_back(knob("vol_pan_t" + std::to_string(track + 1), "Vol/Pan T" + std::to_string(track + 1), "track_volume_pan", 0, track));
-        profile.bindings.push_back(widgetBinding(
+        profile.bindings.push_back(midiBinding(
             "vol_pan_t" + std::to_string(track + 1),
+            MidiMessageType::ControlChange,
+            0,
+            16 + track,
             CommandType::SetTrackVolume,
             track,
-            0.0F,
+            InputTarget::Mic,
+            true));
+        profile.bindings.push_back(midiBinding(
+            "vol_pan_t" + std::to_string(track + 1),
+            MidiMessageType::ControlChange,
+            2,
+            16 + track,
+            CommandType::SetTrackPan,
+            track,
             InputTarget::Mic,
             true));
 
         profile.widgets.push_back(button("select_t" + std::to_string(track + 1), "Select T" + std::to_string(track + 1), "track_select", 0, track));
-        profile.bindings.push_back(widgetBinding(
+        profile.bindings.push_back(midiBinding(
             "select_t" + std::to_string(track + 1),
+            MidiMessageType::ControlChange,
+            1,
+            16 + track,
             CommandType::ToggleTrackSelection,
             track));
     }
 
     for (int looper = 0; looper < 4; ++looper) {
         profile.widgets.push_back(knob("vol_pan_l" + std::to_string(looper + 1), "Vol/Pan L" + std::to_string(looper + 1), "looper_volume_pan", 0, looper));
-        profile.bindings.push_back(widgetBinding(
+        profile.bindings.push_back(midiBinding(
             "vol_pan_l" + std::to_string(looper + 1),
+            MidiMessageType::ControlChange,
+            0,
+            24 + looper,
             CommandType::SetLooperVolume,
             looper,
-            0.0F,
             InputTarget::Mic,
             true));
     }
 
     profile.widgets.push_back(button("resample_selected", "Resample L", "resampling", 0, 0));
-    profile.bindings.push_back(midiBinding(
-        "resample_selected",
-        MidiMessageType::Note,
-        0,
-        90,
-        CommandType::StartResampleSelectedLooper));
+    profile.bindings.push_back(widgetBinding("resample_selected", CommandType::StartResampleSelectedLooper));
 
     profile.widgets.push_back(button("resample_all", "Resample all", "resampling", 0, 1));
-    profile.bindings.push_back(midiBinding(
-        "resample_all",
-        MidiMessageType::Note,
-        0,
-        91,
-        CommandType::StartResampleAllLoopers));
+    profile.bindings.push_back(widgetBinding("resample_all", CommandType::StartResampleAllLoopers));
 
     profile.widgets.push_back(button("reset_all", "Clear", "session", 0, 1));
     profile.bindings.push_back(midiBinding(
         "reset_all",
-        MidiMessageType::Note,
+        MidiMessageType::ControlChange,
         0,
-        92,
+        33,
         CommandType::ResetAll));
 
     profile.widgets.push_back(button("transport_start", "Start", "session", 0, 0));
-    profile.bindings.push_back(widgetBinding("transport_start", CommandType::StartTransport));
+    profile.bindings.push_back(midiBinding("transport_start", MidiMessageType::ControlChange, 0, 32, CommandType::StartTransport));
 
     profile.widgets.push_back(button("transport_stop", "Stop", "session", 0, 2));
     profile.bindings.push_back(widgetBinding("transport_stop", CommandType::StopTransport));
@@ -414,38 +429,83 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         "RECORD",
     };
     const int routingSourceIndexes[] = {0, 1, 3, 4, 5, 6, 7, 8};
+    const int routingSourceMidiNumbers[] = {64, 65, 68, 69, 70, 71, 66, 67};
     for (int i = 0; i < 8; ++i) {
         profile.widgets.push_back(button(routingSourceIds[i], routingSourceLabels[i], "routing_source", i / 4, i % 4));
-        profile.bindings.push_back(widgetBinding(routingSourceIds[i], CommandType::SelectRoutingSource, routingSourceIndexes[i]));
+        profile.bindings.push_back(midiBinding(
+            routingSourceIds[i],
+            MidiMessageType::ControlChange,
+            0,
+            routingSourceMidiNumbers[i],
+            CommandType::SelectRoutingSource,
+            routingSourceIndexes[i]));
     }
 
     for (int slot = 0; slot < 10; ++slot) {
         profile.widgets.push_back(button("center_fx_slot_" + std::to_string(slot + 1), "FX" + std::to_string(slot + 1), "center_fx_slot", slot / 5, slot % 5));
-        profile.bindings.push_back(widgetBinding("center_fx_slot_" + std::to_string(slot + 1), CommandType::SelectCenterFxSlot, slot));
+        const auto midiNumber = slot < 5 ? 88 + slot : 96 + (slot - 5);
+        profile.bindings.push_back(midiBinding(
+            "center_fx_slot_" + std::to_string(slot + 1),
+            MidiMessageType::ControlChange,
+            0,
+            midiNumber,
+            CommandType::SelectCenterFxSlot,
+            slot));
     }
 
     for (int bank = 0; bank < 5; ++bank) {
         profile.widgets.push_back(button("center_fx_bank_" + std::to_string(bank + 1), "B" + std::to_string(bank + 1), "center_fx_bank", bank / 3, bank % 3));
-        profile.bindings.push_back(widgetBinding("center_fx_bank_" + std::to_string(bank + 1), CommandType::SelectCenterFxBank, bank));
+        const auto midiNumber = bank < 3 ? 93 + bank : 101 + (bank - 3);
+        profile.bindings.push_back(midiBinding(
+            "center_fx_bank_" + std::to_string(bank + 1),
+            MidiMessageType::ControlChange,
+            0,
+            midiNumber,
+            CommandType::SelectCenterFxBank,
+            bank));
     }
 
     const char* centerFxParameterIds[] = {"center_fx_dry_wet", "center_fx_lfo1_speed", "center_fx_lfo2_speed", "center_fx_drop"};
     const char* centerFxParameterLabels[] = {"Dry/Wet", "LFO1 Speed", "LFO2 Speed", "Drop FX"};
     for (int parameter = 0; parameter < 4; ++parameter) {
         profile.widgets.push_back(knob(centerFxParameterIds[parameter], centerFxParameterLabels[parameter], "center_fx_parameter", 0, parameter));
-        profile.bindings.push_back(widgetBinding(centerFxParameterIds[parameter], CommandType::SetCenterFxParameter, parameter, 0.0F, InputTarget::Mic, true));
+        profile.bindings.push_back(midiBinding(
+            centerFxParameterIds[parameter],
+            MidiMessageType::ControlChange,
+            0,
+            4 + parameter,
+            CommandType::SetCenterFxParameter,
+            parameter,
+            InputTarget::Mic,
+            true));
     }
 
     const char* topFxParameterIds[] = {"top_vol_drop", "top_reverb", "top_transpose", "top_phaser"};
     const char* topFxParameterLabels[] = {"Vol/Drop", "Reverb", "Transpose", "Phaser"};
     for (int parameter = 0; parameter < 4; ++parameter) {
         profile.widgets.push_back(knob(topFxParameterIds[parameter], topFxParameterLabels[parameter], "top_fx_parameter", 0, parameter));
-        profile.bindings.push_back(widgetBinding(topFxParameterIds[parameter], CommandType::SetTopFxParameter, parameter, 0.0F, InputTarget::Mic, true));
+        profile.bindings.push_back(midiBinding(
+            topFxParameterIds[parameter],
+            MidiMessageType::ControlChange,
+            0,
+            parameter,
+            CommandType::SetTopFxParameter,
+            parameter,
+            InputTarget::Mic,
+            true));
     }
 
     for (int joystick = 0; joystick < 2; ++joystick) {
         profile.widgets.push_back(widget("center_fx_joystick_" + std::to_string(joystick + 1), "Value " + std::to_string(joystick + 1), WidgetType::Joystick, "center_fx_joystick", 0, joystick, 2, 2));
-        profile.bindings.push_back(widgetBinding("center_fx_joystick_" + std::to_string(joystick + 1), CommandType::SetCenterFxJoystick, joystick, 0.0F, InputTarget::Mic, true));
+        profile.bindings.push_back(midiBinding(
+            "center_fx_joystick_" + std::to_string(joystick + 1),
+            MidiMessageType::ControlChange,
+            7,
+            32 + (joystick * 2),
+            CommandType::SetCenterFxJoystick,
+            joystick,
+            InputTarget::Mic,
+            true));
     }
 
     const char* remixerMacroIds[] = {
@@ -492,12 +552,24 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
     };
     for (int mode = 0; mode < kRemixerModes; ++mode) {
         profile.widgets.push_back(button("remixer_mode_" + std::to_string(mode + 1), remixerModeLabels[mode], "remixer_mode", mode / 4, mode % 4));
-        profile.bindings.push_back(widgetBinding("remixer_mode_" + std::to_string(mode + 1), CommandType::TriggerRemixerMode, mode));
+        profile.bindings.push_back(midiBinding(
+            "remixer_mode_" + std::to_string(mode + 1),
+            MidiMessageType::ControlChange,
+            0,
+            104 + mode,
+            CommandType::TriggerRemixerMode,
+            mode));
     }
 
     for (int slot = 0; slot < 8; ++slot) {
         profile.widgets.push_back(button("animation_" + std::to_string(slot + 1), "Ani. " + std::to_string(slot + 1), "animation_slot", 0, slot));
-        profile.bindings.push_back(widgetBinding("animation_" + std::to_string(slot + 1), CommandType::TriggerAnimationSlot, slot));
+        profile.bindings.push_back(midiBinding(
+            "animation_" + std::to_string(slot + 1),
+            MidiMessageType::ControlChange,
+            1,
+            20 + slot,
+            CommandType::TriggerAnimationSlot,
+            slot));
     }
 
     const char* presetSlotIds[] = {"preset_on_off", "preset_default", "preset_pr1", "preset_pr2", "preset_pr3", "preset_pr4", "preset_pr5", "preset_pr6"};
@@ -509,20 +581,24 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
 
     for (int track = 0; track < 4; ++track) {
         profile.widgets.push_back(knob("sidechain_stash_t" + std::to_string(track + 1), "Sidechain Vol/Stash T" + std::to_string(track + 1), "sidechain_parameter", 0, track));
-        profile.bindings.push_back(widgetBinding(
+        profile.bindings.push_back(midiBinding(
             "sidechain_stash_t" + std::to_string(track + 1),
+            MidiMessageType::ControlChange,
+            0,
+            20 + track,
             CommandType::SetSidechainParameter,
             track,
-            0.0F,
             InputTarget::Mic,
             true));
 
         profile.widgets.push_back(knob("sidechain_decay_t" + std::to_string(track + 1), "Sidechain Dec/Ten T" + std::to_string(track + 1), "sidechain_parameter", 1, track));
-        profile.bindings.push_back(widgetBinding(
+        profile.bindings.push_back(midiBinding(
             "sidechain_decay_t" + std::to_string(track + 1),
+            MidiMessageType::ControlChange,
+            0,
+            28 + track,
             CommandType::SetSidechainParameter,
             4 + track,
-            0.0F,
             InputTarget::Mic,
             true));
     }
@@ -553,14 +629,29 @@ ControllerProfile makeYaeltexLiveLoopingProfile()
         "Pan",
         "Dist dry/wet",
     };
+    const int masterParameterMidiNumbers[] = {8, 12, 10, 14, 9, 13, 11, 15};
     for (int parameter = 0; parameter < 8; ++parameter) {
         profile.widgets.push_back(knob(masterParameterIds[parameter], masterParameterLabels[parameter], "master_parameter", parameter / 2, parameter % 2));
-        profile.bindings.push_back(widgetBinding(masterParameterIds[parameter], CommandType::SetMasterParameter, parameter, 0.0F, InputTarget::Mic, true));
+        profile.bindings.push_back(midiBinding(
+            masterParameterIds[parameter],
+            MidiMessageType::ControlChange,
+            0,
+            masterParameterMidiNumbers[parameter],
+            CommandType::SetMasterParameter,
+            parameter,
+            InputTarget::Mic,
+            true));
     }
 
     for (int slot = 0; slot < 8; ++slot) {
         profile.widgets.push_back(button("sampler_slot_" + std::to_string(slot + 1), std::to_string(slot + 1), "sampler", slot / 4, slot % 4));
-        profile.bindings.push_back(widgetBinding("sampler_slot_" + std::to_string(slot + 1), CommandType::TriggerSamplerSlot, slot));
+        profile.bindings.push_back(midiBinding(
+            "sampler_slot_" + std::to_string(slot + 1),
+            MidiMessageType::ControlChange,
+            1,
+            40 + slot,
+            CommandType::TriggerSamplerSlot,
+            slot));
     }
 
     assignController(profile);
