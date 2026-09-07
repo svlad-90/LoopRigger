@@ -124,12 +124,18 @@ target_include_directories(livelooping_plugin_host
 target_compile_features(livelooping_plugin_host PUBLIC cxx_std_17)
 
 add_library(livelooping_audio
+    components/audio/src/AudioHost.cpp
     components/audio/src/OfflineProcessing.cpp
 )
 
 target_include_directories(livelooping_audio
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/components/audio/api
+)
+
+target_link_libraries(livelooping_audio
+    PUBLIC
+        livelooping_core
 )
 
 target_compile_features(livelooping_audio PUBLIC cxx_std_17)
