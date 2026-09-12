@@ -141,6 +141,7 @@ int main(int argc, char** argv)
                   << report.outputChannels << "\t"
                   << report.parameterCount << "\t"
                   << report.programCount << "\t"
+                  << report.latencySamples << "\t"
                   << printable(report.plugin.path) << "\t"
                   << printable(report.errorMessage) << "\n";
     }

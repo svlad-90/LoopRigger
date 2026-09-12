@@ -35,9 +35,9 @@
       "variant": "brand",
       "label": "LIVELOOPING",
       "bounds": {
-        "x": 105,
+        "x": 96,
         "y": 82,
-        "width": 310,
+        "width": 390,
         "height": 42
       }
     },
@@ -48,9 +48,9 @@
       "variant": "brand_sub",
       "label": "YAELTEX",
       "bounds": {
-        "x": 108,
+        "x": 100,
         "y": 122,
-        "width": 150,
+        "width": 180,
         "height": 24
       }
     },
@@ -1056,10 +1056,10 @@
       "widgetId": "center_fx_joystick_1",
       "group": "center_fx_joystick",
       "bounds": {
-        "x": 564,
-        "y": 612,
-        "width": 110,
-        "height": 110
+        "x": 548,
+        "y": 576,
+        "width": 140,
+        "height": 140
       }
     },
     {
@@ -1071,10 +1071,10 @@
       "widgetId": "center_fx_joystick_2",
       "group": "center_fx_joystick",
       "bounds": {
-        "x": 764,
-        "y": 612,
-        "width": 110,
-        "height": 110
+        "x": 748,
+        "y": 576,
+        "width": 140,
+        "height": 140
       }
     },
     {

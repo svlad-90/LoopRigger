@@ -125,6 +125,9 @@ target_compile_features(livelooping_plugin_host PUBLIC cxx_std_17)
 
 add_library(livelooping_audio
     components/audio/src/AudioHost.cpp
+    components/audio/src/HostGraphProcessor.cpp
+    components/audio/src/HostGraphRuntime.cpp
+    components/audio/src/HostGraphSpec.cpp
     components/audio/src/OfflineProcessing.cpp
 )
 
@@ -315,6 +318,12 @@ if(LIVELOOPING_BUILD_PROFILE_IO)
     target_compile_definitions(livelooping_sim_cli PRIVATE LIVELOOPING_HAS_PROFILE_IO=1)
 endif()
 
+add_executable(livelooping_audio_render_cli
+    apps/audio_render_cli/main.cpp
+)
+
+target_link_libraries(livelooping_audio_render_cli PRIVATE livelooping_audio)
+
 include(CTest)
 
 if(BUILD_TESTING)
@@ -390,6 +399,11 @@ if(BUILD_TESTING)
 
     add_test(NAME livelooping_audio_unit_tests COMMAND livelooping_audio_unit_tests)
 
+    add_test(
+        NAME livelooping_audio_render_cli_smoke
+        COMMAND livelooping_audio_render_cli --seconds 0.25 "${CMAKE_CURRENT_BINARY_DIR}/audio-render-smoke.wav"
+    )
+
     if(LIVELOOPING_BUILD_JUCE_PLUGIN_HOST)
         add_executable(livelooping_juce_plugin_host_unit_tests
             components/plugin_host/tests/unit_tests/juce_plugin_scanner_tests.cpp
@@ -426,8 +440,10 @@ if(LIVELOOPING_BUILD_JUCE_APP)
 
     target_link_libraries(livelooping_product
         PRIVATE
+            livelooping_audio
             livelooping_core
             livelooping_control
+            juce::juce_audio_utils
             juce::juce_gui_extra
     )
 

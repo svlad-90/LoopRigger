@@ -47,9 +47,9 @@
       "variant": "brand",
       "label": "KORG",
       "bounds": {
-        "x": 252,
+        "x": 236,
         "y": 88,
-        "width": 160,
+        "width": 190,
         "height": 44
       }
     },
@@ -60,9 +60,9 @@
       "variant": "brand_sub",
       "label": "KAOSS PAD",
       "bounds": {
-        "x": 446,
+        "x": 420,
         "y": 90,
-        "width": 230,
+        "width": 300,
         "height": 42
       }
     },
@@ -73,9 +73,9 @@
       "variant": "brand_sub",
       "label": "KP3+",
       "bounds": {
-        "x": 840,
+        "x": 808,
         "y": 94,
-        "width": 110,
+        "width": 150,
         "height": 34
       }
     },
@@ -634,9 +634,9 @@
       "shape": "fader",
       "variant": "interactive_fader",
       "bounds": {
-        "x": 94,
+        "x": 86,
         "y": 410,
-        "width": 24,
+        "width": 34,
         "height": 168
       },
       "widgetId": "input_volume_fader",
@@ -650,7 +650,7 @@
       "bounds": {
         "x": 136,
         "y": 410,
-        "width": 24,
+        "width": 34,
         "height": 168
       },
       "widgetId": "fx_level_fader",

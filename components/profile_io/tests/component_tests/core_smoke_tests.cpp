@@ -914,7 +914,7 @@ void testJsonSurfaceLayoutLoading()
     for (int index = 1; index <= 8; ++index) {
         expectLayoutWidgetShape(kaossLayout, "fx_parameter_" + std::to_string(index), loop_rigger::profile_io::SurfaceElementShape::Fader);
     }
-    expectGroupGeometry(kaossLayout, "levels", 4, 76.0F, 100.0F, 84.0F, 478.0F);
+    expectGroupGeometry(kaossLayout, "levels", 4, 76.0F, 100.0F, 94.0F, 478.0F);
     expectGroupGeometry(kaossLayout, "pages", 4, 342.0F, 712.0F, 542.0F, 46.0F);
     expectGroupGeometry(kaossLayout, "presets", 8, 322.0F, 247.0F, 628.0F, 44.0F);
 
@@ -934,7 +934,7 @@ void testJsonSurfaceLayoutLoading()
     expectGroupedWidgetsDoNotOverlap(yaeltexLayout);
     expectWidgetGroupsDoNotOverlap(yaeltexLayout);
     expectGroupGeometry(yaeltexLayout, "center_fx_bank", 5, 826.0F, 440.0F, 156.0F, 80.0F);
-    expectGroupGeometry(yaeltexLayout, "center_fx_joystick", 2, 564.0F, 612.0F, 310.0F, 110.0F);
+    expectGroupGeometry(yaeltexLayout, "center_fx_joystick", 2, 548.0F, 576.0F, 340.0F, 140.0F);
     expectGroupGeometry(yaeltexLayout, "center_fx_parameter", 4, 558.0F, 326.0F, 400.0F, 86.0F);
     expectGroupGeometry(yaeltexLayout, "clock_division", 8, 1051.0F, 76.0F, 372.0F, 80.0F);
     expectGroupGeometry(yaeltexLayout, "looper_select", 4, 112.0F, 360.0F, 376.0F, 64.0F);

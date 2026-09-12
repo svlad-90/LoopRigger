@@ -25,6 +25,7 @@ struct PluginProbeReport {
     int outputChannels = 0;
     int parameterCount = 0;
     int programCount = 0;
+    int latencySamples = 0;
 };
 
 struct PluginProbeResult {

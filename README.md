@@ -87,6 +87,33 @@ cmake -S . -B build-juce -DLIVELOOPING_BUILD_JUCE_APP=ON
 cmake --build build-juce --target livelooping_product
 ```
 
+On Windows, build the JUCE product from PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-windows-juce.ps1
+```
+
+The script expects CMake and Visual Studio 2022 with the C++ desktop workload.
+It builds and tests the app in `build-windows-juce` and prints the generated
+`LiveLooping.exe` path, usually:
+
+```text
+build-windows-juce\livelooping_product_artefacts\Release\LiveLooping.exe
+```
+
+For a quick product-only rebuild without tests:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-windows-juce.ps1 -SkipTests
+```
+
+When building from a Visual Studio Developer PowerShell with Ninja installed,
+the same script can use Ninja:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-windows-juce.ps1 -Generator Ninja
+```
+
 Use a local JUCE checkout instead of network fetches when needed:
 
 ```sh

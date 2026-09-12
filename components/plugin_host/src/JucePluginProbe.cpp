@@ -169,6 +169,7 @@ private:
         report.outputChannels = instance->getTotalNumOutputChannels();
         report.parameterCount = instance->getParameters().size();
         report.programCount = instance->getNumPrograms();
+        report.latencySamples = instance->getLatencySamples();
         result.reports.push_back(std::move(report));
     }
 
